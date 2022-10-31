@@ -41,32 +41,42 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
         playerFleet: CampaignFleetAPI,
         playerLocation: LocationAPI,
         playerCoordinates: Vector2f) {
+        
+        val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet()
+        val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin> = HashSet()
+        val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
+        val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
+        
+        for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
+            val terrainPlugin = terrain.plugin
+                if (terrainPlugin.containsEntity(playerFleet)) {
+                if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
+                if (terrainPlugin is SlipstreamTerrainPlugin) slipstreamPlugins += terrainPlugin
+                if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
+                if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
+            }
+        }
 
-        addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates)
-        addMagneticFieldScripts(engine, playerFleet, playerLocation)
-        addPulsarBeamScripts(engine, playerFleet, playerLocation, playerCoordinates)
-        addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates)
-        addNebulaScripts(engine, playerFleet, playerLocation, playerCoordinates)
-        addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates)
+        addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
+        addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, slipstreamPlugins)
+        addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
+        addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
     }
 
-    private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f) {
+    private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin>) {
 
     }
 
-    private fun addNebulaScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f) {
+    private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
 
     }
 
-    private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f) {
+    private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin>) {
 
     }
 
-    private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f) {
-
-    }
-
-    private fun addMagneticFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI) {
+    private fun addMagneticFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin>) {
+        if (!MAG_FIELD_EFFECT_ENABLED) return
 
         var isStorm = false
         var visionMod = 1f
@@ -76,29 +86,20 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
         var missileBreakLockBaseChance = 0f
         var canAddPlugin = false
         val magneticFields: MutableSet<CampaignTerrainPlugin> = HashSet()
-        for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
-            val plugin = terrain.plugin
-            if (plugin is MagneticFieldTerrainPlugin) {
-                if (!plugin.containsEntity(playerFleet)) continue
-                val isInFlare = (plugin.terrainName == "Magnetic Storm")
-                if (isInFlare) isStorm = true
+        for (plugin: MagneticFieldTerrainPlugin in magneticFieldPlugins) {
+            val isInFlare = (plugin.terrainName == "Magnetic Storm")
+            if (isInFlare) isStorm = true
 
-                visionMod *= if (isInFlare) 0.3f else 0.7f
-                missileMod *= if (isInFlare) 0.1f else 0.7f
-                rangeMod *= if (isInFlare) 0.28f else 0.6f
-                eccmChanceMod *= if (isInFlare) 0.2f else 0.7f
-                missileBreakLockBaseChance += if (isInFlare) 0.7f else 0.2f
-                canAddPlugin = true
-                magneticFields += plugin
-            }
+            visionMod *= if (isInFlare) 0.3f else 0.7f
+            missileMod *= if (isInFlare) 0.1f else 0.7f
+            rangeMod *= if (isInFlare) 0.28f else 0.7f
+            eccmChanceMod *= if (isInFlare) 0.2f else 0.7f
+            missileBreakLockBaseChance += if (isInFlare) 0.7f else 0.2f
+            canAddPlugin = true
+            magneticFields += plugin
         }
         if (canAddPlugin) {
             missileBreakLockBaseChance = missileBreakLockBaseChance.coerceAtMost(1f)
-            if (isStorm) {
-                Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, 0.1f)
-            } else {
-                Global.getSoundPlayer().playUILoop("terrain_magfield", 1f, 0.1f)
-            }
             engine.addPlugin(magneticFieldEffect(
                 isStorm,
                 visionMod,
@@ -106,21 +107,6 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
                 rangeMod,
                 eccmChanceMod,
                 missileBreakLockBaseChance))
-        }
-    }
-
-    private fun addPulsarBeamScripts(
-        engine: CombatEngineAPI,
-        playerFleet: CampaignFleetAPI,
-        playerLocation: LocationAPI,
-        playerCoordinates: Vector2f) {
-        for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
-            val plugin = terrain.plugin
-            if (plugin is PulsarBeamTerrainPlugin) {
-                if (!plugin.containsEntity(playerFleet)) continue
-                val intensity = plugin.getIntensityAtPoint(playerCoordinates)
-
-            }
         }
     }
 }
