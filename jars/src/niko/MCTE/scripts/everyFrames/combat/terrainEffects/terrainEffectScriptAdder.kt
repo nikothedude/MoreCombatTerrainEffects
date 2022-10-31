@@ -85,7 +85,6 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
         var eccmChanceMod = 1f
         var missileBreakLockBaseChance = 0f
         var canAddPlugin = false
-        val magneticFields: MutableSet<CampaignTerrainPlugin> = HashSet()
         for (plugin: MagneticFieldTerrainPlugin in magneticFieldPlugins) {
             val isInFlare = (plugin.terrainName == "Magnetic Storm")
             if (isInFlare) isStorm = true
@@ -96,7 +95,6 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
             eccmChanceMod *= if (isInFlare) 0.2f else 0.7f
             missileBreakLockBaseChance += if (isInFlare) 0.7f else 0.2f
             canAddPlugin = true
-            magneticFields += plugin
         }
         if (canAddPlugin) {
             missileBreakLockBaseChance = missileBreakLockBaseChance.coerceAtMost(1f)
