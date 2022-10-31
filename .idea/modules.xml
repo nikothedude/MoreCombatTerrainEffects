@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/starsector-intellij-template.iml" filepath="$PROJECT_DIR$/starsector-intellij-template.iml" />
+      <module fileurl="file://$PROJECT_DIR$/niko_MCPE.iml" filepath="$PROJECT_DIR$/niko_MCPE.iml" />
     </modules>
   </component>
 </project>

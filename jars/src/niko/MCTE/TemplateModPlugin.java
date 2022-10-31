@@ -4,7 +4,7 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 
 public class TemplateModPlugin extends BaseModPlugin {
-    @Override
+   /* @Override
     public void onApplicationLoad() throws Exception {
         super.onApplicationLoad();
 
@@ -23,5 +23,5 @@ public class TemplateModPlugin extends BaseModPlugin {
 //                    new MySectorGen().generate(Global.getSector());
             // Add code that creates a new star system (will only run if Nexerelin's Random (corvus) mode is disabled).
 //        }
-    }
+    } */
 }

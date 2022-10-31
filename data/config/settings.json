@@ -1,0 +1,5 @@
+ {
+	"plugins":{
+		"niko_MCTE_scriptAdder":"niko.MCTE.scripts.everyFrames.combat.terrainEffects.terrainEffectScriptAdder",
+	},
+ }

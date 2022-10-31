@@ -1,4 +1,4 @@
-package niko.MCTE.scripts.everyFrames.combat
+package niko.MCTE.scripts.everyFrames.combat.terrainEffects
 
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
@@ -8,13 +8,17 @@ import com.fs.starfarer.api.campaign.LocationAPI
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
+import com.fs.starfarer.api.impl.campaign.terrain.PulsarBeamTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magFieldNotification
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
+import org.lwjgl.util.vector.Vector2f
 
 class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
-        if (Global.getCurrentState() != GameState.COMBAT) return
         super.advance(amount, events)
+        if (Global.getCurrentState() != GameState.COMBAT) return
 
         val engine = Global.getCombatEngine() ?: return
         val playerFleet = Global.getSector().playerFleet ?: return
@@ -22,6 +26,7 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
         val playerCoordinates = playerFleet.location ?: return
 
         addMagneticFieldScript(engine, playerFleet, playerLocation)
+        //addPulsarBeamScript(engine, playerFleet, playerLocation, playerCoordinates)
         engine.removePlugin(this)
     }
 
@@ -35,26 +40,44 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
         var missileBreakLockBaseChance = 0f
         var canAddPlugin = false
         for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
-            if (terrain is MagneticFieldTerrainPlugin) {
-                if (!terrain.containsEntity(playerFleet)) continue
-                val isInFlare = (terrain.terrainName == "Magnetic Storm")
+            val plugin = terrain.plugin
+            if (plugin is MagneticFieldTerrainPlugin) {
+                if (!plugin.containsEntity(playerFleet)) continue
+                val isInFlare = (plugin.terrainName == "Magnetic Storm")
                 if (isInFlare) isStorm = true
 
                 visionMod *= if (isInFlare) 0.1f else 0.5f
                 missileMod *= if (isInFlare) 0.1f else 0.7f
                 rangeMod *= if (isInFlare) 0.3f else 0.8f
                 eccmChanceMod *= if (isInFlare) 0.2f else 0.7f
-                missileBreakLockBaseChance += if (isInFlare) 60f else 10f
+                missileBreakLockBaseChance += if (isInFlare) 0.7f else 0.2f
                 canAddPlugin = true
             }
         }
         if (canAddPlugin) {
+            missileBreakLockBaseChance = missileBreakLockBaseChance.coerceAtMost(1f)
             if (isStorm) {
                 Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, 0.1f)
             } else {
                 Global.getSoundPlayer().playUILoop("terrain_magfield", 1f, 0.1f)
             }
-            engine.addPlugin(magneticFieldEffect(engine, isStorm, visionMod, missileMod, rangeMod, eccmChanceMod, missileBreakLockBaseChance))
+            engine.addPlugin(magneticFieldEffect(isStorm, visionMod, missileMod, rangeMod, eccmChanceMod, missileBreakLockBaseChance))
+            engine.addPlugin(magFieldNotification())
+        }
+    }
+
+    private fun addPulsarBeamScript(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f) {
+        for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
+            val plugin = terrain.plugin
+            if (plugin is PulsarBeamTerrainPlugin) {
+                if (!plugin.containsEntity(playerFleet)) continue
+                val intensity = plugin.getIntensityAtPoint(playerCoordinates)
+
+            }
         }
     }
 }
