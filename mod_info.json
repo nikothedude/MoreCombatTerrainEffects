@@ -7,7 +7,7 @@
 	"description":"todo",
     "gameVersion": "0.95.1a-RC6", 
   	"jars":["jars/niko_MCPE.jar"],
-  	#"modPlugin":"data.niko_MPC_modPlugin",
+  	"modPlugin":"niko.MCTE.niko_MCTE_modPlugin",
 	  	"dependencies": [
         {
 			"id": "lw_lazylib",

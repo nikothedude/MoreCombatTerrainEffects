@@ -30,20 +30,33 @@ class magneticFieldEffect(
         super.advance(amount, events)
         val engine = Global.getCombatEngine()
 
+        handleSound()
+        handleNotification(engine)
+
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
+                val rangeAndVisionMultForShipSize = when (ship.hullSize) {
+                    ShipAPI.HullSize.FIGHTER -> 1f
+                    ShipAPI.HullSize.DEFAULT -> 1f
+                    ShipAPI.HullSize.FRIGATE -> 1f
+                    ShipAPI.HullSize.DESTROYER -> 1.1f
+                    ShipAPI.HullSize.CRUISER -> 1.2f
+                    ShipAPI.HullSize.CAPITAL_SHIP -> 1.3f
+                    else -> 1f
+                }
                 val ecmMult = ship.mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
-                ship.mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.magneticField, visionMod * ecmMult)
+                val modifiedVisionMult = ((visionMod*rangeAndVisionMultForShipSize)*ecmMult).coerceAtMost(1f)
+                val modifiedRangeMult = ((rangeMod)*ecmMult).coerceAtMost(1f)
+                val modifiedMissileMult = (missileMod*ecmMult).coerceAtMost(1f)
+                ship.mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.magneticField, modifiedVisionMult)
 
-                ship.mutableStats.missileGuidance.modifyMult(terrainCombatEffectIds.magneticField, missileMod * ecmMult)
-                ship.mutableStats.missileMaxTurnRateBonus.modifyMult(terrainCombatEffectIds.magneticField, missileMod * ecmMult
-                )
+                ship.mutableStats.missileGuidance.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
+                ship.mutableStats.missileMaxTurnRateBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
 
-                ship.mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, rangeMod * ecmMult)
-                ship.mutableStats.energyWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, rangeMod * ecmMult
-                )
-                ship.mutableStats.missileWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, rangeMod * ecmMult
-                )
+                ship.mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
+                ship.mutableStats.energyWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
+                ship.mutableStats.missileWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
+
                 ship.mutableStats.eccmChance.modifyMult(terrainCombatEffectIds.magneticField, eccmChanceMod)
 
                 affectedShips[ship] = true
@@ -53,6 +66,50 @@ class magneticFieldEffect(
         if (canAdvance(amount)) {
             scrambleMissiles(engine)
             handleCurrentlyScrambledMissiles(engine)
+        }
+    }
+
+    private fun handleNotification(engine: CombatEngineAPI) {
+        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+        val stormOrNot = if (isStorm) "storm" else "field"
+        engine.maintainStatusForPlayerShip(
+            "niko_MCPE_magFieldInterference1",
+            icon,
+            "Magnetic $stormOrNot",
+            "${100-visionMod*100}% less vision",
+            true)
+        engine.maintainStatusForPlayerShip(
+            "niko_MCPE_magFieldInterference2",
+            icon,
+            "Magnetic $stormOrNot",
+            "${100-missileMod*100}% less missile guidance/turn rate",
+            true)
+        engine.maintainStatusForPlayerShip(
+            "niko_MCPE_magFieldInterference4",
+            icon,
+            "Magnetic $stormOrNot",
+            "${100-rangeMod*100}% less weapon range",
+            true)
+        engine.maintainStatusForPlayerShip(
+            "niko_MCPE_magFieldInterference5",
+            icon,
+            "Magnetic $stormOrNot",
+            "${100-eccmChanceMod*100}% less ECCM chance",
+            true)
+        engine.maintainStatusForPlayerShip(
+            "niko_MCPE_magFieldInterference6",
+            icon,
+            "Magnetic $stormOrNot",
+            "$missileBreakLockBaseChance% chance for missiles to lose lock",
+            true)
+    }
+
+    private fun handleSound() {
+        val volume = 1f
+        if (isStorm) {
+            Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, volume)
+        } else {
+            Global.getSoundPlayer().playUILoop("terrain_magfield", 1f, volume)
         }
     }
 
