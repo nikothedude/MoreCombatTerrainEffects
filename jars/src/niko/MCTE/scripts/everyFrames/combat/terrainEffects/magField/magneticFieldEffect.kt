@@ -152,15 +152,23 @@ class magneticFieldEffect(
         while (iterator.hasNext()) {
             val scrambledMissile = iterator.next()
             val missileAI = scrambledMissile.unwrappedMissileAI
+            val magFlare = scrambledMissiles[scrambledMissile]
             if (!engine.isEntityInPlay(scrambledMissile)) {
-                val magFlare = scrambledMissiles[scrambledMissile]
                 magFlare?.hitpoints = 0f
                 engine.removeObject(magFlare)
                 iterator.remove()
                 continue
+            } else {
+                repositionMagFlare(magFlare)
+                if (missileAI is GuidedMissileAI) missileAI.target = magFlare
             }
-            // do math
-            if (missileAI is GuidedMissileAI) missileAI.target = scrambledMissiles[scrambledMissile]
         }
+    }
+    
+    private fun repositionMagFlare(magFlare: CombatEntityAPI?) {
+        if (magFlare == null) return
+        
+        val magFlareLocation = magFlare.location
+        magFlare.location = Vector2f(magFlareLocation.x - 50, magFlareLocation.y - 50)
     }
 }
