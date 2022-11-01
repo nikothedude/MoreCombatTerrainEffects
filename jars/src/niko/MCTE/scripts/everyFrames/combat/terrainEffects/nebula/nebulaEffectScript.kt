@@ -106,13 +106,13 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "niko_MCPE_nebulaEffect2",
                 icon,
                 "Nebula",
-                "Vision range reduced by ${100-visionMult*100}",
+                "Vision range reduced by ${100-visionMult*100}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect3",
                 icon,
                 "Nebula",
-                "Weapon range reduced by ${100-rangeMult*100}",
+                "Weapon range reduced by ${100-rangeMult*100}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect4",
