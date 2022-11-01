@@ -48,7 +48,7 @@ class SlipstreamEffectScript(
                     mutableStats.missileAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                     mutableStats.missileTurnAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                 }
-                val hasSafetyOverrides = ship.variant.hasHullMod("safety_overrides")
+                val hasSafetyOverrides = ship.variant.hasHullMod("safetyoverrides")
                 if (!hasSafetyOverrides || MCPE_settings.STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO) {
                     mutableStats.peakCRDuration.modifyMult(terrainCombatEffectIds.slipstreamEffect, peakPerformanceMult)
                 }
@@ -61,6 +61,7 @@ class SlipstreamEffectScript(
         }
         for (missile: MissileAPI in engine.missiles) {
             if (affectedMissiles[missile] == null) {
+                if (missile.isFlare) continue
                 affectedMissiles[missile] = true
             }
         }
