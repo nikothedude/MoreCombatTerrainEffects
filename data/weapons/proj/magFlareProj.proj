@@ -1,0 +1,15 @@
+{
+	"id":"MCPE_magFlareProj",
+	"specClass":"projectile",	
+	"spawnType":"BALLISTIC", 
+	"length":0.0,
+	"width":0.0,
+	"sprite":"",
+	"size":[0,0],	
+	"center":[2,2],
+	"collisionRadius":1,
+	"collisionClass":"NONE",
+	"collisionClassByFighter":"NONE",
+	#"maxFlightTime":3,
+	"fadeTime":0.5, # fadeout duration
+}

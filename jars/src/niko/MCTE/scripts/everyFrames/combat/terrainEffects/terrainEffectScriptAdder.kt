@@ -17,6 +17,8 @@ import com.fs.starfarer.api.impl.campaign.terrain.SlipstreamTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magFieldNotification
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
+import niko.MCTE.utils.MCPE_settings.MAG_FIELD_EFFECT_ENABLED
+import niko.MCTE.utils.MCPE_settings.loadSettings
 import org.lwjgl.util.vector.Vector2f
 
 // script to dodge plugin incompatability
@@ -25,6 +27,8 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
         super.advance(amount, events)
         if (Global.getCurrentState() != GameState.COMBAT) return
+
+        loadSettings()
 
         val engine = Global.getCombatEngine() ?: return
         val playerFleet = Global.getSector().playerFleet ?: return
@@ -89,11 +93,11 @@ class terrainEffectScriptAdder: BaseEveryFrameCombatPlugin() {
             val isInFlare = (plugin.terrainName == "Magnetic Storm")
             if (isInFlare) isStorm = true
 
-            visionMod *= if (isInFlare) 0.3f else 0.7f
-            missileMod *= if (isInFlare) 0.1f else 0.7f
-            rangeMod *= if (isInFlare) 0.28f else 0.7f
-            eccmChanceMod *= if (isInFlare) 0.2f else 0.7f
-            missileBreakLockBaseChance += if (isInFlare) 0.7f else 0.2f
+            visionMod *= if (isInFlare) 0.3f else 0.6f
+            missileMod *= if (isInFlare) 0.45f else 0.8f
+            rangeMod *= if (isInFlare) 0.28f else 0.8f
+            eccmChanceMod *= if (isInFlare) 0.2f else 0.8f
+            missileBreakLockBaseChance += if (isInFlare) 0.3f else 0.05f
             canAddPlugin = true
         }
         if (canAddPlugin) {

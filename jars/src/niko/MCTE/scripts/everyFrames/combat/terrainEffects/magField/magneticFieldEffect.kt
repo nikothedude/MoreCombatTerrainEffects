@@ -5,8 +5,7 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.input.InputEventAPI
-import com.fs.starfarer.combat.ai.missile.MissileAI
-import com.fs.starfarer.combat.systems.Flare
+import niko.MCTE.utils.MCPE_ids
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
@@ -20,10 +19,12 @@ class magneticFieldEffect(
     var missileBreakLockBaseChance: Float,
     ): baseCombatDeltaTimeScript() {
     val random = MathUtils.getRandom()
+    val engine = Global.getCombatEngine()
 
     private val affectedShips: HashMap<ShipAPI, Boolean> = HashMap()
     private val scrambledMissiles: HashMap<MissileAPI, CombatEntityAPI> = HashMap()
     override val thresholdForAdvancement: Float = 1f
+    var deltaTimeForReposition = deltaTime
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
         if (Global.getCurrentState() != GameState.COMBAT) return
@@ -35,34 +36,37 @@ class magneticFieldEffect(
 
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
-                val rangeAndVisionMultForShipSize = when (ship.hullSize) {
-                    ShipAPI.HullSize.FIGHTER -> 1f
-                    ShipAPI.HullSize.DEFAULT -> 1f
-                    ShipAPI.HullSize.FRIGATE -> 1f
-                    ShipAPI.HullSize.DESTROYER -> 1.1f
-                    ShipAPI.HullSize.CRUISER -> 1.2f
-                    ShipAPI.HullSize.CAPITAL_SHIP -> 1.3f
-                    else -> 1f
-                }
-                val ecmMult = ship.mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
-                val modifiedVisionMult = ((visionMod*rangeAndVisionMultForShipSize)*ecmMult).coerceAtMost(1f)
+                val mutableStats = ship.mutableStats
+                val ecmMult = mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
+                val shipWeapons = ship.allWeapons
+                var maxRange = 0f
                 val modifiedRangeMult = ((rangeMod)*ecmMult).coerceAtMost(1f)
+                mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
+                mutableStats.energyWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
+                mutableStats.missileWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
+                mutableStats.fighterWingRange.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
+
+                for (weapon: WeaponAPI in shipWeapons) {
+                    val weaponRange = weapon.range
+                    if (weaponRange > maxRange) maxRange = weaponRange
+                }
+                val rangeThresholdForMoreVision = if (isStorm) 500f else 1000f
+                val weaponRangeVisionMult = (maxRange/rangeThresholdForMoreVision).coerceAtLeast(1f)
+                val modifiedVisionMult = ((visionMod*weaponRangeVisionMult)*ecmMult).coerceAtMost(1f)
                 val modifiedMissileMult = (missileMod*ecmMult).coerceAtMost(1f)
-                ship.mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.magneticField, modifiedVisionMult)
+                mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.magneticField, modifiedVisionMult)
 
-                ship.mutableStats.missileGuidance.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
-                ship.mutableStats.missileMaxTurnRateBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
+                mutableStats.missileGuidance.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
+                mutableStats.missileMaxTurnRateBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
 
-                ship.mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
-                ship.mutableStats.energyWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
-                ship.mutableStats.missileWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
 
-                ship.mutableStats.eccmChance.modifyMult(terrainCombatEffectIds.magneticField, eccmChanceMod)
+                mutableStats.eccmChance.modifyMult(terrainCombatEffectIds.magneticField, eccmChanceMod)
 
                 affectedShips[ship] = true
             }
         }
 
+        deltaTimeForReposition += deltaTime
         if (canAdvance(amount)) {
             scrambleMissiles(engine)
             handleCurrentlyScrambledMissiles(engine)
@@ -88,7 +92,7 @@ class magneticFieldEffect(
             "niko_MCPE_magFieldInterference4",
             icon,
             "Magnetic $stormOrNot",
-            "${100-rangeMod*100}% less weapon range",
+            "${100-rangeMod*100}% less weapon range and fighter range",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference5",
@@ -100,7 +104,7 @@ class magneticFieldEffect(
             "niko_MCPE_magFieldInterference6",
             icon,
             "Magnetic $stormOrNot",
-            "$missileBreakLockBaseChance% chance for missiles to lose lock",
+            "$missileBreakLockBaseChance% chance for missiles' guidance to be scrambled per $thresholdForAdvancement seconds",
             true)
     }
 
@@ -117,24 +121,31 @@ class magneticFieldEffect(
         for (missile: MissileAPI in engine.missiles) {
             val missileAI = missile.unwrappedMissileAI
             if (missileAI !is GuidedMissileAI) continue
-            if (missileAI.target == null) continue
-            var missileBreakLockChance = missileBreakLockBaseChance
-            missileBreakLockChance -= missile.eccmChance
+            if (missileAI.target == null || scrambledMissiles[missile] != null) continue
 
-            missileBreakLockChance = missileBreakLockChance.coerceAtMost(1f)
-            val randomFloatVal = random.nextFloat()
-            if (randomFloatVal <= missileBreakLockChance) {
-                scrambleMissile(missile)
-            }
+            if (shouldScrambleMissile(missile, missileAI)) scrambleMissile(missile)
         }
+    }
+
+    private fun getMissileBreakLockChance(missile: MissileAPI, missileAI: GuidedMissileAI): Float {
+        var missileBreakLockChance = missileBreakLockBaseChance
+        missileBreakLockChance -= missile.eccmChance
+
+        missileBreakLockChance = missileBreakLockChance.coerceAtMost(1f)
+        return missileBreakLockChance
+    }
+
+    private fun shouldScrambleMissile(missile: MissileAPI, missileAI: GuidedMissileAI): Boolean {
+        val missileBreakLockChance = getMissileBreakLockChance(missile, missileAI)
+        val randomFloatVal = random.nextFloat()
+        if (randomFloatVal <= missileBreakLockChance) return true
+        return false
     }
 
     private fun scrambleMissile(missile: MissileAPI) {
         val missileAI = missile.unwrappedMissileAI
         if (missileAI is GuidedMissileAI) {
             missileAI.target = null
-            if (missileAI is MissileAI) missileAI.isRetargetNearest = false
-            missile.eccmChanceOverride = 0f
             val magFlare: CombatEntityAPI = createNewMagFlare()
             scrambledMissiles[missile] = magFlare
         }
@@ -142,9 +153,25 @@ class magneticFieldEffect(
 
     private fun createNewMagFlare(): CombatEntityAPI {
         val engine = Global.getCombatEngine()
-        val magFlare = engine.spawnAsteroid(0, 9999f, 9999f, 0f, 0f)
-        magFlare.collisionClass = CollisionClass.NONE
+        val maxHeight = engine.mapHeight
+        val maxWidth = engine.mapWidth
+        val randomY = (-maxHeight + random.nextFloat() * (maxHeight - (-maxHeight)))
+        val randomX = (-maxWidth + random.nextFloat() * (maxWidth - (-maxWidth)))
+        val magFlare = engine.spawnProjectile(
+            null,
+            null,
+            MCPE_ids.magFlareWeaponId,
+            Vector2f(randomX, randomY),
+            0f,
+            null
+        )
+        magFlare.owner = 100
         return magFlare
+    }
+
+    private fun despawnMagFlare(magFlare: CombatEntityAPI) {
+        magFlare.hitpoints = 0f
+        engine.removeEntity(magFlare)
     }
 
     private fun handleCurrentlyScrambledMissiles(engine: CombatEngineAPI) {
@@ -154,21 +181,60 @@ class magneticFieldEffect(
             val missileAI = scrambledMissile.unwrappedMissileAI
             val magFlare = scrambledMissiles[scrambledMissile]
             if (!engine.isEntityInPlay(scrambledMissile)) {
-                magFlare?.hitpoints = 0f
-                engine.removeObject(magFlare)
+                if (magFlare != null) despawnMagFlare(magFlare)
                 iterator.remove()
                 continue
             } else {
-                repositionMagFlare(magFlare)
-                if (missileAI is GuidedMissileAI) missileAI.target = magFlare
+                if (shouldUnscrambleMissile(scrambledMissile)) {
+                    unscrambleMissile(scrambledMissile, iterator)
+                    continue
+                }
+                if (missileAI is GuidedMissileAI) {
+                    missileAI.target = magFlare
+                    if (shouldReposition(scrambledMissile, missileAI)) {
+                        repositionMagFlare(scrambledMissile, missileAI, magFlare)
+                    }
+                }
             }
         }
     }
-    
-    private fun repositionMagFlare(magFlare: CombatEntityAPI?) {
+
+    private fun shouldReposition(scrambledMissile: MissileAPI, missileAI: GuidedMissileAI): Boolean {
+        val thresholdForRepositon = 5f
+        if (deltaTimeForReposition >= thresholdForRepositon) {
+            deltaTimeForReposition = 0f
+            return true
+        }
+        return false
+    }
+
+    private fun shouldUnscrambleMissile(scrambledMissile: MissileAPI): Boolean {
+        val threshold = 0.95f
+        val randomFloat = random.nextFloat()
+        if (randomFloat >= threshold) return true
+        return false
+    }
+
+    private fun unscrambleMissile(scrambledMissile: MissileAPI, iterator: MutableIterator<MissileAPI>?) {
+        val missileAI = scrambledMissile.unwrappedMissileAI
+        if (missileAI is GuidedMissileAI) {
+            missileAI.target = null
+        }
+        val magFlare = scrambledMissiles[scrambledMissile]
+        if (iterator != null) {
+            iterator.remove()
+        } else {
+            scrambledMissiles.remove(scrambledMissile)
+        }
+        if (magFlare != null) despawnMagFlare(magFlare)
+
+    }
+
+    private fun repositionMagFlare(scrambledMissile: MissileAPI, missileAI: GuidedMissileAI, magFlare: CombatEntityAPI?) {
         if (magFlare == null) return
-        
-        val magFlareLocation = magFlare.location
-        magFlare.location = Vector2f(magFlareLocation.x - 50, magFlareLocation.y - 50)
+
+        despawnMagFlare(magFlare)
+        val newMagFlare = createNewMagFlare()
+        missileAI.target = newMagFlare
     }
 }
