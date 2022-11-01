@@ -1,4 +1,4 @@
-package niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField
+package niko.MCTE.scripts.everyFrames.combat.terrainEffects
 
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin

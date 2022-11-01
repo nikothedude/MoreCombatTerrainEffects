@@ -5,6 +5,8 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.input.InputEventAPI
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCPE_ids
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
@@ -17,23 +19,27 @@ class magneticFieldEffect(
     val rangeMod: Float,
     val eccmChanceMod: Float,
     var missileBreakLockBaseChance: Float,
-    ): baseCombatDeltaTimeScript() {
+    ): baseTerrainEffectScript(), usesDeltaTime {
 
+    override var deltaTime = 0f
     val random = MathUtils.getRandom()
 
-    private val affectedShips: HashMap<ShipAPI, Boolean> = HashMap()
     private val scrambledMissiles: HashMap<MissileAPI, CombatEntityAPI> = HashMap()
     override val thresholdForAdvancement: Float = 1f
     var deltaTimeForReposition = deltaTime
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
-        if (Global.getCurrentState() != GameState.COMBAT) return
         super.advance(amount, events)
-        val engine = Global.getCombatEngine()
+        if (Global.getCurrentState() != GameState.COMBAT) return
 
-        handleSound()
-        handleNotification(engine)
+        deltaTimeForReposition += deltaTime
+        if (canAdvance(amount)) {
+            scrambleMissiles(engine)
+            handleCurrentlyScrambledMissiles(engine)
+        }
+    }
 
+    override fun applyEffectsToShips() {
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats
@@ -65,15 +71,9 @@ class magneticFieldEffect(
                 affectedShips[ship] = true
             }
         }
-
-        deltaTimeForReposition += deltaTime
-        if (canAdvance(amount)) {
-            scrambleMissiles(engine)
-            handleCurrentlyScrambledMissiles(engine)
-        }
     }
 
-    private fun handleNotification(engine: CombatEngineAPI) {
+    override fun handleNotification() {
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         val stormOrNot = if (isStorm) "storm" else "field"
         engine.maintainStatusForPlayerShip(
@@ -108,7 +108,7 @@ class magneticFieldEffect(
             true)
     }
 
-    private fun handleSound() {
+    override fun handleSounds() {
         val volume = 1f
         if (isStorm) {
             Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, volume)
