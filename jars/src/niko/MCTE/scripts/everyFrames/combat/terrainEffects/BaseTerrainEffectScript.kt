@@ -7,20 +7,18 @@ import com.fs.starfarer.api.input.InputEventAPI
 
 abstract class baseTerrainEffectScript: baseNikoCombatScript() {
 
-    protected val affectedShips: HashMap<ShipAPI, Boolean> = HashMap()
-
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
         super.advance(amount, events)
         if (Global.getCurrentState() != GameState.COMBAT) return
 
-        applyEffects()
-        handleSounds()
-        handleNotification()
+        applyEffects(amount)
+        handleSounds(amount)
+        handleNotification(amount)
     }
 
-    abstract fun handleNotification()
+    abstract fun handleNotification(amount: Float)
 
-    abstract fun handleSounds()
+    abstract fun handleSounds(amount: Float)
 
-    abstract fun applyEffects()
+    abstract fun applyEffects(amount: Float)
 }

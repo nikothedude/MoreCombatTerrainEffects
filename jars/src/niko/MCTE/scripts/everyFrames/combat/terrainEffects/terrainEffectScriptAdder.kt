@@ -6,22 +6,35 @@ import com.fs.starfarer.api.campaign.CampaignFleetAPI
 import com.fs.starfarer.api.campaign.CampaignTerrainAPI
 import com.fs.starfarer.api.campaign.LocationAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
-import com.fs.starfarer.api.combat.ShipAPI.HullSize
 import com.fs.starfarer.api.impl.campaign.terrain.*
+import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.utils.MCPE_settings.DEBRIS_FIELD_EFFECT_ENABLED
 import niko.MCTE.utils.MCPE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.utils.MCPE_settings.DUST_CLOUD_EFFECT_ENABLED
+import niko.MCTE.utils.MCPE_settings.MAGFIELD_ECCM_MULT
+import niko.MCTE.utils.MCPE_settings.MAGFIELD_MISSILE_MULT
+import niko.MCTE.utils.MCPE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE
+import niko.MCTE.utils.MCPE_settings.MAGFIELD_RANGE_MULT
+import niko.MCTE.utils.MCPE_settings.MAGFIELD_VISION_MULT
+import niko.MCTE.utils.MCPE_settings.MAGSTORM_ECCM_MULT
+import niko.MCTE.utils.MCPE_settings.MAGSTORM_MISSILE_MULT
+import niko.MCTE.utils.MCPE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE
+import niko.MCTE.utils.MCPE_settings.MAGSTORM_RANGE_MULT
+import niko.MCTE.utils.MCPE_settings.MAGSTORM_VISION_MULT
 import niko.MCTE.utils.MCPE_settings.MAG_FIELD_EFFECT_ENABLED
 import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_EFFECT_ENABLED
+import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT
+import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
+import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
+import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.utils.MCPE_settings.loadSettings
 import org.lwjgl.util.vector.Vector2f
-import java.util.*
+import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 // script to dodge plugin incompatability
@@ -96,21 +109,35 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         if (!DEEP_HYPERSPACE_EFFECT_ENABLED) return
 
         var canAddScript = false
-        var isStorming = false
+
+        val pluginToStorming: HashMap<HyperspaceTerrainPlugin, Boolean> = HashMap()
 
         for (plugin: HyperspaceTerrainPlugin in hyperspaceTerrainPlugins) {
+            var isStorming = false
 
-            if (plugin.getExactCellAt(playerCoordinates).isStorming) {
+            val cellAtPlayer: CellStateTracker = plugin.getExactCellAt(playerCoordinates) ?: continue
+            if (cellAtPlayer.isStorming) {
                 isStorming = true
             }
             canAddScript = true
+            pluginToStorming[plugin] = isStorming
         }
-        if (canAddScript) {
+      /*  val deepHyperspaceNebulas: MutableMap<NebulaParticle, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
+        val stormingNebulae: MutableSet<NebulaParticle> = HashSet()
+        for (entry in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[entry] == true) stormingNebulae += entry */
+
+        /*if (canAddScript) {
             engine.addPlugin(deepHyperspaceEffectScript(
-                isStorming
+                stormingNebulae
             ))
-        }
+        } */
     }
+
+   /* private fun instantiateDeephyperspaceNebulae(
+        pluginToStorming: HashMap<HyperspaceTerrainPlugin, Boolean>): MutableMap<NebulaParticle, Boolean> {
+        engine.addNebulaParticle()
+
+    } */
 
     private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
         if (!DEBRIS_FIELD_EFFECT_ENABLED) return
@@ -127,13 +154,13 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             canAddPlugin = true
         }
 
-        if (canAddPlugin) {
+        /*if (canAddPlugin) {
             engine.addPlugin(
                 debrisFieldEffectScript(
                 debrisDensityMult,
                 hazardDensityMult
             ))
-        }
+        }*/
     }
 
     private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2>) {
@@ -147,11 +174,11 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         var hardFluxGenerationPerFrame = 0f
 
         for (plugin: SlipstreamTerrainPlugin2 in slipstreamPlugins) {
-            peakPerformanceMult *= 0.33f
-            fluxDissipationMult *= 3
-            overallSpeedMult++
+            peakPerformanceMult *= SLIPSTREAM_PPT_MULT
+            fluxDissipationMult *= SLIPSTREAM_FLUX_DISSIPATION_MULT
+            overallSpeedMult += SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 
-            hardFluxGenerationPerFrame++
+            hardFluxGenerationPerFrame += SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
             canAddPlugin = true
         }
         if (canAddPlugin) {
@@ -161,8 +188,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 fluxDissipationMult,
                 hardFluxGenerationPerFrame,
                 overallSpeedMult
-            )
-            )
+            ))
         }
     }
 
@@ -180,11 +206,11 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             val isInFlare = (plugin.terrainName == "Magnetic Storm")
             if (isInFlare) isStorm = true
 
-            visionMod *= if (isInFlare) 0.3f else 0.6f
-            missileMod *= if (isInFlare) 0.45f else 0.8f
-            rangeMod *= if (isInFlare) 0.28f else 0.8f
-            eccmChanceMod *= if (isInFlare) 0.2f else 0.8f
-            missileBreakLockBaseChance += if (isInFlare) 0.3f else 0.05f
+            visionMod *= if (isInFlare) MAGSTORM_VISION_MULT else MAGFIELD_VISION_MULT
+            missileMod *= if (isInFlare) MAGSTORM_MISSILE_MULT else MAGFIELD_MISSILE_MULT
+            rangeMod *= if (isInFlare) MAGSTORM_RANGE_MULT else MAGFIELD_RANGE_MULT
+            eccmChanceMod *= if (isInFlare) MAGSTORM_ECCM_MULT else MAGFIELD_ECCM_MULT
+            missileBreakLockBaseChance += if (isInFlare) MAGSTORM_MISSILE_SCRAMBLE_CHANCE else MAGFIELD_MISSILE_SCRAMBLE_CHANCE
             canAddPlugin = true
         }
         if (canAddPlugin) {

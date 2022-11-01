@@ -4,11 +4,15 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.MissileAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.combat.ShipEngineControllerAPI
+import com.sun.org.apache.xpath.internal.operations.Bool
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.MCPE_settings
+import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_DISABLE_VENTING
+import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_INCREASE_TURN_RATE
 import niko.MCTE.utils.terrainCombatEffectIds
 import java.awt.Color
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 class SlipstreamEffectScript(
@@ -19,7 +23,9 @@ class SlipstreamEffectScript(
     baseTerrainEffectScript() {
 
     val speed: MutableMap<ShipAPI.HullSize, Float> = EnumMap(ShipAPI.HullSize::class.java)
-    private val color = Color(255, 100, 211, 255)
+    private val color = Color(212, 55, 255, 255)
+
+    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
 
     init {
         speed[ShipAPI.HullSize.FIGHTER] = 60f
@@ -33,7 +39,7 @@ class SlipstreamEffectScript(
     val missileSpeed = 60f
     private val affectedMissiles: HashMap<MissileAPI, Boolean> = HashMap()
 
-    override fun applyEffects() {
+    override fun applyEffects(amount: Float) {
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats
@@ -44,9 +50,14 @@ class SlipstreamEffectScript(
                     mutableStats.maxSpeed.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
                     mutableStats.acceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
                     mutableStats.deceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
+                    if (SLIPSTREAM_INCREASE_TURN_RATE) {
+                        mutableStats.turnAcceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
+                        mutableStats.maxTurnRate.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
+                        mutableStats.missileTurnAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
+                        mutableStats.missileMaxTurnRateBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
+                    }
                     mutableStats.missileMaxSpeedBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                     mutableStats.missileAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
-                    mutableStats.missileTurnAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                 }
                 val hasSafetyOverrides = ship.variant.hasHullMod("safetyoverrides")
                 if (!hasSafetyOverrides || MCPE_settings.STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO) {
@@ -55,6 +66,12 @@ class SlipstreamEffectScript(
 
                 mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(terrainCombatEffectIds.slipstreamEffect, 2f)
                 mutableStats.fluxDissipation.modifyMult(terrainCombatEffectIds.slipstreamEffect, fluxDissipationMult)
+
+                if (SLIPSTREAM_DISABLE_VENTING) {
+                    mutableStats.ventRateMult.modifyMult(terrainCombatEffectIds.slipstreamEffect, 0f)
+                } else {
+                    mutableStats.ventRateMult.modifyMult(terrainCombatEffectIds.slipstreamEffect, 0.62f)
+                }
 
                 affectedShips[ship] = true
             }
@@ -110,7 +127,7 @@ class SlipstreamEffectScript(
         }
     }
 
-    override fun handleNotification() {
+    override fun handleNotification(amount: Float) {
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_slipstream3",
@@ -125,6 +142,12 @@ class SlipstreamEffectScript(
             "Safety overrides applied to all ships, fighters, and missiles",
             true)
         engine.maintainStatusForPlayerShip(
+            "niko_MCPE_slipstream4",
+            icon,
+            "Slipstream",
+            "Venting effectiveness reduced",
+            true)
+        engine.maintainStatusForPlayerShip(
             "niko_MCPE_slipstream1",
             icon,
             "Slipstream",
@@ -132,8 +155,8 @@ class SlipstreamEffectScript(
             true)
     }
 
-    override fun handleSounds() {
-        Global.getSoundPlayer().playUILoop("terrain_slipstream", 1f, 1f)
+    override fun handleSounds(amount: Float) {
+        Global.getSoundPlayer().playUILoop("terrain_slipstream", 1f, 0.8f)
     }
 
     private fun calculateFluxGeneratedPerSecond(): Float {

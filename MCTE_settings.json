@@ -13,8 +13,41 @@
 	"enableExtraNebulaEffects":true, #if true, nebula clouds in combat will also slightly reduce the weapon range and vision radius of any ships inside of them.
 	# defaults to true
 	
+	#MAGNETIC FIELD SETTINGS
+	#each individual magnetic field you are in sequentially multiplies/adds these settings to 1, then the value of the last calculation, etc.
+	#ex. 3 magfields, all non-storm, with visionMult = 0.6: You get visionModifier = 1*0.6*(0.6*(0.6))
+	
+	"magFieldVisionMult":0.6, #default: 0.6
+	"magFieldMissileManeuverabilityAndGuidanceMult":0.8, #default: 0.8
+	"magFieldWeaponAndFighterRangeMult":0.8, #default: 0.8
+	"magFieldEccmChanceMult":0.8, #modifies missile ECCM chance. this is the stuff provided by ECCM package, default: 0.8
+	"magFieldMissileScrambleChance":0.05, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
+	# value as a percentage chance to determine if the missile should unlock and fly in random directions, default: 0.05
+	
+	#MAGNETIC STORM SETTINGS
+	#same rules as the ones above, except these values are used for magnetic STORMS.
+	
+	"magStormVisionMult":0.3, #default: 0.3
+	"magStormMissileManeuverabilityAndGuidanceMult":0.45, #default: 0.45
+	"magStormWeaponAndFighterRangeMult":0.28, #default: 0.28
+	"magStormEccmChanceMult":0.2, #default: 0.2
+	"magStormMissileScrambleChance":0.3, #default: 0.3
+	
 	#SLIPSTREAM SETTINGS
+	"slipstreamPPTMult":0.45, #default: 0.45
+	"slipstreamFluxDissipationMult":3, #default: 3
+	"slipstreamOverallSpeedMultIncrement":1, #default: 1
+	#^ every slipstream will add this to the overall speed mult, which multiplies the hullsize-specific speed mult by itself
+	"slipstreamHardFluxGenPerFrame":2, #default: 2
 	"stackSlipstreamPPTDebuffWithSO":true, #if true, the slipstream PPT debuff stacks with SO. defualts to true.
+	"slipstreamDisableVenting":false, #if true, disables venting. duh. default: false
+	"slipstreamIncreaseTurnRate":false, #if true, the speed buff will be applied to turnrate for missiles and ships. default: false
+	
+	#NEBULA SETTINGS
+	"nebulaVisionMult":0.8, #default: 0.8
+	"nebulaRangeMult":0.8, #default: 0.8
+	"nebulaSpeedDecrement":-10, #default: -10
+	"nebulaDisableZeroFluxBoost":true, #default: true
 	
 	#GENERAL
 	"showErrorsInGame":true,

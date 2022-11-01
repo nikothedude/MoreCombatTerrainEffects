@@ -8,15 +8,15 @@ class debrisFieldEffectScript(
 ): baseTerrainEffectScript() {
     val isDone = false
 
-    override fun applyEffects() {
+    override fun applyEffects(amount: Float) {
         if (isDone) return
     }
 
-    override fun handleNotification() {
+    override fun handleNotification(amount: Float) {
         TODO("Not yet implemented")
     }
 
-    override fun handleSounds() {
+    override fun handleSounds(amount: Float) {
         TODO("Not yet implemented")
     }
 }

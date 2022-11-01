@@ -8,7 +8,10 @@ import niko.MCTE.utils.terrainCombatEffectIds
 class dustCloudEffectScript(
     val baseSpeedMalice: Float
 ): baseTerrainEffectScript() {
-    override fun applyEffects() {
+
+    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
+
+    override fun applyEffects(amount: Float) {
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats
@@ -26,7 +29,7 @@ class dustCloudEffectScript(
         }
     }
 
-    override fun handleNotification() {
+    override fun handleNotification(amount: Float) {
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_dustCloud1",
@@ -36,7 +39,7 @@ class dustCloudEffectScript(
             true)
     }
 
-    override fun handleSounds() {
+    override fun handleSounds(amount: Float) {
         return
     }
 }

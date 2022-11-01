@@ -11,6 +11,7 @@ import niko.MCTE.utils.MCPE_ids
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
+import java.util.concurrent.ThreadLocalRandom
 
 class magneticFieldEffect(
     val isStorm: Boolean,
@@ -24,8 +25,10 @@ class magneticFieldEffect(
     override var deltaTime = 0f
     val random = MathUtils.getRandom()
 
+    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
     private val scrambledMissiles: HashMap<MissileAPI, CombatEntityAPI> = HashMap()
     override val thresholdForAdvancement: Float = 1f
+
     var deltaTimeForReposition = deltaTime
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
@@ -39,7 +42,7 @@ class magneticFieldEffect(
         }
     }
 
-    override fun applyEffects() {
+    override fun applyEffects(amount: Float) {
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats
@@ -73,7 +76,7 @@ class magneticFieldEffect(
         }
     }
 
-    override fun handleNotification() {
+    override fun handleNotification(amount: Float) {
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         val stormOrNot = if (isStorm) "storm" else "field"
         engine.maintainStatusForPlayerShip(
@@ -108,12 +111,12 @@ class magneticFieldEffect(
             true)
     }
 
-    override fun handleSounds() {
+    override fun handleSounds(amount: Float) {
         val volume = 1f
         if (isStorm) {
-            Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, volume)
+            Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, 1f)
         } else {
-            Global.getSoundPlayer().playUILoop("terrain_magfield", 1f, volume)
+            Global.getSoundPlayer().playUILoop("terrain_magfield", 1f, 0.8f)
         }
     }
 
@@ -200,7 +203,7 @@ class magneticFieldEffect(
     }
 
     private fun shouldReposition(scrambledMissile: MissileAPI, missileAI: GuidedMissileAI): Boolean {
-        val thresholdForRepositon = 5f
+        val thresholdForRepositon = 2f
         if (deltaTimeForReposition >= thresholdForRepositon) {
             deltaTimeForReposition = 0f
             return true
