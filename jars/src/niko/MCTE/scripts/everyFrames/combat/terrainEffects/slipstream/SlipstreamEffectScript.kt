@@ -33,7 +33,7 @@ class SlipstreamEffectScript(
     val missileSpeed = 60f
     private val affectedMissiles: HashMap<MissileAPI, Boolean> = HashMap()
 
-    override fun applyEffectsToShips() {
+    override fun applyEffects() {
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats

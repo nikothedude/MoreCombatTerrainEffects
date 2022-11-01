@@ -13,7 +13,7 @@ abstract class baseTerrainEffectScript: baseNikoCombatScript() {
         super.advance(amount, events)
         if (Global.getCurrentState() != GameState.COMBAT) return
 
-        applyEffectsToShips()
+        applyEffects()
         handleSounds()
         handleNotification()
     }
@@ -22,5 +22,5 @@ abstract class baseTerrainEffectScript: baseNikoCombatScript() {
 
     abstract fun handleSounds()
 
-    abstract fun applyEffectsToShips()
+    abstract fun applyEffects()
 }

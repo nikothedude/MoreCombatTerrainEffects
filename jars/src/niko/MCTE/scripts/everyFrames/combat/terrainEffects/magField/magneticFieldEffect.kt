@@ -39,7 +39,7 @@ class magneticFieldEffect(
         }
     }
 
-    override fun applyEffectsToShips() {
+    override fun applyEffects() {
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats

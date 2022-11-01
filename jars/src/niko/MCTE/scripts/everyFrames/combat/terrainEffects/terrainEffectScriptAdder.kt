@@ -10,6 +10,8 @@ import com.fs.starfarer.api.combat.ShipAPI.HullSize
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.utils.MCPE_settings.DEBRIS_FIELD_EFFECT_ENABLED
@@ -67,19 +69,71 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, slipstreamPlugins)
         addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
-        addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
+        //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
+        // dust clouds already have an effect
     }
 
     private fun addRingSystemTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, ringTerrainPlugins: MutableSet<RingSystemTerrainPlugin>) {
         if (!DUST_CLOUD_EFFECT_ENABLED) return
+
+        var flatSpeedMalice = 0f
+        val speedMaliceIncrement = 5f
+        var canAddScript = false
+
+        for (plugin: RingSystemTerrainPlugin in ringTerrainPlugins) {
+            flatSpeedMalice -= speedMaliceIncrement
+            canAddScript = true
+        }
+        if (canAddScript) {
+            engine.addPlugin(
+                dustCloudEffectScript(
+                flatSpeedMalice
+            ))
+        }
     }
 
     private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin>) {
         if (!DEEP_HYPERSPACE_EFFECT_ENABLED) return
+
+        var canAddScript = false
+        var isStorming = false
+
+        for (plugin: HyperspaceTerrainPlugin in hyperspaceTerrainPlugins) {
+
+            if (plugin.getExactCellAt(playerCoordinates).isStorming) {
+                isStorming = true
+            }
+            canAddScript = true
+        }
+        if (canAddScript) {
+            engine.addPlugin(deepHyperspaceEffectScript(
+                isStorming
+            ))
+        }
     }
 
     private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
         if (!DEBRIS_FIELD_EFFECT_ENABLED) return
+
+        var canAddPlugin = false
+
+        var debrisDensityMult = 0f
+        var hazardDensityMult = 0f
+
+        for (plugin: DebrisFieldTerrainPlugin in debrisFieldPlugins) {
+            debrisDensityMult++
+            hazardDensityMult++
+
+            canAddPlugin = true
+        }
+
+        if (canAddPlugin) {
+            engine.addPlugin(
+                debrisFieldEffectScript(
+                debrisDensityMult,
+                hazardDensityMult
+            ))
+        }
     }
 
     private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2>) {
