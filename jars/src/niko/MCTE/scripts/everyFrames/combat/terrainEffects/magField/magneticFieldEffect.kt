@@ -18,8 +18,8 @@ class magneticFieldEffect(
     val eccmChanceMod: Float,
     var missileBreakLockBaseChance: Float,
     ): baseCombatDeltaTimeScript() {
+
     val random = MathUtils.getRandom()
-    val engine = Global.getCombatEngine()
 
     private val affectedShips: HashMap<ShipAPI, Boolean> = HashMap()
     private val scrambledMissiles: HashMap<MissileAPI, CombatEntityAPI> = HashMap()
