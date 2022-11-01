@@ -6,6 +6,7 @@ import java.io.IOException
 import kotlin.jvm.Throws
 
 object MCPE_settings {
+    var STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO: Boolean = true
     var SHOW_ERRORS_IN_GAME: Boolean = true
     var MAG_FIELD_EFFECT_ENABLED: Boolean = true
     var DEEP_HYPERSPACE_EFFECT_ENABLED: Boolean = true
@@ -26,5 +27,7 @@ object MCPE_settings {
         DEBRIS_FIELD_EFFECT_ENABLED = configJson.getBoolean("enableDebrisFieldEffect")
         DUST_CLOUD_EFFECT_ENABLED = configJson.getBoolean("enableDustcloudEffect")
         EXTRA_NEBULA_EFFECTS_ENABLED = configJson.getBoolean("enableExtraNebulaEffects")
+
+        STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO = configJson.getBoolean("stackSlipstreamPPTDebuffWithSO")
     }
 }

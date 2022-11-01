@@ -13,6 +13,9 @@
 	"enableExtraNebulaEffects":true, #if true, nebula clouds in combat will also slightly reduce the weapon range and vision radius of any ships inside of them.
 	# defaults to true
 	
+	#SLIPSTREAM SETTINGS
+	"stackSlipstreamPPTDebuffWithSO":true, #if true, the slipstream PPT debuff stacks with SO. defualts to true.
+	
 	#GENERAL
 	"showErrorsInGame":true,
 }
