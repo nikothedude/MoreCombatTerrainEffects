@@ -118,7 +118,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "niko_MCPE_nebulaEffect4",
                 icon,
                 "Nebula",
-                "Speed reduced by ${-speedDecrement}",
+                "Speed reduced by ${-speedDecrement} Su",
                 true)
         }
     }
