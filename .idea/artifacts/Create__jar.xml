@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="Create .jar">
     <output-path>$PROJECT_DIR$/jars</output-path>
-    <root id="archive" name="niko_MCPE.jar">
-      <element id="module-output" name="niko_MCPE" />
+    <root id="archive" name="niko_MCTE.jar">
+      <element id="module-output" name="niko_MCTE" />
     </root>
   </artifact>
 </component>

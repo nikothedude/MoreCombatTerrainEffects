@@ -14,7 +14,7 @@
     # created after October 2012 will not have a Public folder, unfortunately.
     #
     # Example links for common hosts:
-    "masterVersionFile":"https://raw.githubusercontent.com/nikothedude/MoreCombatTerrainEffects/master/MCPE_version.version",
+    "masterVersionFile":"https://raw.githubusercontent.com/nikothedude/MoreCombatTerrainEffects/master/MCTE.version",
 
     "modName":"More Combat Terrain Effects",
 
