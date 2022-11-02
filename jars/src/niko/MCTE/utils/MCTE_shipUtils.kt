@@ -58,8 +58,8 @@ object MCTE_shipUtils {
             empDamage = 0f
         } else {
             if (target is ShipAPI) {
-                val variant = target.variant
-                if (variant.hasHullMod(HullMods.SOLAR_SHIELDING)) modifier -= 0.75f
+                val mutableStats = target.mutableStats
+                modifier *= mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
             }
         }
         engine.spawnEmpArc(
@@ -87,8 +87,8 @@ object MCTE_shipUtils {
             modifier = 0f
         } else {
             if (target is ShipAPI) {
-                val variant = target.variant
-                if (variant.hasHullMod(HullMods.SOLAR_SHIELDING)) modifier -= 0.75f
+                val mutableStats = target.mutableStats
+                modifier *= mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
             }
         }
         engine.spawnEmpArc(
