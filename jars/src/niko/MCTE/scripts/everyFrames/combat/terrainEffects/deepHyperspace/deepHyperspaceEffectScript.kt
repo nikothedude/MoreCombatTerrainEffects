@@ -39,6 +39,7 @@ class deepHyperspaceEffectScript(
         val fleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "talon")
         val fleetMemberRepairTracker = fleetMember.repairTracker
         val fleetManager = engine.getFleetManager(MCTE_ids.HYPERSTORM_FLEETSIDE)
+        fleetMember.setShipName("Hyperstorm Arcs")
         val dummyShip = fleetManager.spawnFleetMember(fleetMember, Vector2f(999999f, 999999f), 5f, 0f)
         dummyShip.collisionClass = CollisionClass.NONE
         dummyShip.shipAI = null
