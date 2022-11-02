@@ -10,6 +10,7 @@ object MCTE_settings {
     var SHOW_ERRORS_IN_GAME: Boolean = true
     var MAG_FIELD_EFFECT_ENABLED: Boolean = true
     var DEEP_HYPERSPACE_EFFECT_ENABLED: Boolean = true
+    var HYPERSTORM_EFFECT_ENABLED: Boolean = true
     var SLIPSTREAM_EFFECT_ENABLED: Boolean = true
     var DEBRIS_FIELD_EFFECT_ENABLED: Boolean = true
     var DUST_CLOUD_EFFECT_ENABLED: Boolean = true
@@ -63,9 +64,11 @@ object MCTE_settings {
     fun loadSettings() {
         MCTE_debugUtils.log.info("reloading settings")
         val configJson = Global.getSettings().loadJSON(MCTE_ids.masterConfig)
+        
         SHOW_ERRORS_IN_GAME = configJson.getBoolean("showErrorsInGame")
         MAG_FIELD_EFFECT_ENABLED = configJson.getBoolean("enableMagFieldEffect")
         DEEP_HYPERSPACE_EFFECT_ENABLED = configJson.getBoolean("enableDeepHyperspaceEffect")
+        HYPERSTORM_EFFECT_ENABLED = configJson.getBoolean("enableHyperstormEffect")
         SLIPSTREAM_EFFECT_ENABLED = configJson.getBoolean("enableSlipstreamEffect")
         DEBRIS_FIELD_EFFECT_ENABLED = configJson.getBoolean("enableDebrisFieldEffect")
         DUST_CLOUD_EFFECT_ENABLED = configJson.getBoolean("enableDustcloudEffect")
