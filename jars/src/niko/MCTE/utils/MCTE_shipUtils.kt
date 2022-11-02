@@ -76,9 +76,14 @@ object MCTE_shipUtils {
     fun Cloud.telegraphArc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI, maxDistance: Float = Float.MAX_VALUE) {
         var energyDamage = 3f
         var empDamage = 1f
+        val modifier = 1f
         if (!target.isTangible()) {
-            energyDamage = 0f
-            empDamage = 0f
+            modifier = 0f
+        } else {
+            if (target is ShipAPI) {
+                val variant = target.variant
+                if (variant.hasHullMod(HullMods.SOLAR_SHIELDING)) modifier -= 0.3f
+            }
         }
         engine.spawnEmpArc(
             source,
@@ -86,8 +91,8 @@ object MCTE_shipUtils {
             null,
             target,
             DamageType.ENERGY,
-            energyDamage,
-            empDamage,
+            energyDamage*modifier,
+            empDamage*modifier,
             maxDistance,
             null,
             1f,
