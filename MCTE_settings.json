@@ -2,8 +2,9 @@
 	#TOGGLES
 	"enableMagFieldEffect":true, #if true, magnetic fields will reduce the weapon range, vision, missile mauneverability/guidance, of any fleet in it, and
 	# also have a chance for missiles to randomly break lock. defaults to true.
-	"enableDeepHyperspaceEffect":true, #if true, deep hyperspace will spawn nebula clouds in combat. if the terrain is storming, the clouds will be charged
-	# and will periodically strike anything near them with very powerful emp arcs. defaults to true
+	"enableDeepHyperspaceEffect":true, #if true, deep hyperspace will spawn nebula clouds in combat.
+	"enableHyperstormEffect":true, #if true, nebuale spawned from hyperspace storms will be storming, and will periodically strike anything near them with
+	# powerful EMP arcs. defaults to true
 	"enableSlipstreamEffect":true, #if true, slipstreams will force psuedo-safety overrides onto all deployed ships/missiles, with the caveat that venting is allowed,
 	# and that deployed ships will all slowly accumulate hard flux. defaults to true
 	"enableDebrisFieldEffect":true, #if true, debris fields will cause misc ship debris to spawn in the battlefield, with a rare chance for a few mines to spawn,
