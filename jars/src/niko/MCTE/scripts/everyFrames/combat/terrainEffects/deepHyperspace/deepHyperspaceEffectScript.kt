@@ -163,9 +163,14 @@ class deepHyperspaceEffectScript(
         val targetCoordinates = shipOrMissile.location
         val distance = MathUtils.getDistance(targetCoordinates, arcCoordinates)
         if (distance > maxRadius) return false
+        var modifier = 1f
+        if (shipOrMissile is ShipAPI) {
+            val hasSolarShielding = shipOrMissile.variant.hasHullMod(Hullmods.SOLAR_SHIELDING)
+            if (hasSolarShielding) modifier -= 0.3
+        }
         val randomFloat = random.nextFloat()
 
-        return (randomFloat <= ((maxRadius - distance)/(maxRadius/100)))
+        return (randomFloat <= (((maxRadius - distance)/(maxRadius/100))*modifier))
     }
 
     private fun Cloud.getArcSite(ourCoordinates: Vector2f = `return`()): Vector2f {
