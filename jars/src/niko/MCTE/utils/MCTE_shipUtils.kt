@@ -52,9 +52,15 @@ object MCTE_shipUtils {
     fun Cloud.arc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI, maxDistance: Float = Float.MAX_VALUE) {
         var energyDamage = HYPERSTORM_ENERGY_DAMAGE
         var empDamage = HYPERSTORM_EMP_DAMAGE
+        var modifier = 1f
         if (!target.isTangible()) {
             energyDamage = 0f
             empDamage = 0f
+        } else {
+            if (target is ShipAPI) {
+                val variant = target.variant
+                if (variant.hasHullMod(HullMods.SOLAR_SHIELDING)) modifier -= 0.75f
+            }
         }
         engine.spawnEmpArc(
             source,
@@ -62,27 +68,27 @@ object MCTE_shipUtils {
             null,
             target,
             DamageType.ENERGY,
-            energyDamage,
-            empDamage,
+            energyDamage*modifier,
+            empDamage*modifier,
             maxDistance,
             null,
             50f,
             Color(154, 51, 255, 255),
             Color(255, 255, 255, 255)
         ) // manually play sounds, since no sound normally plays when striking hulks
-        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.5f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
+        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.3f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
         Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
     }
     fun Cloud.telegraphArc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI, maxDistance: Float = Float.MAX_VALUE) {
         var energyDamage = 3f
         var empDamage = 1f
-        val modifier = 1f
+        var modifier = 1f
         if (!target.isTangible()) {
             modifier = 0f
         } else {
             if (target is ShipAPI) {
                 val variant = target.variant
-                if (variant.hasHullMod(HullMods.SOLAR_SHIELDING)) modifier -= 0.3f
+                if (variant.hasHullMod(HullMods.SOLAR_SHIELDING)) modifier -= 0.75f
             }
         }
         engine.spawnEmpArc(
@@ -112,7 +118,7 @@ object MCTE_shipUtils {
             Color(154, 51, 255, 255),
             Color(255, 255, 255, 255)
         )
-        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.5f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
+        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.3f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
         Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target, Vector2f(0f, 0f))
     }
 }
