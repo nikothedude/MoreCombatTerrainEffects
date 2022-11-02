@@ -1,8 +1,8 @@
 package niko.MCTE
 
 import com.fs.starfarer.api.BaseModPlugin
-import niko.MCTE.utils.MCPE_ids
-import niko.MCTE.utils.MCPE_settings.loadSettings
+import niko.MCTE.utils.MCTE_ids
+import niko.MCTE.utils.MCTE_settings.loadSettings
 
 class niko_MCTE_modPlugin : BaseModPlugin() {
     @Throws(Exception::class)
@@ -12,7 +12,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         try {
             loadSettings()
         } catch (ex: Exception) {
-            throw RuntimeException(MCPE_ids.masterConfig + " loading failed during application load! Exception: " + ex)
+            throw RuntimeException(MCTE_ids.masterConfig + " loading failed during application load! Exception: " + ex)
         }
     }
 }

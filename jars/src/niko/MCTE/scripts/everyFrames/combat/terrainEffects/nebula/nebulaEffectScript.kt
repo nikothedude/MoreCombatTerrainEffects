@@ -6,12 +6,12 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
-import niko.MCTE.utils.MCPE_settings
-import niko.MCTE.utils.MCPE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
-import niko.MCTE.utils.MCPE_settings.NEBULA_RANGE_MULT
-import niko.MCTE.utils.MCPE_settings.NEBULA_SPEED_DECREMENT
-import niko.MCTE.utils.MCPE_settings.NEBULA_VISION_MULT
-import niko.MCTE.utils.MCPE_shipUtils.isAffectedByNebulaSecondary
+import niko.MCTE.utils.MCTE_settings
+import niko.MCTE.utils.MCTE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
+import niko.MCTE.utils.MCTE_settings.NEBULA_RANGE_MULT
+import niko.MCTE.utils.MCTE_settings.NEBULA_SPEED_DECREMENT
+import niko.MCTE.utils.MCTE_settings.NEBULA_VISION_MULT
+import niko.MCTE.utils.MCTE_shipUtils.isAffectedByNebulaSecondary
 import niko.MCTE.utils.terrainCombatEffectIds
 import kotlin.collections.HashMap
 
@@ -33,7 +33,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
     override fun init(engine: CombatEngineAPI?) {
         super.init(engine)
         if (Global.getCurrentState() != GameState.COMBAT) return
-        if (!MCPE_settings.EXTRA_NEBULA_EFFECTS_ENABLED) {
+        if (!MCTE_settings.EXTRA_NEBULA_EFFECTS_ENABLED) {
             this.engine.removePlugin(this)
             return
         }

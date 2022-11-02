@@ -7,11 +7,10 @@ import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.input.InputEventAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
-import niko.MCTE.utils.MCPE_ids
+import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
-import java.util.concurrent.ThreadLocalRandom
 
 class magneticFieldEffect(
     val isStorm: Boolean,
@@ -23,7 +22,6 @@ class magneticFieldEffect(
     ): baseTerrainEffectScript(), usesDeltaTime {
 
     override var deltaTime = 0f
-    val random = MathUtils.getRandom()
 
     protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
     private val scrambledMissiles: HashMap<MissileAPI, CombatEntityAPI> = HashMap()
@@ -163,7 +161,7 @@ class magneticFieldEffect(
         val magFlare = engine.spawnProjectile(
             null,
             null,
-            MCPE_ids.magFlareWeaponId,
+            MCTE_ids.magFlareWeaponId,
             Vector2f(randomX, randomY),
             0f,
             null

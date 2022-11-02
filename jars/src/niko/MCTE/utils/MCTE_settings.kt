@@ -6,7 +6,7 @@ import org.lazywizard.lazylib.ext.json.getFloat
 import java.io.IOException
 import kotlin.jvm.Throws
 
-object MCPE_settings {
+object MCTE_settings {
     var SHOW_ERRORS_IN_GAME: Boolean = true
     var MAG_FIELD_EFFECT_ENABLED: Boolean = true
     var DEEP_HYPERSPACE_EFFECT_ENABLED: Boolean = true
@@ -43,11 +43,26 @@ object MCPE_settings {
     var NEBULA_SPEED_DECREMENT: Float = -10f
     var NEBULA_DISABLE_ZERO_FLUX_BOOST: Boolean = true
 
+    //HYPERCLOUD SETTINGS
+    var MIN_HYPERCLOUDS_TO_ADD_PER_CELL: Int = 8
+    var MAX_HYPERCLOUDS_TO_ADD_PER_CELL: Int = 20
+    //HYPERSTORM SETTINGS
+    var HYPERSTORM_ENERGY_DAMAGE = 2000f
+    var HYPERSTORM_EMP_DAMAGE = 6500f
+    var MIN_TIME_BETWEEN_HYPERSTORM_STRIKES = 5f
+    var MAX_TIME_BETWEEN_HYPERSTORM_STRIKES = 9f
+    var HYPERSTORM_GRACE_INCREMENT = 3f
+    var HYPERSTORM_ARCSITE_X_VARIATION = 500f
+    var HYPERSTORM_ARCSITE_Y_VARIATION = 500f
+    var HYPERSTORM_MIN_ARC_RANGE = 1000f
+    var HYPERSTORM_MAX_ARC_RANGE = 1600f
+
+
     @JvmStatic
     @Throws(JSONException::class, IOException::class)
     fun loadSettings() {
-        MCPE_debugUtils.log.info("reloading settings")
-        val configJson = Global.getSettings().loadJSON(MCPE_ids.masterConfig)
+        MCTE_debugUtils.log.info("reloading settings")
+        val configJson = Global.getSettings().loadJSON(MCTE_ids.masterConfig)
         SHOW_ERRORS_IN_GAME = configJson.getBoolean("showErrorsInGame")
         MAG_FIELD_EFFECT_ENABLED = configJson.getBoolean("enableMagFieldEffect")
         DEEP_HYPERSPACE_EFFECT_ENABLED = configJson.getBoolean("enableDeepHyperspaceEffect")
@@ -83,5 +98,20 @@ object MCPE_settings {
         NEBULA_RANGE_MULT = configJson.getFloat("nebulaRangeMult")
         NEBULA_SPEED_DECREMENT = configJson.getFloat("nebulaSpeedDecrement")
         NEBULA_DISABLE_ZERO_FLUX_BOOST = configJson.getBoolean("nebulaDisableZeroFluxBoost")
+
+        //HYPERCLOUD
+        MIN_HYPERCLOUDS_TO_ADD_PER_CELL = configJson.getInt("minimumHypercloudsPerCell")
+        MAX_HYPERCLOUDS_TO_ADD_PER_CELL = configJson.getInt("maximumHypercloudsPerCell")
+
+        //HYPERSTORM
+        HYPERSTORM_ENERGY_DAMAGE = configJson.getFloat("hyperstormEnergyDamage")
+        HYPERSTORM_EMP_DAMAGE = configJson.getFloat("hyperstormEMPDamage")
+        MIN_TIME_BETWEEN_HYPERSTORM_STRIKES = configJson.getFloat("minTimeBetweenHyperstormStrikes")
+        MAX_TIME_BETWEEN_HYPERSTORM_STRIKES = configJson.getFloat("maxTimeBetweenHyperstormStrikes")
+        HYPERSTORM_GRACE_INCREMENT = configJson.getFloat("amountOfTimeShipsHaveBetweenStrikes")
+        HYPERSTORM_ARCSITE_X_VARIATION = configJson.getFloat("hyperstormArcSiteXVariation")
+        HYPERSTORM_ARCSITE_Y_VARIATION = configJson.getFloat("hyperstormArcSiteYVariation")
+        HYPERSTORM_MIN_ARC_RANGE = configJson.getFloat("hyperstormMinArcRange")
+        HYPERSTORM_MAX_ARC_RANGE = configJson.getFloat("hyperstormMaxArcRange")
     }
 }

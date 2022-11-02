@@ -49,6 +49,22 @@
 	"nebulaSpeedDecrement":-10, #default: -10
 	"nebulaDisableZeroFluxBoost":true, #default: true
 	
+	#HYPERCLOUD EFFECTS, all effects here are for hyperstorms too
+	"minimumHypercloudsPerCell":8, #controls how many nebulae hyperclouds spawn. default: 8
+	"maximumHypercloudsPerCell":20, #default: 20
+	
+	#HYPERSTORM EFFECTS
+	"hyperstormEnergyDamage":2000, #energy damage the final purple bolt will do. default: 2000
+	"hyperstormEMPDamage":6500, #EMP damage the final purple bolt will do. default: 6500
+	"minTimeBetweenHyperstormStrikes":3, #Minimum time, in ~seconds, between arc attempts. default: 3
+	"maxTimeBetweenHyperstormStrikes":9, #Maximum time, in ~seconds, between arc attempts. default: 9
+	"amountOfTimeShipsHaveBetweenStrikes":3, #After all active arc attempts on a target finish, the target is given this amount of time in 
+	#~seconds before they can be targetted again. default: 3
+	"hyperstormArcSiteXVariation":500, #Max and min coordinates in the x direction an arc can appear from, relative to the nebula. default: 500
+	"hyperstormArcSiteYVariation":500, #Max and min coordinates in the y direction an arc can appear from, relative to the nebula. default: 500
+	"hyperstormMinArcRange":1000, #Lower bound of the range that can be picked for an arc attempt. Default: 1000
+	"hyperstormMaxArcRange":1600, #Upper bound of the range that can be picked for an arc attempt. Default: 1600
+	
 	#GENERAL
 	"showErrorsInGame":true,
 }

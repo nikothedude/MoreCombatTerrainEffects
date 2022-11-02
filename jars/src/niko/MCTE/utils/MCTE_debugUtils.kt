@@ -2,19 +2,14 @@ package niko.MCTE.utils
 
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
-import com.fs.starfarer.api.campaign.CampaignFleetAPI
-import com.fs.starfarer.api.campaign.CustomCampaignEntityAPI
-import com.fs.starfarer.api.campaign.SectorEntityToken
-import com.fs.starfarer.api.campaign.StarSystemAPI
-import com.fs.starfarer.api.campaign.econ.MarketAPI
 import com.fs.starfarer.api.campaign.rules.HasMemory
 import com.fs.starfarer.api.campaign.rules.MemoryAPI
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import java.awt.Color
 
-object MCPE_debugUtils {
-    val log: Logger = Global.getLogger(MCPE_debugUtils::class.java)
+object MCTE_debugUtils {
+    val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 
     init {
         log.level = Level.ALL
@@ -34,7 +29,7 @@ object MCPE_debugUtils {
     fun displayError(errorCode: String = "Unimplemented errorcode", highPriority: Boolean = false, crash: Boolean = false,
                      logType: Level = Level.ERROR) {
 
-        if (MCPE_settings.SHOW_ERRORS_IN_GAME) {
+        if (MCTE_settings.SHOW_ERRORS_IN_GAME) {
             when (val gameState = Global.getCurrentState()) {
                 GameState.CAMPAIGN -> displayErrorToCampaign(errorCode, highPriority)
                 GameState.COMBAT -> displayErrorToCombat(errorCode, highPriority)

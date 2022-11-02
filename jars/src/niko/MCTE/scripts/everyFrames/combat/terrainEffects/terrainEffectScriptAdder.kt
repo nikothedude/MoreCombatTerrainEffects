@@ -10,32 +10,36 @@ import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
+import com.fs.starfarer.combat.entities.terrain.A
+import com.fs.starfarer.combat.entities.terrain.Cloud
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
-import niko.MCTE.utils.MCPE_settings.DEBRIS_FIELD_EFFECT_ENABLED
-import niko.MCTE.utils.MCPE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
-import niko.MCTE.utils.MCPE_settings.DUST_CLOUD_EFFECT_ENABLED
-import niko.MCTE.utils.MCPE_settings.MAGFIELD_ECCM_MULT
-import niko.MCTE.utils.MCPE_settings.MAGFIELD_MISSILE_MULT
-import niko.MCTE.utils.MCPE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE
-import niko.MCTE.utils.MCPE_settings.MAGFIELD_RANGE_MULT
-import niko.MCTE.utils.MCPE_settings.MAGFIELD_VISION_MULT
-import niko.MCTE.utils.MCPE_settings.MAGSTORM_ECCM_MULT
-import niko.MCTE.utils.MCPE_settings.MAGSTORM_MISSILE_MULT
-import niko.MCTE.utils.MCPE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE
-import niko.MCTE.utils.MCPE_settings.MAGSTORM_RANGE_MULT
-import niko.MCTE.utils.MCPE_settings.MAGSTORM_VISION_MULT
-import niko.MCTE.utils.MCPE_settings.MAG_FIELD_EFFECT_ENABLED
-import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_EFFECT_ENABLED
-import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT
-import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
-import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
-import niko.MCTE.utils.MCPE_settings.SLIPSTREAM_PPT_MULT
-import niko.MCTE.utils.MCPE_settings.loadSettings
+import niko.MCTE.utils.MCTE_debugUtils
+import niko.MCTE.utils.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
+import niko.MCTE.utils.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
+import niko.MCTE.utils.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
+import niko.MCTE.utils.MCTE_settings.MAGFIELD_ECCM_MULT
+import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_MULT
+import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE
+import niko.MCTE.utils.MCTE_settings.MAGFIELD_RANGE_MULT
+import niko.MCTE.utils.MCTE_settings.MAGFIELD_VISION_MULT
+import niko.MCTE.utils.MCTE_settings.MAGSTORM_ECCM_MULT
+import niko.MCTE.utils.MCTE_settings.MAGSTORM_MISSILE_MULT
+import niko.MCTE.utils.MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE
+import niko.MCTE.utils.MCTE_settings.MAGSTORM_RANGE_MULT
+import niko.MCTE.utils.MCTE_settings.MAGSTORM_VISION_MULT
+import niko.MCTE.utils.MCTE_settings.MAG_FIELD_EFFECT_ENABLED
+import niko.MCTE.utils.MCTE_settings.MAX_HYPERCLOUDS_TO_ADD_PER_CELL
+import niko.MCTE.utils.MCTE_settings.MIN_HYPERCLOUDS_TO_ADD_PER_CELL
+import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_EFFECT_ENABLED
+import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT
+import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
+import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
+import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_PPT_MULT
+import niko.MCTE.utils.MCTE_settings.loadSettings
 import org.lwjgl.util.vector.Vector2f
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 // script to dodge plugin incompatability
 class terrainEffectScriptAdder: baseNikoCombatScript() {
@@ -115,29 +119,62 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         for (plugin: HyperspaceTerrainPlugin in hyperspaceTerrainPlugins) {
             var isStorming = false
 
-            val cellAtPlayer: CellStateTracker = plugin.getExactCellAt(playerCoordinates) ?: continue
+            val cellAtPlayer: CellStateTracker? = plugin.getCellAt(playerCoordinates, 100f)
+            if (cellAtPlayer == null) {
+                MCTE_debugUtils.displayError("failed to locate cell tracker despite player being in a hypercloud")
+                continue
+            }
             if (cellAtPlayer.isStorming) {
                 isStorming = true
             }
             canAddScript = true
             pluginToStorming[plugin] = isStorming
         }
-      /*  val deepHyperspaceNebulas: MutableMap<NebulaParticle, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
-        val stormingNebulae: MutableSet<NebulaParticle> = HashSet()
-        for (entry in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[entry] == true) stormingNebulae += entry */
+        val deepHyperspaceNebulas: MutableMap<Cloud, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
+        val stormingNebulae: MutableSet<Cloud> = HashSet()
+        for (entry in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[entry] == true) stormingNebulae += entry
 
-        /*if (canAddScript) {
-            engine.addPlugin(deepHyperspaceEffectScript(
-                stormingNebulae
-            ))
-        } */
+        if (canAddScript) {
+            engine.addPlugin(deepHyperspaceEffectScript(stormingNebulae))
+        }
     }
 
-   /* private fun instantiateDeephyperspaceNebulae(
-        pluginToStorming: HashMap<HyperspaceTerrainPlugin, Boolean>): MutableMap<NebulaParticle, Boolean> {
-        engine.addNebulaParticle()
+    private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): MutableMap<Cloud, Boolean> {
+        val nebulaManager = (engine.nebula as A)
+        val mapHeight = engine.mapHeight
+        val mapWidth = engine.mapWidth
 
-    } */
+        val deepHyperspaceNebulae = HashMap<Cloud, Boolean>()
+
+        for (plugin in pluginToStorming.keys) {
+            val isStorming = (pluginToStorming[plugin] == true)
+
+            val minNebulaeToAdd = MIN_HYPERCLOUDS_TO_ADD_PER_CELL
+            val maxNebulaeToAdd = MAX_HYPERCLOUDS_TO_ADD_PER_CELL
+            val nebulaeToAdd: Int = (minNebulaeToAdd..maxNebulaeToAdd).random()
+
+            var addedNebulae = 0f
+            while (addedNebulae < nebulaeToAdd) {
+                addedNebulae++
+                // copypasted form battlecreationplugin
+                val x = random.nextFloat() * mapWidth - mapWidth / 2
+                val y = random.nextFloat() * mapHeight - mapHeight / 2
+                var radius = 100f + random.nextFloat() * 400f
+                radius += 100f + 500f * random.nextFloat()
+
+                nebulaManager.spawnCloud(Vector2f(x, y), radius)
+                val nebula: Cloud = nebulaManager.getCloud(x, y)
+                deepHyperspaceNebulae[nebula] = isStorming
+            }
+        }
+        return deepHyperspaceNebulae
+    }
+
+    /* private fun instantiateDeephyperspaceNebulae(
+         pluginToStorming: HashMap<HyperspaceTerrainPlugin, Boolean>): MutableMap<NebulaParticle, Boolean> {
+         engine.addNebulaParticle()
+
+     } */
 
     private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
         if (!DEBRIS_FIELD_EFFECT_ENABLED) return
