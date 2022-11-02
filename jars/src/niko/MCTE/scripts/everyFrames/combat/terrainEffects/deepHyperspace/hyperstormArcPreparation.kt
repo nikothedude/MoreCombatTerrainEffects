@@ -75,7 +75,10 @@ class hyperstormArcPreparation(
         val threshold = (deltaTime * (1/thresholdForAdvancement))*.5
         val randomFloat = random.nextFloat()
         val modifier = 1f
-        if (targetHasSolarShielding) modifier -= 0.3f
+        if (target is ShipAPI) {
+            val mutableStats = target.mutableStats
+            modifier *= mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
+        }
         if (randomFloat <= (threshold*modifier)) {
             hyperStormNebula.telegraphArc(engine, coordinatesToSpawnArcFrom, dummyShip, target, maxRadius)
         }
