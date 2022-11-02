@@ -124,7 +124,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 MCTE_debugUtils.displayError("failed to locate cell tracker despite player being in a hypercloud")
                 continue
             }
-            if (cellAtPlayer.isStorming) {
+            if (cellAtPlayer.isStorming && HYPERSTORM_EFFECT_ENABLED) {
                 isStorming = true
             }
             canAddScript = true
