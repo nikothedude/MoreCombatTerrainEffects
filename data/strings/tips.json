@@ -5,7 +5,7 @@
 		  {"freq":1.5, "tip":"[More Combat Terrain Effects] Slipstreams supercharge the systems of anything inside them, giving them psuedo-safety overrides, even missiles! However, the extreme load often causes a passive buildup of hardflux."},
 		  {"freq":0.9, "tip":"[More Combat Terrain Effects] Slipstreams don't actually color your engines the same color as safety overrides - it's a more purple color."},
 		  {"freq":1.5, "tip":"[More Combat Terrain Effects] While long-ranged sensors are unaffected by nebulae, combat-grade sensors struggle somewhat, resulting in nebulae reducing vision and weapon range somewhat of any ship inside them, alongside the gasses choking out the engines, reducing speed somewhat and disabling the zero-flux boost."},
-		  #{"freq":1, "tip":"[More Combat Terrain Effects] In combat, hyperspace clouds are similar in function to nebulae, with one major exception: If storming, they will periodically strike a nearby area with powerful EMP-capable lightning, that sends their target flying. This includes ships!"},
+		  {"freq":1.5, "tip":"[More Combat Terrain Effects] In combat, hyperspace clouds are similar in function to nebulae, with one major exception: If storming, they will periodically strike a nearby area with cripplingly-powerful lightning. This includes ships!"},
 		  #{"freq":1, "tip":"[More Combat Terrain Effects] Oftentimes, debris fields are the aftermath of a battle. Fighting inside them can be a challenge, what with the large ship pieces floating around, leftover munitions/mines, drones with their combat program still active..."},
 		 
     ],
