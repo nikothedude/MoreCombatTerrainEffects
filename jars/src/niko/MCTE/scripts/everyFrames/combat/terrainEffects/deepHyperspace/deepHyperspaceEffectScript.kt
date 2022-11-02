@@ -165,8 +165,8 @@ class deepHyperspaceEffectScript(
         if (distance > maxRadius) return false
         var modifier = 1f
         if (shipOrMissile is ShipAPI) {
-            val hasSolarShielding = shipOrMissile.variant.hasHullMod(Hullmods.SOLAR_SHIELDING)
-            if (hasSolarShielding) modifier -= 0.3
+            val mutableStats = shipOrMissile.mutableStats
+            modifier *= mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
         }
         val randomFloat = random.nextFloat()
 
