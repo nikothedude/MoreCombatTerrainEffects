@@ -65,12 +65,13 @@ object MCTE_shipUtils {
             energyDamage,
             empDamage,
             maxDistance,
-            "MCTE_hyperStormArcSound",
+            null,
             50f,
             Color(154, 51, 255, 255),
             Color(255, 255, 255, 255)
-        )
+        ) // manually play sounds, since no sound normally plays when striking hulks
         Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.5f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
+        Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
     }
     fun Cloud.telegraphArc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI, maxDistance: Float = Float.MAX_VALUE) {
         var energyDamage = 3f
@@ -88,11 +89,12 @@ object MCTE_shipUtils {
             energyDamage,
             empDamage,
             maxDistance,
-            "MCTE_telegraphArcSound",
+            null,
             1f,
             Color(106, 162, 215, 255),
             Color(255, 255, 255, 255)
         )
+        Global.getSoundPlayer().playSound("MCTE_telegraphArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
     }
 
     fun Cloud.cosmeticArc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, target: Vector2f) {
@@ -106,5 +108,6 @@ object MCTE_shipUtils {
             Color(255, 255, 255, 255)
         )
         Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
+        Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target, Vector2f(0f, 0f))
     }
 }
