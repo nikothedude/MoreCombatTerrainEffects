@@ -107,7 +107,7 @@ object MCTE_shipUtils {
             Color(154, 51, 255, 255),
             Color(255, 255, 255, 255)
         )
-        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
+        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.5f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
         Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target, Vector2f(0f, 0f))
     }
 }
