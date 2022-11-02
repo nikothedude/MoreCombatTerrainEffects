@@ -31,6 +31,12 @@ class hyperstormArcPreparation(
     val thresholdForReposition = 0.1f
 
     var threatIndicator: CombatEntityAPI? = createThreatIndicator()
+    val targetHasSolarShielding: Boolean = targetHasSolarShielding()
+    private fun targetHasSolarShielding() {
+        if (target !is ShipAPI) return false
+        val variant = target.variant
+        return (variant.hasHullMod(HullMods.SOLAR_SHIELDING))
+    }
 
     private fun getAdvancementThreshold(): Float {
         val max = 4.6f
@@ -68,7 +74,9 @@ class hyperstormArcPreparation(
     private fun tryToTelegraph() {
         val threshold = (deltaTime * (1/thresholdForAdvancement))*.5
         val randomFloat = random.nextFloat()
-        if (randomFloat <= threshold) {
+        val modifier = 1f
+        if (targetHasSolarShielding) modifier -= 0.3f
+        if (randomFloat <= (threshold*modifier)) {
             hyperStormNebula.telegraphArc(engine, coordinatesToSpawnArcFrom, dummyShip, target, maxRadius)
         }
     }
