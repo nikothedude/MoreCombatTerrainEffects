@@ -97,6 +97,7 @@ class deepHyperspaceEffectScript(
     }
 
     private fun prepareArc(amount: Float, cell: MutableSet<Cloud>, maxRadius: Float, shipsAndMissiles: MutableList<CombatEntityAPI>) {
+        TODO("replace shipsAndMissiles with something that doesnt share THIS cell's values with everythijng else. each cell should use its own radius")
         val params = stormingCellsWithParams[cell] ?: return
         val randomizedPosition = getArcSite(cell)
         if (shipsAndMissiles.isEmpty()) shipsAndMissiles.addAll(this.getEntitiesWithinRange(cell, randomizedPosition, maxRadius, amount))
