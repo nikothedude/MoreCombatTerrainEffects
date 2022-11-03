@@ -5,12 +5,16 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.MissileAPI
-import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.input.InputEventAPI
+import com.fs.starfarer.combat.entities.Missile
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseNikoCombatScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
+import niko.MCTE.utils.MCTE_settings.HYPERSTORM_EMP_DAMAGE
+import niko.MCTE.utils.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
+import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
+import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_shipUtils.arc
 import niko.MCTE.utils.MCTE_shipUtils.telegraphArc
 import org.lazywizard.lazylib.VectorUtils
@@ -18,11 +22,10 @@ import org.lwjgl.util.vector.Vector2f
 
 class hyperstormArcPreparation(
     val parentScript: deepHyperspaceEffectScript,
-    val hyperStormNebula: Cloud,
+    val hyperStormNebula: MutableSet<Cloud>,
     val target: CombatEntityAPI,
     val coordinatesToSpawnArcFrom: Vector2f,
     val maxRadius: Float,
-    val dummyShip: ShipAPI
 ): baseNikoCombatScript(), usesDeltaTime {
 
     override var deltaTime: Float = 0f
@@ -31,16 +34,10 @@ class hyperstormArcPreparation(
     val thresholdForReposition = 0.1f
 
     var threatIndicator: CombatEntityAPI? = createThreatIndicator()
-    val targetHasSolarShielding: Boolean = targetHasSolarShielding()
-    private fun targetHasSolarShielding() {
-        if (target !is ShipAPI) return false
-        val variant = target.variant
-        return (variant.hasHullMod(HullMods.SOLAR_SHIELDING))
-    }
 
     private fun getAdvancementThreshold(): Float {
-        val max = 4.6f
-        val min = 3.2f
+        val max = HYPERSTORM_MAX_ARC_CHARGE_TIME
+        val min = HYPERSTORM_MIN_ARC_CHARGE_TIME
 
         return min + random.nextFloat() * (max - min)
     }
@@ -54,7 +51,7 @@ class hyperstormArcPreparation(
         }
         parentScript.targettedEntities[target]!! += this
 
-        hyperStormNebula.telegraphArc(this.engine, coordinatesToSpawnArcFrom, dummyShip, target)
+        telegraphArc(hyperStormNebula, this.engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target)
 
         //target.aiFlags.setFlag(ShipwideAIFlags.AIFlags.DO_NOT_VENT, thresholdForAdvancement)
     }
@@ -74,28 +71,28 @@ class hyperstormArcPreparation(
     private fun tryToTelegraph() {
         val threshold = (deltaTime * (1/thresholdForAdvancement))*.5
         val randomFloat = random.nextFloat()
-        val modifier = 1f
-        if (target is ShipAPI) {
-            val mutableStats = target.mutableStats
-            modifier *= mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
-        }
+        val modifier = parentScript.getActualDamageMultForEntity(target)
         if (randomFloat <= (threshold*modifier)) {
-            hyperStormNebula.telegraphArc(engine, coordinatesToSpawnArcFrom, dummyShip, target, maxRadius)
+            telegraphArc(hyperStormNebula, engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius)
         }
     }
 
     private fun doArc() {
 
-        hyperStormNebula.arc(engine, coordinatesToSpawnArcFrom, dummyShip, target, maxRadius)
-        val prepScriptsTargettingTarget = parentScript.targettedEntities[target]
-        prepScriptsTargettingTarget!! -= this
-        if (prepScriptsTargettingTarget.isEmpty()) parentScript.giveGraceToTarget(target)
-        parentScript.arcingNebulae[hyperStormNebula] = null
+        val damage = parentScript.getActualDamageForEntity(target)
+        val emp = parentScript.getEMPDamageForEntity(target)
+        arc(hyperStormNebula, engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, damage, emp)
 
         delete()
     }
 
-    private fun delete() {
+    fun delete() {
+        val prepScriptsTargettingTarget = parentScript.targettedEntities[target]
+        prepScriptsTargettingTarget!! -= this
+        if (prepScriptsTargettingTarget.isEmpty()) parentScript.giveGraceToTarget(target)
+        val params = parentScript.stormingCellsWithParams[hyperStormNebula] ?: return
+        params.preparationScript = null
+
         engine.removePlugin(this)
         deleteThreatIndicator()
     }
@@ -126,7 +123,9 @@ class hyperstormArcPreparation(
             null
         )
         if (threatIndicator is MissileAPI) {
-            threatIndicator.untilMineExplosion = (thresholdForAdvancement - deltaTime).coerceAtLeast(thresholdForReposition)
+            threatIndicator.untilMineExplosion = (thresholdForAdvancement - deltaTime).coerceAtLeast(0.1f)
+            threatIndicator.damageAmount = HYPERSTORM_ENERGY_DAMAGE
+            threatIndicator.damage.fluxComponent = HYPERSTORM_EMP_DAMAGE
         }
         return threatIndicator
     }

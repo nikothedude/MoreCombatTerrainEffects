@@ -6,20 +6,27 @@ import com.fs.starfarer.api.campaign.CampaignFleetAPI
 import com.fs.starfarer.api.campaign.CampaignTerrainAPI
 import com.fs.starfarer.api.campaign.LocationAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
+import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudParams
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.utils.MCTE_debugUtils
+import niko.MCTE.utils.MCTE_miscUtils
+import niko.MCTE.utils.MCTE_miscUtils.getCellCentroid
+import niko.MCTE.utils.MCTE_miscUtils.getRadiusOfCell
 import niko.MCTE.utils.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
+import niko.MCTE.utils.MCTE_settings.HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
+import niko.MCTE.utils.MCTE_settings.HYPERSTORM_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.MAGFIELD_ECCM_MULT
 import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_MULT
 import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE
@@ -39,6 +46,8 @@ import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.utils.MCTE_settings.loadSettings
+import org.lazywizard.lazylib.MathUtils
+import org.lazywizard.lazylib.ext.logging.i
 import org.lwjgl.util.vector.Vector2f
 
 // script to dodge plugin incompatability
@@ -110,8 +119,12 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
     }
 
     private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin>) {
-        if (!DEEP_HYPERSPACE_EFFECT_ENABLED) return
-
+        if (!DEEP_HYPERSPACE_EFFECT_ENABLED || engine.nebula == null) return
+        if (MCTE_debugUtils.isMacOS()) {
+            MCTE_debugUtils.log.info("Rejected hyperspace terrain due to potential macOS crashes.")
+            return
+        }
+        val nebula = engine.nebula
         var canAddScript = false
 
         val pluginToStorming: HashMap<HyperspaceTerrainPlugin, Boolean> = HashMap()
@@ -130,21 +143,70 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             canAddScript = true
             pluginToStorming[plugin] = isStorming
         }
-        val deepHyperspaceNebulas: MutableMap<Cloud, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
-        val stormingNebulae: MutableSet<Cloud> = HashSet()
-        for (entry in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[entry] == true) stormingNebulae += entry
-
         if (canAddScript) {
-            engine.addPlugin(deepHyperspaceEffectScript(stormingNebulae))
+            val deepHyperspaceNebulas: MutableMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
+            val stormingNebulae: MutableSet<MutableSet<Cloud>> = HashSet()
+            val stormingNebulaeToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
+            for (mapOfCellsToCentroid in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[mapOfCellsToCentroid] == true) {
+                stormingNebulae += mapOfCellsToCentroid.keys
+                stormingNebulaeToCentroid += mapOfCellsToCentroid
+            }
+            val stormingNebulaeToRadius = getRadiusOfHyperstorms(stormingNebulaeToCentroid, nebula)
+
+            val stormingNebulaeWithParams = HashMap<MutableSet<Cloud>, cloudParams>()
+            for (cell: MutableSet<Cloud> in stormingNebulae) {
+                val centroid = getCellCentroidRepeatadly(nebula, cell)
+                if (centroid == null) {
+                    MCTE_debugUtils.displayError("centroid null when making params")
+                    continue
+                }
+                val radius = getRadiusOfCell(cell, nebula, centroid)
+                val cloudParams = cloudParams(
+                    centroid,
+                    radius
+                )
+                stormingNebulaeWithParams[cell] = cloudParams
+            }
+
+            engine.addPlugin(deepHyperspaceEffectScript(stormingNebulaeWithParams))
         }
     }
 
-    private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): MutableMap<Cloud, Boolean> {
-        val nebulaManager = (engine.nebula as A)
+    private fun getCellCentroidRepeatadly(nebula: CombatNebulaAPI?, cell: MutableSet<Cloud>): Vector2f? {
+        if (nebula == null) {
+            MCTE_debugUtils.displayError("nebula null during centroid repeat")
+            return Vector2f(0f, 0f)
+        }
+        val amountOfTimes = HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
+        var centroid = getCellCentroid(nebula, cell)
+        var indexVal = 0
+        while (indexVal < amountOfTimes) {
+            indexVal++
+            centroid = getCellCentroid(nebula, cell, centroid)
+        }
+        return centroid
+    }
+
+    fun getRadiusOfHyperstorms(cellMap: MutableMap<MutableSet<Cloud>, Vector2f>, nebula: CombatNebulaAPI): MutableMap<MutableSet<Cloud>, Float> {
+        val cellsToRadius = HashMap<MutableSet<Cloud>, Float>()
+        for (cell in cellMap.keys) {
+            val centroid = cellMap[cell]
+            if (centroid == null) {
+                MCTE_debugUtils.displayError("centroid null during getRadiusOfHyperstorms in terraineffectadder")
+                continue
+            }
+            val radius = MCTE_miscUtils.getRadiusOfCell(cell, nebula, centroid)
+            cellsToRadius[cell] = radius
+        }
+        return cellsToRadius
+    }
+
+    private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> {
+        val nebulaManager = (engine.nebula as? A) ?: return HashMap()
         val mapHeight = engine.mapHeight
         val mapWidth = engine.mapWidth
 
-        val deepHyperspaceNebulae = HashMap<Cloud, Boolean>()
+        val deepHyperspaceNebulae = HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean>()
 
         for (plugin in pluginToStorming.keys) {
             val isStorming = (pluginToStorming[plugin] == true)
@@ -163,8 +225,18 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 radius += 100f + 500f * random.nextFloat()
 
                 nebulaManager.spawnCloud(Vector2f(x, y), radius)
+                val cellToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
                 val nebula: Cloud = nebulaManager.getCloud(x, y)
-                deepHyperspaceNebulae[nebula] = isStorming
+                val nebulaCell: MutableSet<Cloud> = HashSet()
+                nebulaCell += nebula
+                var possibleCellInhabitant = nebula.Object()
+                while (possibleCellInhabitant != null) {
+                    nebulaCell += possibleCellInhabitant
+                    possibleCellInhabitant = possibleCellInhabitant.Object()
+                }
+                val cellCentroid = getCellCentroid(nebulaManager, nebulaCell) ?: return deepHyperspaceNebulae
+                cellToCentroid[nebulaCell] = cellCentroid
+                deepHyperspaceNebulae[cellToCentroid] = isStorming
             }
         }
         return deepHyperspaceNebulae

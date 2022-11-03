@@ -19,7 +19,6 @@ object MCTE_shipUtils {
 
     @JvmStatic
     fun CombatEntityAPI.isTangible(): Boolean {
-        var isTangible = false
         if (this is ShipAPI) {
             if (isPhased) return false
         }
@@ -27,7 +26,7 @@ object MCTE_shipUtils {
     }
 
     @JvmStatic
-    fun ShipAPI.isAffectedByNebulaSecondary(nebula: CombatNebulaAPI): Boolean {
+    fun CombatEntityAPI.isAffectedByNebulaSecondary(nebula: CombatNebulaAPI): Boolean {
         if (!isTangible()) return false
         if (nebula.locationHasNebula(location.x, location.y)) return true
         return false
@@ -49,18 +48,12 @@ object MCTE_shipUtils {
         return closest
     }
 
-    fun Cloud.arc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI, maxDistance: Float = Float.MAX_VALUE) {
-        var energyDamage = HYPERSTORM_ENERGY_DAMAGE
-        var empDamage = HYPERSTORM_EMP_DAMAGE
+    fun arc(cell: MutableSet<Cloud>, engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI,
+                  maxDistance: Float = Float.MAX_VALUE, actualDamage: Float, empDamage: Float) {
+
         var modifier = 1f
         if (!target.isTangible()) {
-            energyDamage = 0f
-            empDamage = 0f
-        } else {
-            if (target is ShipAPI) {
-                val mutableStats = target.mutableStats
-                modifier *= mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
-            }
+            modifier = 0f
         }
         engine.spawnEmpArc(
             source,
@@ -68,7 +61,7 @@ object MCTE_shipUtils {
             null,
             target,
             DamageType.ENERGY,
-            energyDamage*modifier,
+            actualDamage*modifier,
             empDamage*modifier,
             maxDistance,
             null,
@@ -79,17 +72,12 @@ object MCTE_shipUtils {
         Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.3f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
         Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
     }
-    fun Cloud.telegraphArc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI, maxDistance: Float = Float.MAX_VALUE) {
+    fun telegraphArc(cell: MutableSet<Cloud>, engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI, maxDistance: Float = Float.MAX_VALUE) {
         var energyDamage = 3f
         var empDamage = 1f
         var modifier = 1f
         if (!target.isTangible()) {
             modifier = 0f
-        } else {
-            if (target is ShipAPI) {
-                val mutableStats = target.mutableStats
-                modifier *= mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
-            }
         }
         engine.spawnEmpArc(
             source,
@@ -108,7 +96,7 @@ object MCTE_shipUtils {
         Global.getSoundPlayer().playSound("MCTE_telegraphArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
     }
 
-    fun Cloud.cosmeticArc(engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, target: Vector2f) {
+    fun cosmeticArc(cell: MutableSet<Cloud>, engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, target: Vector2f) {
         engine.spawnEmpArcVisual(
             coordinatesToSpawnArcFrom,
             null,
@@ -119,6 +107,6 @@ object MCTE_shipUtils {
             Color(255, 255, 255, 255)
         )
         Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.3f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
-        Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target, Vector2f(0f, 0f))
+        Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 0.09f, target, Vector2f(0f, 0f))
     }
 }

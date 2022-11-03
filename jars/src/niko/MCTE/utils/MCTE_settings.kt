@@ -53,10 +53,12 @@ object MCTE_settings {
     var MIN_TIME_BETWEEN_HYPERSTORM_STRIKES = 5f
     var MAX_TIME_BETWEEN_HYPERSTORM_STRIKES = 9f
     var HYPERSTORM_GRACE_INCREMENT = 3f
-    var HYPERSTORM_ARCSITE_X_VARIATION = 500f
-    var HYPERSTORM_ARCSITE_Y_VARIATION = 500f
+    var HYPERSTORM_MAX_ARC_CHARGE_TIME = 4.6f
+    var HYPERSTORM_MIN_ARC_CHARGE_TIME = 3.2f
     var HYPERSTORM_MIN_ARC_RANGE = 1000f
     var HYPERSTORM_MAX_ARC_RANGE = 1600f
+
+    var HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = 2500
 
 
     @JvmStatic
@@ -112,9 +114,10 @@ object MCTE_settings {
         MIN_TIME_BETWEEN_HYPERSTORM_STRIKES = configJson.getFloat("minTimeBetweenHyperstormStrikes")
         MAX_TIME_BETWEEN_HYPERSTORM_STRIKES = configJson.getFloat("maxTimeBetweenHyperstormStrikes")
         HYPERSTORM_GRACE_INCREMENT = configJson.getFloat("amountOfTimeShipsHaveBetweenStrikes")
-        HYPERSTORM_ARCSITE_X_VARIATION = configJson.getFloat("hyperstormArcSiteXVariation")
-        HYPERSTORM_ARCSITE_Y_VARIATION = configJson.getFloat("hyperstormArcSiteYVariation")
         HYPERSTORM_MIN_ARC_RANGE = configJson.getFloat("hyperstormMinArcRange")
         HYPERSTORM_MAX_ARC_RANGE = configJson.getFloat("hyperstormMaxArcRange")
+        HYPERSTORM_MAX_ARC_CHARGE_TIME = configJson.getFloat("hyperstormMaxArcChargeTime")
+
+        HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = configJson.getInt("hyperstormCentroidRefinementIterations")
     }
 }

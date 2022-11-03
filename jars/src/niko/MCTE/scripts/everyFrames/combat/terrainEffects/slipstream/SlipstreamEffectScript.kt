@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.MissileAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.combat.ShipEngineControllerAPI
+import com.fs.starfarer.api.impl.campaign.ids.HullMods
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
@@ -58,7 +59,7 @@ class SlipstreamEffectScript(
                     mutableStats.missileMaxSpeedBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                     mutableStats.missileAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                 }
-                val hasSafetyOverrides = ship.variant.hasHullMod(Hullmods.SAFETYOVERRIDES)
+                val hasSafetyOverrides = ship.variant.hasHullMod(HullMods.SAFETYOVERRIDES)
                 if (!hasSafetyOverrides || MCTE_settings.STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO) {
                     mutableStats.peakCRDuration.modifyMult(terrainCombatEffectIds.slipstreamEffect, peakPerformanceMult)
                 }

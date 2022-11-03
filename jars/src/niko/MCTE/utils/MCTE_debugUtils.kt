@@ -6,9 +6,11 @@ import com.fs.starfarer.api.campaign.rules.HasMemory
 import com.fs.starfarer.api.campaign.rules.MemoryAPI
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.lwjgl.Sys
 import java.awt.Color
 
 object MCTE_debugUtils {
+    val systemName = System.getProperty("os.name").lowercase()
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 
     init {
@@ -111,5 +113,9 @@ object MCTE_debugUtils {
             return true
         }
         return false
+    }
+
+    fun isMacOS(): Boolean {
+        return (systemName == "mac")
     }
 }

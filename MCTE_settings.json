@@ -57,14 +57,16 @@
 	#HYPERSTORM EFFECTS
 	"hyperstormEnergyDamage":2000, #energy damage the final purple bolt will do. default: 2000
 	"hyperstormEMPDamage":6500, #EMP damage the final purple bolt will do. default: 6500
-	"minTimeBetweenHyperstormStrikes":3, #Minimum time, in ~seconds, between arc attempts. default: 3
-	"maxTimeBetweenHyperstormStrikes":9, #Maximum time, in ~seconds, between arc attempts. default: 9
-	"amountOfTimeShipsHaveBetweenStrikes":3, #After all active arc attempts on a target finish, the target is given this amount of time in 
-	#~seconds before they can be targetted again. default: 3
-	"hyperstormArcSiteXVariation":500, #Max and min coordinates in the x direction an arc can appear from, relative to the nebula. default: 500
-	"hyperstormArcSiteYVariation":500, #Max and min coordinates in the y direction an arc can appear from, relative to the nebula. default: 500
-	"hyperstormMinArcRange":1000, #Lower bound of the range that can be picked for an arc attempt. Default: 1000
-	"hyperstormMaxArcRange":1600, #Upper bound of the range that can be picked for an arc attempt. Default: 1600
+	"minTimeBetweenHyperstormStrikes":4, #Minimum time, in ~seconds, between arc attempts. default: 4
+	"maxTimeBetweenHyperstormStrikes":6, #Maximum time, in ~seconds, between arc attempts. default: 6
+	"amountOfTimeShipsHaveBetweenStrikes":5, #After all active arc attempts on a target finish, the target is given this amount of time in 
+	#~seconds before they can be targetted again. default: 5
+	"hyperstormMaxArcChargeTime":3.6, #Max time a ship will be zapped by the white telegraphing arcs before they are struck by lightning. Default: 3.6
+	"hyperstormMinArcChargeTime":3.0, #Minimum time a ship will be zapped by the white telegraphing arcs before they are struck by lightning. Default: 3.0
+	"hyperstormMinArcRange":900, #Lower bound of the range that can be picked for an arc attempt. Default: 900
+	"hyperstormMaxArcRange":900, #Upper bound of the range that can be picked for an arc attempt. Default: 900
+	
+	"hyperstormCentroidRefinementIterations":2500, #Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times. default: 2500
 	
 	#GENERAL
 	"showErrorsInGame":true,
