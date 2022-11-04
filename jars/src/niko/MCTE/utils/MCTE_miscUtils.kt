@@ -152,7 +152,7 @@ object MCTE_miscUtils {
                     MathUtils.getDistance(rightCoord, centroid)
                     )/4
 
-            return combinedValue*2
+            return combinedValue/2
         }
         MCTE_debugUtils.displayError("$nebula, nebula failed cast to A")
         return 0f

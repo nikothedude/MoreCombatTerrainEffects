@@ -19,6 +19,7 @@ import niko.MCTE.utils.MCTE_shipUtils.arc
 import niko.MCTE.utils.MCTE_shipUtils.telegraphArc
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
+import kotlin.math.pow
 
 class hyperstormArcPreparation(
     val parentScript: deepHyperspaceEffectScript,
@@ -51,7 +52,8 @@ class hyperstormArcPreparation(
         }
         parentScript.targettedEntities[target]!! += this
 
-        telegraphArc(hyperStormNebula, this.engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target)
+        telegraphArc(hyperStormNebula, this.engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target,
+            volume = getTelegraphVolume())
 
         //target.aiFlags.setFlag(ShipwideAIFlags.AIFlags.DO_NOT_VENT, thresholdForAdvancement)
     }
@@ -69,12 +71,20 @@ class hyperstormArcPreparation(
     }
 
     private fun tryToTelegraph() {
-        val threshold = (deltaTime * (1/thresholdForAdvancement))*.5
+        val threshold = getTelegraphThreshold()
         val randomFloat = random.nextFloat()
         val modifier = parentScript.getActualDamageMultForEntity(target)
         if (randomFloat <= (threshold*modifier)) {
-            telegraphArc(hyperStormNebula, engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius)
+            telegraphArc(hyperStormNebula, engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
         }
+    }
+
+    private fun getTelegraphVolume(): Float {
+        return ((getTelegraphThreshold()+1).pow(4.6)).toFloat()
+    }
+
+    private fun getTelegraphThreshold(): Double {
+        return (deltaTime * (1/thresholdForAdvancement))*.5
     }
 
     private fun doArc() {

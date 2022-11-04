@@ -10,6 +10,7 @@ import org.lwjgl.Sys
 import java.awt.Color
 
 object MCTE_debugUtils {
+    var graphicsLibEnabled: Boolean = false
     val systemName = System.getProperty("os.name").lowercase()
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 

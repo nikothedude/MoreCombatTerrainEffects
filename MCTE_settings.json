@@ -63,8 +63,8 @@
 	#~seconds before they can be targetted again. default: 5
 	"hyperstormMaxArcChargeTime":3.6, #Max time a ship will be zapped by the white telegraphing arcs before they are struck by lightning. Default: 3.6
 	"hyperstormMinArcChargeTime":3.0, #Minimum time a ship will be zapped by the white telegraphing arcs before they are struck by lightning. Default: 3.0
-	"hyperstormMinArcRange":900, #Lower bound of the range that can be picked for an arc attempt. Default: 900
-	"hyperstormMaxArcRange":900, #Upper bound of the range that can be picked for an arc attempt. Default: 900
+	"hyperstormMinArcRange":1000, #Lower bound of the range that can be picked for an arc attempt. Default: 1000
+	"hyperstormMaxArcRange":1000, #Upper bound of the range that can be picked for an arc attempt. Default: 1000
 	
 	"hyperstormCentroidRefinementIterations":2500, #Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times. default: 2500
 	

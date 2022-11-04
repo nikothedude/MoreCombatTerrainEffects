@@ -60,7 +60,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         loadSettings()
 
         val engine = Global.getCombatEngine() ?: return
-        val playerFleet = Global.getSector().playerFleet ?: return
+        val playerFleet = Global.getSector()?.playerFleet ?: return
         val playerLocation = playerFleet.containingLocation ?: return
         val playerCoordinates = playerFleet.location ?: return
 
@@ -119,7 +119,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
     }
 
     private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin>) {
-        if (!DEEP_HYPERSPACE_EFFECT_ENABLED || engine.nebula == null) return
+        if (!DEEP_HYPERSPACE_EFFECT_ENABLED || engine.nebula == null || !engine.isInCampaign) return
         if (MCTE_debugUtils.isMacOS()) {
             MCTE_debugUtils.log.info("Rejected hyperspace terrain due to potential macOS crashes.")
             return

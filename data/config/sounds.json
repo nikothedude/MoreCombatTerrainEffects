@@ -1,13 +1,13 @@
 {
 	"MCTE_hyperStormArcSound":[
-		{"file":"sounds/sfx_systems/emp_emitter_impact_01.ogg","pitch":0.7,"volume":9},
-		{"file":"sounds/sfx_systems/emp_emitter_impact_02.ogg","pitch":0.6,"volume":9},
-		{"file":"sounds/sfx_systems/emp_emitter_impact_03.ogg","pitch":0.8,"volume":9},
+		{"file":"sounds/sfx_systems/emp_emitter_impact_01.ogg","pitch":0.7,"volume":10},
+		{"file":"sounds/sfx_systems/emp_emitter_impact_02.ogg","pitch":0.6,"volume":10},
+		{"file":"sounds/sfx_systems/emp_emitter_impact_03.ogg","pitch":0.8,"volume":10},
 		],
 	
 	"MCTE_telegraphArcSound":[ 
-		{"file":"sounds/sfx_systems/emp_emitter_impact_01.ogg","pitch":1.4,"volume":0.24},
-		{"file":"sounds/sfx_systems/emp_emitter_impact_02.ogg","pitch":1.4,"volume":0.24},
-		{"file":"sounds/sfx_systems/emp_emitter_impact_03.ogg","pitch":1.4,"volume":0.24},
+		{"file":"sounds/sfx_systems/emp_emitter_impact_01.ogg","pitch":1.4,"volume":0.05},
+		{"file":"sounds/sfx_systems/emp_emitter_impact_02.ogg","pitch":1.4,"volume":0.05},
+		{"file":"sounds/sfx_systems/emp_emitter_impact_03.ogg","pitch":1.4,"volume":0.05},
 		],
 }

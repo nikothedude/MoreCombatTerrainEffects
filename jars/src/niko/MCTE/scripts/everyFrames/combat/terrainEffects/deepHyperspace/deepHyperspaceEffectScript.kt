@@ -69,14 +69,13 @@ class deepHyperspaceEffectScript(
     }
 
     override fun applyEffects(amount: Float) {
-        val shipsAndMissiles: MutableList<CombatEntityAPI> = ArrayList()
         for (cell in ArrayList(stormingCellsWithParams.keys)) {
-            tryToArc(cell, amount, shipsAndMissiles)
+            tryToArc(cell, amount)
         }
         decrementGracePeriods(amount)
     }
 
-    protected fun tryToArc(cell: MutableSet<Cloud>, amount: Float, shipsAndMissiles: MutableList<CombatEntityAPI>): Boolean {
+    protected fun tryToArc(cell: MutableSet<Cloud>, amount: Float): Boolean {
         if (engine.isPaused) return false
         val params = stormingCellsWithParams[cell] ?: return false
         if (params.preparingToArc()) return false
@@ -84,22 +83,22 @@ class deepHyperspaceEffectScript(
         val timeTilNextArc = params.cooldown
 
         if (timeTilNextArc <= 0f) {
-            doArc(cell, amount, shipsAndMissiles)
+            doArc(cell, amount)
             return true
         }
         return false
     }
 
-    private fun doArc(cell: MutableSet<Cloud>, amount: Float, shipsAndMissiles: MutableList<CombatEntityAPI>) {
+    private fun doArc(cell: MutableSet<Cloud>, amount: Float) {
         val params = stormingCellsWithParams[cell] ?: return
         resetArcCooldown(params)
-        prepareArc(amount, cell, getArcRange(cell), shipsAndMissiles)
+        prepareArc(amount, cell, getArcRange(cell))
     }
 
-    private fun prepareArc(amount: Float, cell: MutableSet<Cloud>, maxRadius: Float, shipsAndMissiles: MutableList<CombatEntityAPI>) {
-        TODO("replace shipsAndMissiles with something that doesnt share THIS cell's values with everythijng else. each cell should use its own radius")
+    private fun prepareArc(amount: Float, cell: MutableSet<Cloud>, maxRadius: Float) {
         val params = stormingCellsWithParams[cell] ?: return
         val randomizedPosition = getArcSite(cell)
+        val shipsAndMissiles = HashSet<CombatEntityAPI>()
         if (shipsAndMissiles.isEmpty()) shipsAndMissiles.addAll(this.getEntitiesWithinRange(cell, randomizedPosition, maxRadius, amount))
         var target: CombatEntityAPI? = null
         for (shipOrMissile in shipsAndMissiles) {
@@ -148,6 +147,7 @@ class deepHyperspaceEffectScript(
         shipOrMissile: CombatEntityAPI,
         arcCoordinates: Vector2f,
         maxRadius: Float = getArcRange(cell)): Boolean {
+        if (shipOrMissile is ShipAPI && shipOrMissile.isShuttlePod) return false
 
         val graceValue = entitiesToNotTarget[shipOrMissile]
         if (graceValue != null && graceValue > 0) {
@@ -168,11 +168,11 @@ class deepHyperspaceEffectScript(
         val radius: Float = params.radius
         val ourCoordinates = params.centroid
         val currentx = ourCoordinates.x
-        val minx = currentx - radius/3
-        val maxx = currentx + radius/3
+        val minx = currentx - radius/1.1f
+        val maxx = currentx + radius/1.1f
         val currenty = ourCoordinates.y
-        val miny = currenty - radius/3
-        val maxy = currenty + radius/3
+        val miny = currenty - radius/1.1f
+        val maxy = currenty + radius/1.1f
 
         val adjustedx = (minx + random.nextFloat() * (maxx - minx))
         val adjustedy = (miny + random.nextFloat() * (maxy - miny))
