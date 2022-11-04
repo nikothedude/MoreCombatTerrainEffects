@@ -17,6 +17,7 @@ import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_shipUtils.arc
 import niko.MCTE.utils.MCTE_shipUtils.telegraphArc
+import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
 import kotlin.math.pow
@@ -75,7 +76,9 @@ class hyperstormArcPreparation(
         val randomFloat = random.nextFloat()
         val modifier = parentScript.getActualDamageMultForEntity(target)
         if (randomFloat <= (threshold*modifier)) {
-            telegraphArc(hyperStormNebula, engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
+            val telegraphLocationX = MathUtils.getRandomNumberInRange(coordinatesToSpawnArcFrom.x-50, coordinatesToSpawnArcFrom.x+50)
+            val telegraphLocationY = MathUtils.getRandomNumberInRange(coordinatesToSpawnArcFrom.y-50, coordinatesToSpawnArcFrom.y+50)
+            telegraphArc(hyperStormNebula, engine, Vector2f(telegraphLocationX, telegraphLocationY), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
         }
     }
 
