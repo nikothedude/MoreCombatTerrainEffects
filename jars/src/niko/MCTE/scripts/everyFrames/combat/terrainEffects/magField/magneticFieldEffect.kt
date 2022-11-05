@@ -4,8 +4,11 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
+import com.fs.starfarer.api.impl.campaign.terrain.AuroraRenderer
+import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.renderableEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.terrainCombatEffectIds
@@ -19,6 +22,7 @@ class magneticFieldEffect(
     val rangeMod: Float,
     val eccmChanceMod: Float,
     var missileBreakLockBaseChance: Float,
+    val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin>
     ): baseTerrainEffectScript(), usesDeltaTime {
 
     override var deltaTime = 0f
@@ -28,6 +32,12 @@ class magneticFieldEffect(
     override val thresholdForAdvancement: Float = 1f
 
     var deltaTimeForReposition = deltaTime
+
+    override fun init(engine: CombatEngineAPI?) {
+        super.init(engine)
+
+        this.engine.addLayeredRenderingPlugin(magFieldRenderingPlugin(magneticFieldPlugins))
+    }
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
         super.advance(amount, events)
@@ -57,7 +67,7 @@ class magneticFieldEffect(
                     val weaponRange = weapon.range
                     if (weaponRange > maxRange) maxRange = weaponRange
                 }
-                val rangeThresholdForMoreVision = if (isStorm) 500f else 1000f
+                val rangeThresholdForMoreVision = 1000f
                 val weaponRangeVisionMult = (maxRange/rangeThresholdForMoreVision).coerceAtLeast(1f)
                 val modifiedVisionMult = ((visionMod*weaponRangeVisionMult)*ecmMult).coerceAtMost(1f)
                 val modifiedMissileMult = (missileMod*ecmMult).coerceAtMost(1f)
@@ -110,7 +120,6 @@ class magneticFieldEffect(
     }
 
     override fun handleSounds(amount: Float) {
-        val volume = 1f
         if (isStorm) {
             Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, 1f)
         } else {

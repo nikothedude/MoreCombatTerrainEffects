@@ -11,8 +11,10 @@ import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
+import com.fs.starfarer.api.util.Misc
 import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudParams
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
@@ -46,8 +48,6 @@ import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.utils.MCTE_settings.loadSettings
-import org.lazywizard.lazylib.MathUtils
-import org.lazywizard.lazylib.ext.logging.i
 import org.lwjgl.util.vector.Vector2f
 
 // script to dodge plugin incompatability
@@ -77,23 +77,21 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
         val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet()
         val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2> = HashSet()
-        val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
+        //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
         val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
-        val ringTerrainPlugins: MutableSet<RingSystemTerrainPlugin> = HashSet()
 
         for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
             val terrainPlugin = terrain.plugin
                 if (terrainPlugin.containsEntity(playerFleet)) {
                 if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
                 if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
-                if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
+                //if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
                 if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
-                if (terrainPlugin is RingSystemTerrainPlugin) ringTerrainPlugins += terrainPlugin
             }
         }
         addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
         addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, slipstreamPlugins)
-        addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
+        //addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
         // dust clouds already have an effect
@@ -132,11 +130,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         for (plugin: HyperspaceTerrainPlugin in hyperspaceTerrainPlugins) {
             var isStorming = false
 
-            val cellAtPlayer: CellStateTracker? = plugin.getCellAt(playerCoordinates, 100f)
-            if (cellAtPlayer == null) {
-                MCTE_debugUtils.displayError("failed to locate cell tracker despite player being in a hypercloud")
-                continue
-            }
+            val cellAtPlayer: CellStateTracker = plugin.getCellAt(playerCoordinates, 100f) ?: continue
             if (cellAtPlayer.isStorming && HYPERSTORM_EFFECT_ENABLED) {
                 isStorming = true
             }
@@ -253,23 +247,47 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
         var canAddPlugin = false
 
-        var debrisDensityMult = 0f
+        var debrisDensity = 0f
         var hazardDensityMult = 0f
+        val specialSalvage = HashSet<Any>()
 
         for (plugin: DebrisFieldTerrainPlugin in debrisFieldPlugins) {
-            debrisDensityMult++
-            hazardDensityMult++
+            val terrainEntity = plugin.entity
+            val params = plugin.getParams()
+            val density = params.density
+            var accidentProbability: Float = (0.2f + 0.8f * (1f - density)).coerceAtMost(0.9f)
+            val dropValue = plugin.entity.dropValue
+            val randomDropValue = plugin.entity.dropRandom
+            var lootValue = 0f
+            for (data in dropValue) {
+                lootValue += data.value
+            }
+            for (data in randomDropValue) {
+                lootValue += if (data.value > 0) {
+                    data.value.toFloat()
+                } else {
+                    500f // close enough
+                }
+            }
+            lootValue *= density
+            debrisDensity += density
 
-            canAddPlugin = true
+            val specialSalvage = Misc.getSalvageSpecial(terrainEntity)
+
+            //savageEntity.java
+
+            if (density > 0f) {
+                canAddPlugin = true
+            }
         }
 
-        /*if (canAddPlugin) {
+        if (canAddPlugin) {
             engine.addPlugin(
                 debrisFieldEffectScript(
-                debrisDensityMult,
-                hazardDensityMult
+                    debrisDensity.toDouble(),
+                    specialSalvage
             ))
-        }*/
+        }
     }
 
     private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2>) {
@@ -311,6 +329,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         var eccmChanceMod = 1f
         var missileBreakLockBaseChance = 0f
         var canAddPlugin = false
+
         for (plugin: MagneticFieldTerrainPlugin in magneticFieldPlugins) {
             val isInFlare = (plugin.terrainName == "Magnetic Storm")
             if (isInFlare) isStorm = true
@@ -322,6 +341,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             missileBreakLockBaseChance += if (isInFlare) MAGSTORM_MISSILE_SCRAMBLE_CHANCE else MAGFIELD_MISSILE_SCRAMBLE_CHANCE
             canAddPlugin = true
         }
+
         if (canAddPlugin) {
             missileBreakLockBaseChance = missileBreakLockBaseChance.coerceAtMost(1f)
             engine.addPlugin(magneticFieldEffect(
@@ -330,7 +350,9 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 missileMod,
                 rangeMod,
                 eccmChanceMod,
-                missileBreakLockBaseChance))
+                missileBreakLockBaseChance,
+                magneticFieldPlugins
+                ))
         }
     }
 }

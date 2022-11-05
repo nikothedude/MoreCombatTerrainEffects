@@ -43,7 +43,7 @@ object MCTE_debugUtils {
         log.log(logType, "Error code:", java.lang.RuntimeException(errorCode))
         if (crash) {
             throw RuntimeException(
-                "A critical error has occurred in More Planetary Conditions, and for one reason" +
+                "A critical error has occurred in MORE COMBAT TERRAIN EFFECTS, and for one reason" +
                         " or another, the mod author has decided that this error is severe enough to warrant a crash." +
                         " Error code: " + errorCode
             )
@@ -53,7 +53,7 @@ object MCTE_debugUtils {
     @JvmStatic
     private fun displayErrorToCampaign(errorCode: String, highPriority: Boolean) {
         val campaignUI = Global.getSector().campaignUI
-        campaignUI.addMessage("###### MORE PLANETARY CONDITIONS ERROR ######")
+        campaignUI.addMessage("###### MORE COMBAT TERRAIN EFFECTS ERROR ######")
         campaignUI.addMessage(errorCode)
         if (highPriority) {
             Global.getSoundPlayer().playUISound("cr_playership_critical", 1f, 1f)
@@ -64,7 +64,7 @@ object MCTE_debugUtils {
                 Color.RED
             )
         }
-        campaignUI.addMessage("Please provide the mod author of more planetary conditions a copy of your logs. These messages can be disabled in the niko_MPC_settings.json file in the MPC mod folder.")
+        campaignUI.addMessage("Please provide the mod author of MORE COMBAT TERRAIN EFFECTS a copy of your logs. These messages can be disabled in the niko_MPC_settings.json file in the MPC mod folder.")
     }
 
     @JvmStatic
@@ -73,7 +73,7 @@ object MCTE_debugUtils {
         val combatUI = engine.combatUI
         combatUI.addMessage(
             1,
-            "Please provide the mod author of more planetary conditions with a copy of your logs. These messages can be disabled in the niko_MPC_settings.json file in the MPC mod folder."
+            "Please provide the mod author of MORE COMBAT TERRAIN EFFECTS with a copy of your logs. These messages can be disabled in the niko_MPC_settings.json file in the MPC mod folder."
         )
         if (highPriority) {
             Global.getSoundPlayer().playUISound("cr_playership_critical", 1f, 1f)
@@ -85,7 +85,7 @@ object MCTE_debugUtils {
             )
         }
         combatUI.addMessage(1, errorCode)
-        combatUI.addMessage(1, "###### MORE PLANETARY CONDITIONS ERROR ######")
+        combatUI.addMessage(1, "###### MORE COMBAT TERRAIN EFFECTS ERROR ######")
     }
 
     @JvmStatic

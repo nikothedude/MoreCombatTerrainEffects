@@ -76,10 +76,15 @@ class hyperstormArcPreparation(
         val randomFloat = random.nextFloat()
         val modifier = parentScript.getActualDamageMultForEntity(target)
         if (randomFloat <= (threshold*modifier)) {
-            val telegraphLocationX = MathUtils.getRandomNumberInRange(coordinatesToSpawnArcFrom.x-50, coordinatesToSpawnArcFrom.x+50)
-            val telegraphLocationY = MathUtils.getRandomNumberInRange(coordinatesToSpawnArcFrom.y-50, coordinatesToSpawnArcFrom.y+50)
-            telegraphArc(hyperStormNebula, engine, Vector2f(telegraphLocationX, telegraphLocationY), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
+            telegraphArc(hyperStormNebula, engine, getTelegraphArcStartPoint(), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
         }
+    }
+
+    private fun getTelegraphArcStartPoint(): Vector2f {
+        val telegraphLocationX = MathUtils.getRandomNumberInRange(coordinatesToSpawnArcFrom.x-50, coordinatesToSpawnArcFrom.x+50)
+        val telegraphLocationY = MathUtils.getRandomNumberInRange(coordinatesToSpawnArcFrom.y-50, coordinatesToSpawnArcFrom.y+50)
+
+        return Vector2f(telegraphLocationX, telegraphLocationY)
     }
 
     private fun getTelegraphVolume(): Float {

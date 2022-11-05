@@ -1,14 +1,57 @@
 package niko.MCTE.utils
 
+import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.CombatNebulaAPI
+import com.fs.starfarer.api.impl.campaign.ids.Factions
+import com.fs.starfarer.api.impl.campaign.ids.FleetTypes
+import com.fs.starfarer.api.impl.campaign.ids.ShipRoles
+import com.fs.starfarer.api.loading.RoleEntryAPI
+import com.fs.starfarer.api.util.WeightedRandomPicker
 import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
+import java.lang.reflect.AccessibleObject
+import java.lang.reflect.Field
+import java.util.Objects
+import javax.management.relation.Role
 
 object MCTE_miscUtils {
-    val failuresTilDecision = 900
-    val incrementValue = 1
+    private val debrisFieldShipSourcePicker: WeightedRandomPicker<String> = WeightedRandomPicker()
+
+    fun getGlobalDebrisFieldShipSourcePicker(): WeightedRandomPicker<String> {
+        if (debrisFieldShipSourcePicker.isEmpty) {
+            buildDebrisFieldSource()
+        }
+        return debrisFieldShipSourcePicker
+    }
+
+    private fun buildDebrisFieldSource() {
+        val sector = Global.getSector() ?: return MCTE_debugUtils.displayError("buildDebrisFieldSource called with null sector")
+        val settings = Global.getSettings()
+        val independants = sector.getFaction(Factions.INDEPENDENT)
+
+        val roleEntryIds: Set<String> = setOf(ShipRoles.COMBAT_SMALL, ShipRoles.COMBAT_MEDIUM, ShipRoles.COMBAT_LARGE,
+            ShipRoles.COMBAT_CAPITAL, ShipRoles.CARRIER_SMALL, ShipRoles.CARRIER_MEDIUM, ShipRoles.CARRIER_LARGE,
+            ShipRoles.PHASE_SMALL, ShipRoles.PHASE_MEDIUM, ShipRoles.PHASE_LARGE, ShipRoles.CIV_RANDOM,
+            ShipRoles.COMBAT_FREIGHTER_SMALL, ShipRoles.COMBAT_FREIGHTER_MEDIUM, ShipRoles.COMBAT_FREIGHTER_LARGE,
+            ShipRoles.FREIGHTER_SMALL, ShipRoles.FREIGHTER_MEDIUM, ShipRoles.FREIGHTER_LARGE,
+            ShipRoles.TANKER_SMALL, ShipRoles.TANKER_MEDIUM, ShipRoles.TANKER_LARGE,
+            ShipRoles.PERSONNEL_SMALL, ShipRoles.PERSONNEL_MEDIUM, ShipRoles.PERSONNEL_LARGE,
+            ShipRoles.TUG, ShipRoles.CRIG, ShipRoles.UTILITY)
+
+        for (id in roleEntryIds) {
+            val roleEntries = settings.getDefaultEntriesForRole(id)
+            for (entry in roleEntries) {
+                if (independants.knowsShip(Global.getSettings().getVariant(entry.variantId).hullSpec.hullId)) {
+                    debrisFieldShipSourcePicker.add(entry.variantId, entry.weight)
+                }
+            }
+        }
+    }
+
+    private const val failuresTilDecision = 900
+    private const val incrementValue = 1
 
     fun getCellCentroid(nebulaHandler: CombatNebulaAPI, nebulaCell: MutableSet<Cloud>, ourCoordinates: Vector2f? = null): Vector2f? {
         if (nebulaHandler is A) {

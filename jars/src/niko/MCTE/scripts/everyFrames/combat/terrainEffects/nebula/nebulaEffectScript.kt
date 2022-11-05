@@ -6,7 +6,9 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.util.Misc
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
@@ -21,7 +23,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
 
     var nebulaHandler: CombatNebulaAPI? = engine?.nebula
 
-    val thresholdForAdvancement: Float = 1.9f
+    val thresholdForNebulaAdvancement: Float = 1.9f
 
     val visionMult = NEBULA_VISION_MULT
     val rangeMult = NEBULA_RANGE_MULT
@@ -74,7 +76,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 }
             } else if (!ship.isAffectedByNebulaSecondary(nebulaHandler!!)) {
                 amountOfTimeElapsedOutsideOfNebula[ship] = amountOfTimeElapsedOutsideOfNebula[ship]!! + amount
-                if (amountOfTimeElapsedOutsideOfNebula[ship]!! >= thresholdForAdvancement) {
+                if (amountOfTimeElapsedOutsideOfNebula[ship]!! >= thresholdForNebulaAdvancement) {
                     mutableStats.ballisticWeaponRangeBonus.unmodifyMult(terrainCombatEffectIds.nebulaEffect)
                     mutableStats.energyWeaponRangeBonus.unmodifyMult(terrainCombatEffectIds.nebulaEffect)
                     mutableStats.missileWeaponRangeBonus.unmodifyMult(terrainCombatEffectIds.nebulaEffect)
@@ -112,7 +114,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 }
             } else if (!missile.isAffectedByNebulaSecondary(nebulaHandler!!)) {
                 amountOfTimeElapsedOutsideOfNebula[missile] = amountOfTimeElapsedOutsideOfNebula[missile]!! + amount
-                if (amountOfTimeElapsedOutsideOfNebula[missile]!! >= thresholdForAdvancement) {
+                if (amountOfTimeElapsedOutsideOfNebula[missile]!! >= thresholdForNebulaAdvancement) {
                     mutableStats.maxSpeed.unmodifyFlat(terrainCombatEffectIds.nebulaEffect)
                     mutableStats.acceleration.unmodifyFlat(terrainCombatEffectIds.nebulaEffect)
                     mutableStats.deceleration.unmodifyFlat(terrainCombatEffectIds.nebulaEffect)
@@ -129,7 +131,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
         val playerShip = engine.playerShip
         if (playerShip.isAffectedByNebulaSecondary(nebulaHandler!!) ||
             (amountOfTimeElapsedOutsideOfNebula[playerShip] != null &&
-            amountOfTimeElapsedOutsideOfNebula[playerShip]!! < thresholdForAdvancement)) {
+            amountOfTimeElapsedOutsideOfNebula[playerShip]!! < thresholdForNebulaAdvancement)) {
             val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect1",
