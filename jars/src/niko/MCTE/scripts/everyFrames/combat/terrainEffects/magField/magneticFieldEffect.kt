@@ -36,7 +36,8 @@ class magneticFieldEffect(
     override fun init(engine: CombatEngineAPI?) {
         super.init(engine)
 
-        this.engine.addLayeredRenderingPlugin(magFieldRenderingPlugin(magneticFieldPlugins))
+        //this.engine.addLayeredRenderingPlugin(magFieldRenderingPlugin(magneticFieldPlugins))
+        // way beyond my skill level for now
     }
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
@@ -75,7 +76,6 @@ class magneticFieldEffect(
 
                 mutableStats.missileGuidance.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
                 mutableStats.missileMaxTurnRateBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
-
 
                 mutableStats.eccmChance.modifyMult(terrainCombatEffectIds.magneticField, eccmChanceMod)
 

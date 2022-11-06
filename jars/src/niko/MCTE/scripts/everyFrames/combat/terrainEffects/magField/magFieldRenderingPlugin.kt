@@ -8,7 +8,9 @@ import com.fs.starfarer.api.combat.ViewportAPI
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.api.impl.campaign.terrain.RangeBlockerUtil
 import com.fs.starfarer.api.util.Misc
+import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
+import org.lazywizard.lazylib.ext.minus
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.vector.Vector2f
 import java.awt.Color
@@ -27,21 +29,36 @@ class magFieldRenderingPlugin(
 
     val pluginToPlayerfleetAngle: MutableMap<MagneticFieldTerrainPlugin, Float> = HashMap()
 
-    val pluginToRenderPoint: HashMap<MagneticFieldTerrainPlugin, Float> = HashMap()
+    val pluginToRenderPoint: HashMap<MagneticFieldTerrainPlugin, Vector2f> = HashMap()
 
     init {
         val maxHeight = engine.mapHeight
         val maxWidth = engine.mapWidth
         for (plugin in plugins) {
+            var renderPoint: Vector2f = Vector2f(maxWidth, maxHeight)
             var angle = 5f
             if (playerFleet != null && playerFleet.location != null) {
-                angle = VectorUtils.getAngle(plugin.auroraCenterLoc, playerFleet.location)
+                angle = Misc.normalizeAngle(VectorUtils.getAngle(plugin.auroraCenterLoc, playerFleet.location))
+
+                val aTemp = angle % Math.PI /2
+                val radius = getRadiusOfMap()
+                val amplitude = radius/cos(aTemp)
+                val x = MathUtils.clamp((cos(angle) * amplitude).toFloat(), -maxWidth, maxWidth)
+                val y = MathUtils.clamp((sin(angle) * amplitude).toFloat(), -maxHeight, maxHeight)
+
+                renderPoint = Vector2f(x, y)
             }
             pluginToPlayerfleetAngle[plugin] = angle
+            pluginToRenderPoint[plugin] = renderPoint
 
-            var renderPoint: Vector2f
-            renderPoint = ()
         }
+    }
+
+    private fun getRadiusOfMap(): Float {
+        val maxHeight = engine.mapHeight
+        val maxWidth = engine.mapWidth
+        val ratio = maxHeight/maxWidth
+        return ((maxWidth)*ratio)
     }
 
     protected val layers: EnumSet<CombatEngineLayers> = EnumSet.of(CombatEngineLayers.ABOVE_PLANETS)
@@ -68,26 +85,35 @@ class magFieldRenderingPlugin(
 
         val alphaMult = viewport?.alphaMult
         if (alphaMult == null || alphaMult <= 0) return
+        val overallMult = 50
         for (plugin in plugins) {
 
             val bandWidthInTexture: Float = plugin.auroraBandWidthInTexture
             var bandIndex: Float
 
             val radStart: Float = 0f //controls inner radius of the aurora
-            var radEnd: Float = 40000f //vice versa
+            var radEnd: Float = 500f //vice versa
 
             if (radEnd < radStart + 10f) radEnd = radStart + 10f
 
             val circ = ((Math.PI * 2f * (radStart + radEnd) / 2f).toFloat())
-            val pixelsPerSegment = 50f
+            val pixelsPerSegment = 50f/overallMult
             val segments = ((circ / pixelsPerSegment).roundToInt().toFloat())
 
-            val startRad = Math.toRadians(180.0).toFloat()
-            val endRad = Math.toRadians(360.0).toFloat()
+            val pluginAngle = pluginToPlayerfleetAngle[plugin]!!
+            //val invertedAngle: Float = Misc.normalizeAngle(180f - pluginAngle)
+
+            //val startRadius = 0.0
+            //val endRadius = 360.0
+            var startRadius: Double = (0.0)
+            var endRadius = (180.0)
+            val startRad = Math.toRadians(startRadius).toFloat()
+            var endRad = Math.toRadians(endRadius).toFloat()
             val spanRad = abs(endRad - startRad)
             val anglePerSegment = (spanRad / segments)
 
-            val loc = Vector2f(0f, -engine.mapHeight)
+            //val loc = Vector2f(0f, 0f)
+            val loc = pluginToRenderPoint[plugin]!!
             val x = loc.x
             val y = loc.y
 
@@ -101,14 +127,14 @@ class magFieldRenderingPlugin(
             GL11.glEnable(GL11.GL_BLEND)
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE)
 
-            val thickness = (radEnd - radStart) * 1f
+            val thickness = (radEnd - radStart) * overallMult
 
             var texProgress = 0f
             val texHeight: Float = plugin.auroraTexture.textureHeight
             val imageHeight: Float = plugin.auroraTexture.height
             var texPerSegment = pixelsPerSegment * texHeight / imageHeight * bandWidthInTexture / thickness
 
-            texPerSegment *= plugin.auroraTexPerSegmentMult*3
+            texPerSegment *= plugin.auroraTexPerSegmentMult
 
             val totalTex = Math.max(1f, (texPerSegment * segments).roundToInt().toFloat())
             texPerSegment = totalTex / segments
@@ -137,7 +163,7 @@ class magFieldRenderingPlugin(
                     } else { //if (iter == 1) {
                         Math.toRadians(-phaseAngle.toDouble()).toFloat() + segIndex * anglePerSegment * 5f
                     }
-                    var angle = Math.toDegrees((segIndex * anglePerSegment).toDouble()).toFloat()
+                    var angle = Misc.normalizeAngle(Math.toDegrees((segIndex * anglePerSegment).toDouble()).toFloat())
                     if (iter == 1) angle += 180f
                     var blockerMax = 100000f
                     if (blocker != null) {
@@ -209,10 +235,9 @@ class magFieldRenderingPlugin(
                     i++
                 }
                 GL11.glEnd()
-                //GL11.glRotatef(180f, 0f, 0f, 1f)
+                GL11.glRotatef(180f, 0f, 0f, 1f)
             }
             GL11.glPopMatrix()
-
 //		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         }
     }

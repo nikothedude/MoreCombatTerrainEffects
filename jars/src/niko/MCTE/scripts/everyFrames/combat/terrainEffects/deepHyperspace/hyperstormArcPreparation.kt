@@ -2,6 +2,7 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace
 
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
+import com.fs.starfarer.api.combat.CollisionClass
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.MissileAPI
@@ -142,8 +143,11 @@ class hyperstormArcPreparation(
         )
         if (threatIndicator is MissileAPI) {
             threatIndicator.untilMineExplosion = (thresholdForAdvancement - deltaTime).coerceAtLeast(0.1f)
-            threatIndicator.damageAmount = HYPERSTORM_ENERGY_DAMAGE
+            //threatIndicator.damageAmount = HYPERSTORM_ENERGY_DAMAGE
+            threatIndicator.damage.damage = HYPERSTORM_ENERGY_DAMAGE
             threatIndicator.damage.fluxComponent = HYPERSTORM_EMP_DAMAGE
+            /*threatIndicator.collisionClass = CollisionClass.FIGHTER
+            threatIndicator.hitpoints = 9999999f*/
         }
         return threatIndicator
     }
