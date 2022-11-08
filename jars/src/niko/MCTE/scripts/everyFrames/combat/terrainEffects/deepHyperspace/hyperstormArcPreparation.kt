@@ -144,8 +144,8 @@ class hyperstormArcPreparation(
         if (threatIndicator is MissileAPI) {
             threatIndicator.untilMineExplosion = (thresholdForAdvancement - deltaTime).coerceAtLeast(0.1f)
             //threatIndicator.damageAmount = HYPERSTORM_ENERGY_DAMAGE
-            threatIndicator.damage.damage = HYPERSTORM_ENERGY_DAMAGE
-            threatIndicator.damage.fluxComponent = HYPERSTORM_EMP_DAMAGE
+            threatIndicator.damage.damage = parentScript.getActualDamageForEntity(target)
+            threatIndicator.damage.fluxComponent = parentScript.getEMPDamageForEntity(target)
             /*threatIndicator.collisionClass = CollisionClass.FIGHTER
             threatIndicator.hitpoints = 9999999f*/
         }

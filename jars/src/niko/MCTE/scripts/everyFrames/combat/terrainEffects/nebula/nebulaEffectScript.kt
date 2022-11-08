@@ -23,7 +23,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
 
     var nebulaHandler: CombatNebulaAPI? = engine?.nebula
 
-    val thresholdForNebulaAdvancement: Float = 1.9f
+    val thresholdForNebulaAdvancement: Float = 1.4f
 
     val visionMult = NEBULA_VISION_MULT
     val rangeMult = NEBULA_RANGE_MULT
