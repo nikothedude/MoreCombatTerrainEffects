@@ -43,7 +43,7 @@ class SlipstreamEffectScript(
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats
-                val speedForSize = speed[ship.hullSize]
+                val speedForSize = speed[ship.variant.hullSize]
                 if (speedForSize != null) {
                     val adjustedSpeedMult = (speedForSize * overallSpeedMult)
                     val adjustedMissileSpeedMult = (missileSpeed * overallSpeedMult)
