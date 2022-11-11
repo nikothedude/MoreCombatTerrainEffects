@@ -7,6 +7,8 @@
 		  {"freq":1.5, "tip":"[More Combat Terrain Effects] While long-ranged sensors are unaffected by nebulae, combat-grade sensors struggle somewhat, resulting in nebulae reducing vision and weapon range somewhat of any ship inside them, alongside the gasses choking out the engines, reducing speed somewhat and disabling the zero-flux boost."},
 		  {"freq":1.5, "tip":"[More Combat Terrain Effects] In combat, hyperspace clouds are similar in function to nebulae, with one major exception: If storming, they will periodically strike anything nearby with extremely powerful lightning. This lightning's effect is mitigated by solar shielding!"},
 		  #{"freq":1, "tip":"[More Combat Terrain Effects] Oftentimes, debris fields are the aftermath of a battle. Fighting inside them can be a challenge, what with the large ship pieces floating around, leftover munitions/mines, drones with their combat program still active..."},
+		  {"freq":2, "tip":"[More Combat Terrain Effects] Literally EVERYTHING about this mod is configurable in MCTE_settings.json. From disabling/enabling effects individually, to tweaking their values, you have a lot of control!"},
+		  #{"freq":0.001, "tip":"[More Combat Terrain Effects] Unlike "some" modders, I prefix my annoying tips so you know which mod needs to have tips removed!"},
 		 
     ],
 }
