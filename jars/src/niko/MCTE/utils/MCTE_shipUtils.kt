@@ -6,6 +6,8 @@ import com.fs.starfarer.combat.entities.terrain.Cloud
 import org.dark.shaders.light.LightShader
 import org.dark.shaders.light.StandardLight
 import org.lazywizard.lazylib.MathUtils
+import org.lazywizard.lazylib.VectorUtils
+import org.lazywizard.lazylib.ext.combat.applyForce
 import org.lwjgl.util.vector.Vector2f
 import java.awt.Color
 import java.nio.channels.FileLock
@@ -55,6 +57,7 @@ object MCTE_shipUtils {
         if (!target.isTangible()) {
             modifier = 0f
         }
+
         engine.spawnEmpArc(
             source,
             coordinatesToSpawnArcFrom,
@@ -64,14 +67,19 @@ object MCTE_shipUtils {
             actualDamage*modifier,
             empDamage*modifier,
             maxDistance,
-            null,
+            "MCTE_hyperStormArcSound",
             damageArcThickness,
             arcFringeColor,
             arcCoreColor
         ) // manually play sounds, since no sound normally plays when striking hulks
         Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.3f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
-        Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 999f, target.location, Vector2f(0f, 0f))
+        if (target is ShipAPI && target.isHulk) {
+            Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
+        }
         doMainArcLighting(target.location, coordinatesToSpawnArcFrom)
+
+        val vectorBetweenSourceAndTarget = VectorUtils.getAngle(coordinatesToSpawnArcFrom, target.location)
+        target.applyForce(vectorBetweenSourceAndTarget, 2000f)
     }
 
     fun telegraphArc(cell: MutableSet<Cloud>, engine: CombatEngineAPI, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI,
@@ -91,12 +99,14 @@ object MCTE_shipUtils {
             energyDamage*modifier,
             empDamage*modifier,
             maxDistance,
-            null,
+            "MCTE_telegraphArcSound",
             1f,
             arcFringeColor,
             arcCoreColor
         )
-        Global.getSoundPlayer().playSound("MCTE_telegraphArcSound", 1f, volume, target.location, Vector2f(0f, 0f))
+        if (target is ShipAPI && target.isHulk) {
+            Global.getSoundPlayer().playSound("MCTE_telegraphArcSound", 1f, volume, target.location, Vector2f(0f, 0f))
+        }
         doTelegraphArcLighting(target.location, coordinatesToSpawnArcFrom)
     }
 

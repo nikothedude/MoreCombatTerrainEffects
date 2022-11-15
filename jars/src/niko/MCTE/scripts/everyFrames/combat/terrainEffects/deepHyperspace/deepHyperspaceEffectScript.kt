@@ -25,6 +25,7 @@ class deepHyperspaceEffectScript(
     val stormingCellsWithParams: HashMap<MutableSet<Cloud>, cloudParams>,
 ): baseTerrainEffectScript() {
 
+    val standardSpeedForTargettingChance: Float = 100f
     val targettedEntities: MutableMap<CombatEntityAPI, MutableSet<hyperstormArcPreparation>> = HashMap()
     val entitiesToNotTarget: MutableMap<CombatEntityAPI, Float> = HashMap()
     var nebulaHandler: CombatNebulaAPI = engine.nebula
@@ -99,7 +100,7 @@ class deepHyperspaceEffectScript(
         val params = stormingCellsWithParams[cell] ?: return
         val randomizedPosition = getArcSite(cell)
         val shipsAndMissiles = HashSet<CombatEntityAPI>()
-        if (shipsAndMissiles.isEmpty()) shipsAndMissiles.addAll(this.getEntitiesWithinRange(cell, randomizedPosition, maxRadius, amount))
+        shipsAndMissiles.addAll(this.getEntitiesWithinRange(cell, randomizedPosition, maxRadius, amount))
         var target: CombatEntityAPI? = null
         for (shipOrMissile in shipsAndMissiles) {
             if (combatEntityIsValidArcTarget(cell, amount, shipOrMissile, randomizedPosition, maxRadius)) {
@@ -279,7 +280,13 @@ class deepHyperspaceEffectScript(
     }
 
     private fun getTargettingChanceMult(shipOrMissile: CombatEntityAPI): Float {
-        return 1f
+        var modifier = 1f
+        if (!shipOrMissile.isTangible()) return 0f
+
+        val speed = shipOrMissile.velocity.length()
+        modifier = ((standardSpeedForTargettingChance*2 - speed)/100).coerceAtLeast(0f)
+
+        return modifier.coerceAtLeast(0f)
     }
 
     fun giveGraceToTarget(target: CombatEntityAPI) {

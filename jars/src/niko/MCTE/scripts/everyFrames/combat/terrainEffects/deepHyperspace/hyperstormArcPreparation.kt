@@ -2,12 +2,11 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace
 
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
-import com.fs.starfarer.api.combat.CollisionClass
-import com.fs.starfarer.api.combat.CombatEngineAPI
-import com.fs.starfarer.api.combat.CombatEntityAPI
-import com.fs.starfarer.api.combat.MissileAPI
+import com.fs.starfarer.api.combat.*
+import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission.FlagData
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.combat.entities.Missile
+import com.fs.starfarer.combat.entities.Ship
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseNikoCombatScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
@@ -18,6 +17,7 @@ import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_shipUtils.arc
 import niko.MCTE.utils.MCTE_shipUtils.telegraphArc
+import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
@@ -56,8 +56,6 @@ class hyperstormArcPreparation(
 
         telegraphArc(hyperStormNebula, this.engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target,
             volume = getTelegraphVolume())
-
-        //target.aiFlags.setFlag(ShipwideAIFlags.AIFlags.DO_NOT_VENT, thresholdForAdvancement)
     }
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
