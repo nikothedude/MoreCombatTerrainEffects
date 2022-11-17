@@ -106,7 +106,7 @@ class SlipstreamEffectScript(
                 shipIterator.remove()
                 continue
             }
-            val engineController = ship.engineController
+            val engineController = ship.engineController ?: continue
             engineControllers += engineController
         }
         val missileIterator = affectedMissiles.keys.iterator()
@@ -116,7 +116,7 @@ class SlipstreamEffectScript(
                 missileIterator.remove()
                 continue
             }
-            val engineController = missile.engineController
+            val engineController = missile.engineController ?: continue
             engineControllers += engineController
         }
 
