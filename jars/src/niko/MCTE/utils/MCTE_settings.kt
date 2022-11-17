@@ -15,9 +15,9 @@ object MCTE_settings {
     var DEBRIS_FIELD_EFFECT_ENABLED: Boolean = true
     var DUST_CLOUD_EFFECT_ENABLED: Boolean = true
     var EXTRA_NEBULA_EFFECTS_ENABLED: Boolean = true
-
     //MAGFIELD SETTINGS
     var MAGFIELD_VISION_MULT: Float = 0.6f
+
     var MAGFIELD_MISSILE_MULT: Float = 0.8f
     var MAGFIELD_RANGE_MULT: Float = 0.8f
     var MAGFIELD_ECCM_MULT: Float = 0.8f
@@ -28,24 +28,24 @@ object MCTE_settings {
     var MAGSTORM_RANGE_MULT: Float = 0.8f
     var MAGSTORM_ECCM_MULT: Float = 0.8f
     var MAGSTORM_MISSILE_SCRAMBLE_CHANCE: Float = 0.6f
-
     //SLIPSTREAM SETTINGS
     var SLIPSTREAM_PPT_MULT: Float = 0.33f
+
     var SLIPSTREAM_FLUX_DISSIPATION_MULT: Float = 3f
     var SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT: Float = 3f
     var SLIPSTREAM_HARDFLUX_GEN_PER_FRAME: Float = 1f
     var STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO: Boolean = true
     var SLIPSTREAM_DISABLE_VENTING: Boolean = false
     var SLIPSTREAM_INCREASE_TURN_RATE: Boolean = false
-
     //NEBULA SETTINGS
     var NEBULA_VISION_MULT: Float = 0.8f
+
     var NEBULA_RANGE_MULT: Float = 0.8f
     var NEBULA_SPEED_DECREMENT: Float = -10f
     var NEBULA_DISABLE_ZERO_FLUX_BOOST: Boolean = true
-
     //HYPERCLOUD SETTINGS
     var MIN_HYPERCLOUDS_TO_ADD_PER_CELL: Int = 8
+
     var MAX_HYPERCLOUDS_TO_ADD_PER_CELL: Int = 20
     //HYPERSTORM SETTINGS
     var HYPERSTORM_ENERGY_DAMAGE = 2000f
@@ -57,8 +57,14 @@ object MCTE_settings {
     var HYPERSTORM_MIN_ARC_CHARGE_TIME = 3.2f
     var HYPERSTORM_MIN_ARC_RANGE = 1000f
     var HYPERSTORM_MAX_ARC_RANGE = 1600f
-
     var HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = 2500
+    var HYPERSTORM_ARC_FORCE: Float = 2000f
+    var HYPERSTORM_SPEED_THRESHOLD: Float = 20f
+
+    var EMP_DAMAGE_FEAR_MULT: Float = 0.3f
+    fun getHyperstormFearThreshold(): Float {
+        return (HYPERSTORM_ENERGY_DAMAGE + HYPERSTORM_EMP_DAMAGE*EMP_DAMAGE_FEAR_MULT)*0.4f
+    }
 
 
     @JvmStatic
@@ -66,7 +72,7 @@ object MCTE_settings {
     fun loadSettings() {
         MCTE_debugUtils.log.info("reloading settings")
         val configJson = Global.getSettings().loadJSON(MCTE_ids.masterConfig)
-        
+
         SHOW_ERRORS_IN_GAME = configJson.getBoolean("showErrorsInGame")
         MAG_FIELD_EFFECT_ENABLED = configJson.getBoolean("enableMagFieldEffect")
         DEEP_HYPERSPACE_EFFECT_ENABLED = configJson.getBoolean("enableDeepHyperspaceEffect")
@@ -117,6 +123,8 @@ object MCTE_settings {
         HYPERSTORM_MIN_ARC_RANGE = configJson.getFloat("hyperstormMinArcRange")
         HYPERSTORM_MAX_ARC_RANGE = configJson.getFloat("hyperstormMaxArcRange")
         HYPERSTORM_MAX_ARC_CHARGE_TIME = configJson.getFloat("hyperstormMaxArcChargeTime")
+        HYPERSTORM_ARC_FORCE = configJson.getFloat("hyperstormArcForce")
+        HYPERSTORM_SPEED_THRESHOLD = configJson.getFloat("hyperstormSpeedThreshold")
 
         HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = configJson.getInt("hyperstormCentroidRefinementIterations")
     }

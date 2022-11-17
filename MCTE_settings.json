@@ -65,6 +65,8 @@
 	"hyperstormMinArcChargeTime":3.0, #Minimum time a ship will be zapped by the white telegraphing arcs before they are struck by lightning. Default: 3.0
 	"hyperstormMinArcRange":1000, #Lower bound of the range that can be picked for an arc attempt. Default: 1000
 	"hyperstormMaxArcRange":1000, #Upper bound of the range that can be picked for an arc attempt. Default: 1000
+	"hyperstormArcForce":3500, #The amount of force in starsector units (yes i know) a arc will apply to a ship it hits. Default: 3500
+	"hyperstormSpeedThreshold":35.0, #The speed at which the hyperstorm lightning becomes able to hit a ship at. Ex. At default speed, youre immune. At 2x the default speed, youre 2x as likely to be hit. Default: 35.0 
 	
 	"hyperstormCentroidRefinementIterations":2500, #Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times. default: 2500
 	

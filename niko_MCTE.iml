@@ -12,7 +12,6 @@
     <orderEntry type="library" name="starsector-core" level="project" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="magic" level="project" />
-    <orderEntry type="library" name="jars" level="project" />
     <orderEntry type="library" name="lazylib" level="project" />
     <orderEntry type="library" name="GraphicsLib" level="project" />
   </component>

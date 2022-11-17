@@ -3,21 +3,15 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
-import com.fs.starfarer.api.impl.campaign.missions.hub.BaseHubMission.FlagData
 import com.fs.starfarer.api.input.InputEventAPI
-import com.fs.starfarer.combat.entities.Missile
-import com.fs.starfarer.combat.entities.Ship
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseNikoCombatScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_EMP_DAMAGE
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_shipUtils.arc
 import niko.MCTE.utils.MCTE_shipUtils.telegraphArc
-import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
@@ -54,7 +48,7 @@ class hyperstormArcPreparation(
         }
         parentScript.targettedEntities[target]!! += this
 
-        telegraphArc(hyperStormNebula, this.engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target,
+        telegraphArc(hyperStormNebula, parentScript.stormingCellsWithParams[hyperStormNebula], this.engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target,
             volume = getTelegraphVolume())
     }
 
@@ -75,7 +69,7 @@ class hyperstormArcPreparation(
         val randomFloat = random.nextFloat()
         val modifier = parentScript.getActualDamageMultForEntity(target)
         if (randomFloat <= (threshold*modifier)) {
-            telegraphArc(hyperStormNebula, engine, getTelegraphArcStartPoint(), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
+            telegraphArc(hyperStormNebula,  parentScript.stormingCellsWithParams[hyperStormNebula], engine, getTelegraphArcStartPoint(), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
         }
     }
 
@@ -96,9 +90,9 @@ class hyperstormArcPreparation(
 
     private fun doArc() {
 
-        val damage = parentScript.getActualDamageForEntity(target)
-        val emp = parentScript.getEMPDamageForEntity(target)
-        arc(hyperStormNebula, engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, damage, emp)
+        val damage = parentScript.getRawActualDamageForEntity(target)
+        val emp = parentScript.getRawEMPDamageForEntity(target)
+        arc(hyperStormNebula, parentScript.stormingCellsWithParams[hyperStormNebula], engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, damage, emp)
 
         delete()
     }
@@ -142,11 +136,12 @@ class hyperstormArcPreparation(
         if (threatIndicator is MissileAPI) {
             threatIndicator.untilMineExplosion = (thresholdForAdvancement - deltaTime).coerceAtLeast(0.1f)
             //threatIndicator.damageAmount = HYPERSTORM_ENERGY_DAMAGE
-            threatIndicator.damage.damage = parentScript.getActualDamageForEntity(target)
-            threatIndicator.damage.fluxComponent = parentScript.getEMPDamageForEntity(target)
+            threatIndicator.damage.damage = parentScript.getRawActualDamageForEntity(target)
+            threatIndicator.damage.fluxComponent = parentScript.getRawEMPDamageForEntity(target)
             /*threatIndicator.collisionClass = CollisionClass.FIGHTER
             threatIndicator.hitpoints = 9999999f*/
         }
+        threatIndicator.owner = 100
         return threatIndicator
     }
 
