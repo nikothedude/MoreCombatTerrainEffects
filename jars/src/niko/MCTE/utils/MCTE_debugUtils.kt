@@ -64,7 +64,7 @@ object MCTE_debugUtils {
                 Color.RED
             )
         }
-        campaignUI.addMessage("Please provide the mod author of MORE COMBAT TERRAIN EFFECTS a copy of your logs. These messages can be disabled in the niko_MPC_settings.json file in the MPC mod folder.")
+        campaignUI.addMessage("Please provide the mod author of MORE COMBAT TERRAIN EFFECTS a copy of your logs. These messages can be disabled in the MCTE_settings.json file in the MCTE mod folder.")
     }
 
     @JvmStatic
@@ -73,7 +73,7 @@ object MCTE_debugUtils {
         val combatUI = engine.combatUI
         combatUI.addMessage(
             1,
-            "Please provide the mod author of MORE COMBAT TERRAIN EFFECTS with a copy of your logs. These messages can be disabled in the niko_MPC_settings.json file in the MPC mod folder."
+            "Please provide the mod author of MORE COMBAT TERRAIN EFFECTS with a copy of your logs. These messages can be disabled in the MCTE_settings.json file in the MCTE mod folder."
         )
         if (highPriority) {
             Global.getSoundPlayer().playUISound("cr_playership_critical", 1f, 1f)

@@ -33,8 +33,8 @@ class hyperstormArcPreparation(
     var threatIndicator: CombatEntityAPI? = createThreatIndicator()
 
     private fun getAdvancementThreshold(): Float {
-        val max = HYPERSTORM_MAX_ARC_CHARGE_TIME
         val min = HYPERSTORM_MIN_ARC_CHARGE_TIME
+        val max = HYPERSTORM_MAX_ARC_CHARGE_TIME
 
         return min + random.nextFloat() * (max - min)
     }
@@ -81,7 +81,7 @@ class hyperstormArcPreparation(
     }
 
     private fun getTelegraphVolume(): Float {
-        return ((getTelegraphThreshold()+1).pow(4.6)).toFloat()
+        return ((getTelegraphThreshold()+1).pow(4.6)).toFloat() //arbitrary
     }
 
     private fun getTelegraphThreshold(): Double {

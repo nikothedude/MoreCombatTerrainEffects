@@ -7,11 +7,13 @@
 	# powerful EMP arcs. defaults to true
 	"enableSlipstreamEffect":true, #if true, slipstreams will force psuedo-safety overrides onto all deployed ships/missiles, with the caveat that venting is allowed,
 	# and that deployed ships will all slowly accumulate hard flux. defaults to true
+	"enableExtraNebulaEffects":true, #if true, nebula clouds in combat will also slightly reduce the weapon range and vision radius of any ships inside of them.
+	# defaults to true
+	"enableBlackHoleEffectReplacement":true, #if true, black holes, depending on the distance from the black hole, will apply a time mult to all deployed ships
+	# !!!BELOW IS UNIMPLEMENTED!!!
 	"enableDebrisFieldEffect":true, #if true, debris fields will cause misc ship debris to spawn in the battlefield, with a rare chance for a few mines to spawn,
 	# and potentially fighter drones hostile to both sides. defaults to true
 	"enableDustcloudEffect":true, #if true, dust rings, clouds, etc will cause all movement to be slightly slowed, including ship, msisile, projectile, fighter, etc.
-	# defaults to true
-	"enableExtraNebulaEffects":true, #if true, nebula clouds in combat will also slightly reduce the weapon range and vision radius of any ships inside of them.
 	# defaults to true
 	
 	#MAGNETIC FIELD SETTINGS
@@ -28,11 +30,11 @@
 	#MAGNETIC STORM SETTINGS
 	#same rules as the ones above, except these values are used for magnetic STORMS.
 	
-	"magStormVisionMult":0.3, #default: 0.3
-	"magStormMissileManeuverabilityAndGuidanceMult":0.45, #default: 0.45
-	"magStormWeaponAndFighterRangeMult":0.28, #default: 0.28
+	"magStormVisionMult":0.38, #default: 0.3
+	"magStormMissileManeuverabilityAndGuidanceMult":0.55, #default: 0.45
+	"magStormWeaponAndFighterRangeMult":0.38, #default: 0.28
 	"magStormEccmChanceMult":0.2, #default: 0.2
-	"magStormMissileScrambleChance":0.3, #default: 0.3
+	"magStormMissileScrambleChance":0.5, #default: 0.3
 	
 	#SLIPSTREAM SETTINGS
 	"slipstreamPPTMult":0.45, #default: 0.45
@@ -43,6 +45,9 @@
 	"stackSlipstreamPPTDebuffWithSO":true, #if true, the slipstream PPT debuff stacks with SO. defualts to true.
 	"slipstreamDisableVenting":false, #if true, disables venting. duh. default: false
 	"slipstreamIncreaseTurnRate":false, #if true, the speed buff will be applied to turnrate for missiles and ships. default: false
+	
+	"slipstreamFighterZeroFluxBoost":true, #if true, fighters will have an additional speed boost applied to emulate a zero-flux boost. default: true
+	"slipstreamMissileZeroFluxBoost":true, #if true, missiles will have an additional speed boost applied to emulate a zero-flux boost. default: true
 	
 	#NEBULA SETTINGS
 	"nebulaVisionMult":0.8, #default: 0.8
@@ -55,20 +60,26 @@
 	"maximumHypercloudsPerCell":20, #default: 20
 	
 	#HYPERSTORM EFFECTS
-	"hyperstormEnergyDamage":2000, #energy damage the final purple bolt will do. default: 2000
-	"hyperstormEMPDamage":6500, #EMP damage the final purple bolt will do. default: 6500
+	"hyperstormEnergyDamage":850, #energy damage the final purple bolt will do. default: 850
+	"hyperstormEMPDamage":8000, #EMP damage the final purple bolt will do. default: 8000
 	"minTimeBetweenHyperstormStrikes":4, #Minimum time, in ~seconds, between arc attempts. default: 4
 	"maxTimeBetweenHyperstormStrikes":6, #Maximum time, in ~seconds, between arc attempts. default: 6
 	"amountOfTimeShipsHaveBetweenStrikes":5, #After all active arc attempts on a target finish, the target is given this amount of time in 
 	#~seconds before they can be targetted again. default: 5
-	"hyperstormMaxArcChargeTime":3.6, #Max time a ship will be zapped by the white telegraphing arcs before they are struck by lightning. Default: 3.6
-	"hyperstormMinArcChargeTime":3.0, #Minimum time a ship will be zapped by the white telegraphing arcs before they are struck by lightning. Default: 3.0
+	"hyperstormMaxArcChargeTime":3.6, #Max time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.6
+	"hyperstormMinArcChargeTime":3.0, #Minimum time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.0
 	"hyperstormMinArcRange":1000, #Lower bound of the range that can be picked for an arc attempt. Default: 1000
 	"hyperstormMaxArcRange":1000, #Upper bound of the range that can be picked for an arc attempt. Default: 1000
 	"hyperstormArcForce":3500, #The amount of force in starsector units (yes i know) a arc will apply to a ship it hits. Default: 3500
-	"hyperstormSpeedThreshold":35.0, #The speed at which the hyperstorm lightning becomes able to hit a ship at. Ex. At default speed, youre immune. At 2x the default speed, youre 2x as likely to be hit. Default: 35.0 
+	"hyperstormSpeedThreshold":25.0, #The speed at which the hyperstorm lightning becomes able to hit a ship at. Ex. At default speed, youre immune. At 2x the default speed, youre 2x as likely to be hit. Default: 25.0 
 	
 	"hyperstormCentroidRefinementIterations":2500, #Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times. default: 2500
+	
+	#BLACK HOLE EFFECTS
+	"blackholeTimemultMult":1.5f, #Multiplies the "intensity" of the black hole by this, then adds the result to the timemult to be applied to all ships. Ex. At the center of a black hole,
+	# the intensity is 1, so it becomes 1*1.5.
+	"blackholePPTCompensation":100f, #The percent of the black hole CR debuffs to be removed.
+	"blackholeBaseGravity":2f,
 	
 	#GENERAL
 	"showErrorsInGame":true,

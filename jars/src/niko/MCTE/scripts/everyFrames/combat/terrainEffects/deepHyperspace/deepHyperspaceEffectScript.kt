@@ -371,11 +371,10 @@ class deepHyperspaceEffectScript(
 
     private fun getTargettingChanceMult(shipOrMissile: CombatEntityAPI): Float {
         if (!shipOrMissile.isTangible()) return 0f
-        var modifier: Float
-
         val speed = shipOrMissile.velocity.length()
-        modifier = (((-HYPERSTORM_SPEED_THRESHOLD + speed).coerceAtLeast(0f))/100)
-        modifier *= ((shipOrMissile.mass - 300)/1000).coerceAtLeast(1f)
+        var modifier: Float = 1f
+        modifier *= MathUtils.clamp((((speed - HYPERSTORM_SPEED_THRESHOLD)/HYPERSTORM_SPEED_THRESHOLD)), 0f, 3.5f)
+        modifier *= ((shipOrMissile.mass - 600)/100).coerceAtLeast(1f)
 
         return modifier.coerceAtLeast(0f)
     }

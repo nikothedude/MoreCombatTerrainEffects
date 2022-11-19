@@ -14,6 +14,8 @@ import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.Misc
 import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import com.sun.org.apache.xpath.internal.operations.Bool
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudParams
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
@@ -24,6 +26,8 @@ import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_miscUtils
 import niko.MCTE.utils.MCTE_miscUtils.getCellCentroid
 import niko.MCTE.utils.MCTE_miscUtils.getRadiusOfCell
+import niko.MCTE.utils.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
+import niko.MCTE.utils.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
@@ -48,7 +52,11 @@ import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.utils.MCTE_settings.loadSettings
+import org.lazywizard.lazylib.MathUtils
+import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
+import kotlin.math.cos
+import kotlin.math.sin
 
 // script to dodge plugin incompatability
 class terrainEffectScriptAdder: baseNikoCombatScript() {
@@ -79,6 +87,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2> = HashSet()
         //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
         val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
+        val blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin> = HashSet()
 
         for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
             val terrainPlugin = terrain.plugin
@@ -87,14 +96,90 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
                 //if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
                 if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
+                if (terrainPlugin is EventHorizonPlugin) blackHoleTerrainPlugins += terrainPlugin
             }
         }
         addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
         addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, slipstreamPlugins)
         //addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
+        addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, blackHoleTerrainPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
         // dust clouds already have an effect
+    }
+
+    private fun addBlackHoleTerrainScripts(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f,
+        blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin>
+    ) {
+        if (!BLACK_HOLE_EFFECT_ENABLED) return
+
+        var timeMult = 1f
+        val gravityPointsToIntensity: MutableMap<Vector2f, Float> = HashMap()
+        val pluginToIntensity: MutableMap<EventHorizonPlugin, Float> = HashMap()
+        val pluginToAngle: MutableMap<EventHorizonPlugin, Float> = HashMap()
+        var canAddScript: Boolean = false
+
+        for (plugin: EventHorizonPlugin in blackHoleTerrainPlugins) {
+            if (playerLocation != plugin.entity.containingLocation) continue
+            val intensity = plugin.getIntensityAtPoint(playerCoordinates)
+            timeMult += getBlackholeTimeMultIncrement(engine, playerFleet, playerLocation, playerCoordinates, plugin, intensity)
+            pluginToIntensity[plugin] = intensity
+            pluginToAngle[plugin] = (VectorUtils.getAngle(playerCoordinates, plugin.entity.location))
+            //gravityPointsToIntensity[getGravityPointOfBlackHole(engine, playerCoordinates, plugin)] = intensity
+
+            canAddScript = true
+        }
+        if (canAddScript) {
+            engine.addPlugin(
+                blackHoleEffectScript(
+                    timeMult,
+                    pluginToIntensity,
+                    pluginToAngle,
+                    playerCoordinates
+                    //gravityPointsToIntensity
+                )
+            )
+        }
+    }
+
+    private fun getBlackholeTimeMultIncrement(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f,
+        plugin: EventHorizonPlugin,
+        intensity: Float
+    ): Float {
+        return intensity*BLACKHOLE_TIMEMULT_MULT
+    }
+
+    /*private fun getGravityPointOfBlackHole(
+        engine: CombatEngineAPI,
+        playerCoordinates: Vector2f,
+        plugin: EventHorizonPlugin
+    ): Vector2f {
+        val maxWidth = engine.mapWidth
+        val maxHeight = engine.mapHeight
+        val angle = (VectorUtils.getAngle(playerCoordinates, plugin.entity.location))
+
+        val aTemp = angle % Math.PI /2
+        val radius = getRadiusOfMap()
+        val amplitude = radius/cos(aTemp)
+        val x = MathUtils.clamp((cos(angle) * amplitude).toFloat(), -maxWidth, maxWidth)
+        val y = MathUtils.clamp((sin(angle) * amplitude).toFloat(), -maxHeight, maxHeight)
+
+        return Vector2f(x, y)
+    } */
+
+    private fun getRadiusOfMap(): Float {
+        val maxHeight = engine.mapHeight
+        val maxWidth = engine.mapWidth
+        val ratio = maxHeight/maxWidth
+        return ((maxWidth)*ratio)
     }
 
     private fun addRingSystemTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, ringTerrainPlugins: MutableSet<RingSystemTerrainPlugin>) {

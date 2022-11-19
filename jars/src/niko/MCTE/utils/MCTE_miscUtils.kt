@@ -1,6 +1,8 @@
 package niko.MCTE.utils
 
 import com.fs.starfarer.api.Global
+import com.fs.starfarer.api.combat.CombatEngineAPI
+import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.impl.campaign.ids.Factions
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes
@@ -200,5 +202,12 @@ object MCTE_miscUtils {
         MCTE_debugUtils.displayError("$nebula, nebula failed cast to A")
         return 0f
 
+    }
+
+    fun CombatEngineAPI.getAllObjects(): MutableSet<CombatEntityAPI> {
+        val allEntities = HashSet<CombatEntityAPI>()
+        allEntities.addAll(listOf(ships, projectiles, asteroids).flatten())
+
+        return allEntities
     }
 }

@@ -6,6 +6,7 @@ import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.combat.ShipEngineControllerAPI
 import com.fs.starfarer.api.impl.campaign.ids.HullMods
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
@@ -20,12 +21,14 @@ class SlipstreamEffectScript(
     val fluxDissipationMult: Float,
     val hardFluxGenerationPerFrame: Float,
     val overallSpeedMult: Float):
-    baseTerrainEffectScript() {
+    baseTerrainEffectScript(), usesDeltaTime {
 
     val speed: MutableMap<ShipAPI.HullSize, Float> = EnumMap(ShipAPI.HullSize::class.java)
     private val color = Color(212, 55, 255, 255)
+    private val timesToGenerateFluxPerSecond = 60f
 
-    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
+    override var deltaTime: Float = 0f
+    override val thresholdForAdvancement: Float = (1/timesToGenerateFluxPerSecond)
 
     init {
         speed[ShipAPI.HullSize.FIGHTER] = 60f
@@ -35,8 +38,10 @@ class SlipstreamEffectScript(
         speed[ShipAPI.HullSize.CRUISER] = 20f
         speed[ShipAPI.HullSize.CAPITAL_SHIP] = 10f
     }
+    private val missileSpeed = 60f
+    private val missileZeroFluxApproximation = 60f
 
-    val missileSpeed = 60f
+    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
     private val affectedMissiles: HashMap<MissileAPI, Boolean> = HashMap()
 
     override fun applyEffects(amount: Float) {
@@ -45,8 +50,17 @@ class SlipstreamEffectScript(
                 val mutableStats = ship.mutableStats
                 val speedForSize = speed[ship.variant.hullSize]
                 if (speedForSize != null) {
-                    val adjustedSpeedMult = (speedForSize * overallSpeedMult)
-                    val adjustedMissileSpeedMult = (missileSpeed * overallSpeedMult)
+                    var adjustedSpeedMult = (speedForSize * overallSpeedMult)
+                    if (ship.isFighter) {
+                        if (MCTE_settings.SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST) {
+                            adjustedSpeedMult += ship.mutableStats.zeroFluxSpeedBoost.modifiedValue
+                        }
+                    }
+                    val adjustedMissileSpeedMult = ((missileSpeed) * overallSpeedMult)
+                    var adjustedMissileSpeedMultWithZeroFluxBoost = (adjustedMissileSpeedMult)
+                    if (MCTE_settings.SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST) {
+                        adjustedMissileSpeedMultWithZeroFluxBoost = ((adjustedMissileSpeedMult + missileZeroFluxApproximation))
+                    }
                     mutableStats.maxSpeed.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
                     mutableStats.acceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
                     mutableStats.deceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
@@ -56,15 +70,19 @@ class SlipstreamEffectScript(
                         mutableStats.missileTurnAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                         mutableStats.missileMaxTurnRateBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                     }
-                    mutableStats.missileMaxSpeedBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
+                    mutableStats.missileMaxSpeedBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMultWithZeroFluxBoost)
                     mutableStats.missileAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
                 }
-                val hasSafetyOverrides = ship.variant.hasHullMod(HullMods.SAFETYOVERRIDES)
-                if (!hasSafetyOverrides || MCTE_settings.STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO) {
-                    mutableStats.peakCRDuration.modifyMult(terrainCombatEffectIds.slipstreamEffect, peakPerformanceMult)
+                val safetiesOverridden = (mutableStats.zeroFluxMinimumFluxLevel.modifiedValue >= 1)
+                if (safetiesOverridden) {
+                    if (MCTE_settings.STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO) {
+                        mutableStats.peakCRDuration.modifyMult(terrainCombatEffectIds.slipstreamEffect, peakPerformanceMult)
+                    }
+                    mutableStats.zeroFluxSpeedBoost.modifyFlat(terrainCombatEffectIds.slipstreamEffect, mutableStats.zeroFluxSpeedBoost.modifiedValue)
                 }
 
                 mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(terrainCombatEffectIds.slipstreamEffect, 2f)
+                //mutableStats.allowZeroFluxAtAnyLevel.modifyFlat(terrainCombatEffectIds.slipstreamEffect, 1f)
                 mutableStats.fluxDissipation.modifyMult(terrainCombatEffectIds.slipstreamEffect, fluxDissipationMult)
 
                 if (SLIPSTREAM_DISABLE_VENTING) {
@@ -83,16 +101,20 @@ class SlipstreamEffectScript(
             }
         }
 
-        generateFlux()
+        generateFlux(amount)
 
         handleEngines()
     }
 
-    private fun generateFlux() {
+    private fun generateFlux(amount: Float) {
         if (engine.isPaused) return
+        if (!canAdvance(amount)) return
         for (ship: ShipAPI in affectedShips.keys) {
             if (ship.isFighter) continue
-            ship.fluxTracker.increaseFlux(hardFluxGenerationPerFrame, true)
+            val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
+            val engineMult: Float = engine.timeMult.modifiedValue
+            val totalMult = timeMult + engineMult-1
+            ship.fluxTracker.increaseFlux(((hardFluxGenerationPerFrame)*totalMult), true)
         }
     }
 
@@ -102,7 +124,7 @@ class SlipstreamEffectScript(
         val shipIterator = affectedShips.keys.iterator()
         while (shipIterator.hasNext()) {
             val ship: ShipAPI = shipIterator.next()
-            if (!engine.isEntityInPlay(ship)) {
+            if (!engine.isEntityInPlay(ship) || !ship.isAlive) {
                 shipIterator.remove()
                 continue
             }
@@ -160,7 +182,7 @@ class SlipstreamEffectScript(
     }
 
     private fun calculateFluxGeneratedPerSecond(): Float {
-        return (hardFluxGenerationPerFrame * 60)
+        return (hardFluxGenerationPerFrame*timesToGenerateFluxPerSecond)
     }
 
 }

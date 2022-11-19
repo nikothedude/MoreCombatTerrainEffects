@@ -1,0 +1,2 @@
+command,class,tags,syntax,help
+MCTE_loadSettings,niko.MCTE.console.commands.MCTE_reloadSettings,"debug, settings",MCTE_loadSettings,Forces a reload of the MCTE settings .json.

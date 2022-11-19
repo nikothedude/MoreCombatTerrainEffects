@@ -14,5 +14,6 @@
     <orderEntry type="library" name="magic" level="project" />
     <orderEntry type="library" name="lazylib" level="project" />
     <orderEntry type="library" name="GraphicsLib" level="project" />
+    <orderEntry type="library" name="Console Commands" level="project" />
   </component>
 </module>

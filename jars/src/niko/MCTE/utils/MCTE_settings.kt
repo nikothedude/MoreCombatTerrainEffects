@@ -15,10 +15,12 @@ object MCTE_settings {
     var DEBRIS_FIELD_EFFECT_ENABLED: Boolean = true
     var DUST_CLOUD_EFFECT_ENABLED: Boolean = true
     var EXTRA_NEBULA_EFFECTS_ENABLED: Boolean = true
+    var BLACK_HOLE_EFFECT_ENABLED: Boolean = true
+
     //MAGFIELD SETTINGS
     var MAGFIELD_VISION_MULT: Float = 0.6f
-
     var MAGFIELD_MISSILE_MULT: Float = 0.8f
+
     var MAGFIELD_RANGE_MULT: Float = 0.8f
     var MAGFIELD_ECCM_MULT: Float = 0.8f
     var MAGFIELD_MISSILE_SCRAMBLE_CHANCE: Float = 0.6f
@@ -30,13 +32,15 @@ object MCTE_settings {
     var MAGSTORM_MISSILE_SCRAMBLE_CHANCE: Float = 0.6f
     //SLIPSTREAM SETTINGS
     var SLIPSTREAM_PPT_MULT: Float = 0.33f
-
     var SLIPSTREAM_FLUX_DISSIPATION_MULT: Float = 3f
+
     var SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT: Float = 3f
-    var SLIPSTREAM_HARDFLUX_GEN_PER_FRAME: Float = 1f
+    var SLIPSTREAM_HARDFLUX_GEN_PER_FRAME: Float = 2f
     var STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO: Boolean = true
     var SLIPSTREAM_DISABLE_VENTING: Boolean = false
     var SLIPSTREAM_INCREASE_TURN_RATE: Boolean = false
+    var SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST: Boolean = false
+    var SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST: Boolean = false
     //NEBULA SETTINGS
     var NEBULA_VISION_MULT: Float = 0.8f
 
@@ -59,9 +63,16 @@ object MCTE_settings {
     var HYPERSTORM_MAX_ARC_RANGE = 1600f
     var HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = 2500
     var HYPERSTORM_ARC_FORCE: Float = 2000f
-    var HYPERSTORM_SPEED_THRESHOLD: Float = 20f
+    var HYPERSTORM_SPEED_THRESHOLD: Float = 10f
 
     var EMP_DAMAGE_FEAR_MULT: Float = 0.3f
+
+    // BLACK HOLE SETTINGS
+    var BLACKHOLE_TIMEMULT_MULT = 1.5f
+    var BLACKHOLE_PPT_COMPENSATION = 1f
+    var BLACKHOLE_BASE_GRAVITY = 350f
+
+    @JvmStatic
     fun getHyperstormFearThreshold(): Float {
         return (HYPERSTORM_ENERGY_DAMAGE + HYPERSTORM_EMP_DAMAGE*EMP_DAMAGE_FEAR_MULT)*0.4f
     }
@@ -81,6 +92,7 @@ object MCTE_settings {
         DEBRIS_FIELD_EFFECT_ENABLED = configJson.getBoolean("enableDebrisFieldEffect")
         DUST_CLOUD_EFFECT_ENABLED = configJson.getBoolean("enableDustcloudEffect")
         EXTRA_NEBULA_EFFECTS_ENABLED = configJson.getBoolean("enableExtraNebulaEffects")
+        BLACK_HOLE_EFFECT_ENABLED = configJson.getBoolean("enableBlackHoleEffectReplacement")
 
         //MAGFIELD
         MAGFIELD_VISION_MULT = configJson.getFloat("magFieldVisionMult")
@@ -104,6 +116,9 @@ object MCTE_settings {
         SLIPSTREAM_DISABLE_VENTING = configJson.getBoolean("slipstreamDisableVenting")
         SLIPSTREAM_INCREASE_TURN_RATE = configJson.getBoolean("slipstreamIncreaseTurnRate")
 
+        SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST = configJson.getBoolean("slipstreamFighterZeroFluxBoost")
+        SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST = configJson.getBoolean("slipstreamMissileZeroFluxBoost")
+
         //NEBULA
         NEBULA_VISION_MULT = configJson.getFloat("nebulaVisionMult")
         NEBULA_RANGE_MULT = configJson.getFloat("nebulaRangeMult")
@@ -122,10 +137,16 @@ object MCTE_settings {
         HYPERSTORM_GRACE_INCREMENT = configJson.getFloat("amountOfTimeShipsHaveBetweenStrikes")
         HYPERSTORM_MIN_ARC_RANGE = configJson.getFloat("hyperstormMinArcRange")
         HYPERSTORM_MAX_ARC_RANGE = configJson.getFloat("hyperstormMaxArcRange")
-        HYPERSTORM_MAX_ARC_CHARGE_TIME = configJson.getFloat("hyperstormMaxArcChargeTime")
+        HYPERSTORM_MIN_ARC_CHARGE_TIME = (configJson.getFloat("hyperstormMinArcChargeTime")).coerceAtLeast(0f)
+        HYPERSTORM_MAX_ARC_CHARGE_TIME = (configJson.getFloat("hyperstormMaxArcChargeTime")).coerceAtLeast(HYPERSTORM_MIN_ARC_CHARGE_TIME)
         HYPERSTORM_ARC_FORCE = configJson.getFloat("hyperstormArcForce")
         HYPERSTORM_SPEED_THRESHOLD = configJson.getFloat("hyperstormSpeedThreshold")
 
         HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = configJson.getInt("hyperstormCentroidRefinementIterations")
+
+        // BLACK HOLE
+        BLACKHOLE_TIMEMULT_MULT = configJson.getFloat("blackholeTimemultMult")
+        BLACKHOLE_PPT_COMPENSATION = configJson.getFloat("blackholePPTCompensation")/100
+        BLACKHOLE_BASE_GRAVITY = configJson.getFloat("blackholeBaseGravity")
     }
 }
