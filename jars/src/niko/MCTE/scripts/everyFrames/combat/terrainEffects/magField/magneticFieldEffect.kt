@@ -11,6 +11,7 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScri
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.renderableEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
+import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
@@ -91,31 +92,31 @@ class magneticFieldEffect(
             "niko_MCPE_magFieldInterference1",
             icon,
             "Magnetic $stormOrNot",
-            "${100-visionMod*100}% less vision",
+            "${(100-visionMod*100).roundTo(2)}% less vision",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference2",
             icon,
             "Magnetic $stormOrNot",
-            "${100-missileMod*100}% less missile guidance/turn rate",
+            "${(100-missileMod*100).roundTo(2)}% less missile guidance/turn rate",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference4",
             icon,
             "Magnetic $stormOrNot",
-            "${100-rangeMod*100}% less weapon range and fighter range",
+            "${(100-rangeMod*100).roundTo(2)}% less weapon range and fighter range",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference5",
             icon,
             "Magnetic $stormOrNot",
-            "${100-eccmChanceMod*100}% less ECCM chance",
+            "${(100-eccmChanceMod*100).roundTo(2)}% less ECCM chance",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference6",
             icon,
             "Magnetic $stormOrNot",
-            "$missileBreakLockBaseChance% chance for missiles' guidance to be scrambled per $thresholdForAdvancement seconds",
+            "${missileBreakLockBaseChance.roundTo(2)}% chance for missiles' guidance to be scrambled per $thresholdForAdvancement seconds",
             true)
     }
 

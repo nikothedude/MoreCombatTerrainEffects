@@ -14,13 +14,13 @@ import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.Misc
 import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
-import com.sun.org.apache.xpath.internal.operations.Bool
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudParams
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_miscUtils
@@ -46,17 +46,22 @@ import niko.MCTE.utils.MCTE_settings.MAGSTORM_VISION_MULT
 import niko.MCTE.utils.MCTE_settings.MAG_FIELD_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.MAX_HYPERCLOUDS_TO_ADD_PER_CELL
 import niko.MCTE.utils.MCTE_settings.MIN_HYPERCLOUDS_TO_ADD_PER_CELL
+import niko.MCTE.utils.MCTE_settings.PULSAR_DAMAGE_INCREMENT
+import niko.MCTE.utils.MCTE_settings.PULSAR_EFFECT_ENABLED
+import niko.MCTE.utils.MCTE_settings.PULSAR_EMP_CHANCE_INCREMENT
+import niko.MCTE.utils.MCTE_settings.PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT
+import niko.MCTE.utils.MCTE_settings.PULSAR_EMP_DAMAGE_INCREMENT
+import niko.MCTE.utils.MCTE_settings.PULSAR_HARDFLUX_GEN_INCREMENT
+import niko.MCTE.utils.MCTE_settings.PULSAR_INTENSITY_BASE_MULT
+import niko.MCTE.utils.MCTE_settings.PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.utils.MCTE_settings.loadSettings
-import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
-import kotlin.math.cos
-import kotlin.math.sin
 
 // script to dodge plugin incompatability
 class terrainEffectScriptAdder: baseNikoCombatScript() {
@@ -88,10 +93,12 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
         val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
         val blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin> = HashSet()
+        val pulsarPlugins: MutableSet<PulsarBeamTerrainPlugin> = HashSet()
 
         for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
             val terrainPlugin = terrain.plugin
                 if (terrainPlugin.containsEntity(playerFleet)) {
+                if (terrainPlugin is PulsarBeamTerrainPlugin) pulsarPlugins += terrainPlugin
                 if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
                 if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
                 //if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
@@ -101,11 +108,65 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         }
         addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
         addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, slipstreamPlugins)
+        addPulsarScripts(engine, playerFleet, playerLocation, playerCoordinates, pulsarPlugins)
         //addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
         addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, blackHoleTerrainPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
         // dust clouds already have an effect
+    }
+
+    private fun addPulsarScripts(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f,
+        pulsarPlugins: MutableSet<PulsarBeamTerrainPlugin>
+    ) {
+        if (!PULSAR_EFFECT_ENABLED) return
+
+        val pluginToIntensity: MutableMap<PulsarBeamTerrainPlugin, Float> = HashMap()
+        val pluginToAngle: MutableMap<PulsarBeamTerrainPlugin, Float> = HashMap()
+        var canAddScript: Boolean = false
+        var hardFluxGenPerFrame = 0f
+        var bonusEMPDamageForWeapons = 0f
+        var shieldDestabilziationMult = 1f
+
+        var EMPChancePerFrame = 0f
+        var EMPDamage = 0f
+        var energyDamage = 0f
+
+        for (plugin: PulsarBeamTerrainPlugin in pulsarPlugins) {
+            val intensity = (plugin.getIntensityAtPoint(playerCoordinates))*PULSAR_INTENSITY_BASE_MULT
+
+            hardFluxGenPerFrame += (PULSAR_HARDFLUX_GEN_INCREMENT * intensity)
+            bonusEMPDamageForWeapons += (PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT * intensity)
+            shieldDestabilziationMult += (PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT * intensity)
+
+            EMPChancePerFrame += (PULSAR_EMP_CHANCE_INCREMENT * intensity)
+            EMPDamage += (PULSAR_EMP_DAMAGE_INCREMENT * intensity)
+            energyDamage += (PULSAR_DAMAGE_INCREMENT * intensity)
+
+            pluginToIntensity[plugin] = (intensity)
+            pluginToAngle[plugin] = (VectorUtils.getAngle(plugin.entity.location, playerCoordinates))
+            canAddScript = true
+        }
+        if (canAddScript) {
+            engine.addPlugin(
+                pulsarEffectScript(
+                    pulsarPlugins,
+                    pluginToIntensity,
+                    pluginToAngle,
+                    hardFluxGenPerFrame,
+                    bonusEMPDamageForWeapons,
+                    shieldDestabilziationMult,
+                    EMPChancePerFrame,
+                    EMPDamage,
+                    energyDamage
+                    //gravityPointsToIntensity
+                )
+            )
+        }
     }
 
     private fun addBlackHoleTerrainScripts(
@@ -118,7 +179,6 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         if (!BLACK_HOLE_EFFECT_ENABLED) return
 
         var timeMult = 1f
-        val gravityPointsToIntensity: MutableMap<Vector2f, Float> = HashMap()
         val pluginToIntensity: MutableMap<EventHorizonPlugin, Float> = HashMap()
         val pluginToAngle: MutableMap<EventHorizonPlugin, Float> = HashMap()
         var canAddScript: Boolean = false

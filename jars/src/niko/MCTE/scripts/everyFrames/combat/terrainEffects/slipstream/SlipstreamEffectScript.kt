@@ -7,6 +7,7 @@ import com.fs.starfarer.api.combat.ShipEngineControllerAPI
 import com.fs.starfarer.api.impl.campaign.ids.HullMods
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
+import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
@@ -155,7 +156,7 @@ class SlipstreamEffectScript(
             "niko_MCPE_slipstream3",
             icon,
             "Slipstream",
-            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond()} per second",
+            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond().roundTo(2)} per second",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_slipstream2",

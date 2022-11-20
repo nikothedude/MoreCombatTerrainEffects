@@ -10,6 +10,7 @@ import com.fs.starfarer.api.util.Misc
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_debugUtils
+import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
 import niko.MCTE.utils.MCTE_settings.NEBULA_RANGE_MULT
@@ -143,19 +144,19 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "niko_MCPE_nebulaEffect2",
                 icon,
                 "Nebula",
-                "Vision range reduced by ${100-visionMult*100}%",
+                "Vision range reduced by ${(100-visionMult*100).roundTo(2)}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect3",
                 icon,
                 "Nebula",
-                "Weapon range reduced by ${100-rangeMult*100}%",
+                "Weapon range reduced by ${(100-rangeMult*100).roundTo(2)}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect4",
                 icon,
                 "Nebula",
-                "Speed reduced by ${-speedDecrement} Su",
+                "Speed reduced by ${-speedDecrement.roundTo(2)} Su",
                 true)
         }
     }

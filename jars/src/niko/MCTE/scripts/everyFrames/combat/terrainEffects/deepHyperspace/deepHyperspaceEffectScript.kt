@@ -9,6 +9,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Personalities
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
+import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_EMP_DAMAGE
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
@@ -294,7 +295,7 @@ class deepHyperspaceEffectScript(
                 "niko_MCPE_hyperStorm2",
                 icon,
                 "Hyperspace Storm",
-                "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip)} energy damage and ${getRawEMPDamageForEntity(playerShip)} EMP damage",
+                "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip).roundTo(2)} energy damage and ${getRawEMPDamageForEntity(playerShip).roundTo(2)} EMP damage",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_hyperStorm1",
@@ -316,7 +317,7 @@ class deepHyperspaceEffectScript(
         var mult = 1f
         if (entity is ShipAPI) {
             val mutableStats = entity.mutableStats
-            mult += mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue - 1
+            mult += mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
         }
 
         return mult

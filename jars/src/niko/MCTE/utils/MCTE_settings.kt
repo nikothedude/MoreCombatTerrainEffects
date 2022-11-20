@@ -16,6 +16,7 @@ object MCTE_settings {
     var DUST_CLOUD_EFFECT_ENABLED: Boolean = true
     var EXTRA_NEBULA_EFFECTS_ENABLED: Boolean = true
     var BLACK_HOLE_EFFECT_ENABLED: Boolean = true
+    var PULSAR_EFFECT_ENABLED: Boolean = true
 
     //MAGFIELD SETTINGS
     var MAGFIELD_VISION_MULT: Float = 0.6f
@@ -70,7 +71,22 @@ object MCTE_settings {
     // BLACK HOLE SETTINGS
     var BLACKHOLE_TIMEMULT_MULT = 1.5f
     var BLACKHOLE_PPT_COMPENSATION = 1f
-    var BLACKHOLE_BASE_GRAVITY = 350f
+    var BLACKHOLE_BASE_GRAVITY = 2f
+
+    var BLACKHOLE_GRAVITY_ENABLED = true
+
+    // PULSAR
+    var PULSAR_FORCE_ENABLED = true
+    var PULSAR_BASE_FORCE: Float = 0.3f
+    var PULSAR_INTENSITY_BASE_MULT: Float = 1f
+    var PULSAR_PPT_COMPENSATION: Float = 1f
+    var PULSAR_HARDFLUX_GEN_INCREMENT: Float = 10f
+    var PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT: Float = 10f
+    var PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT: Float = 25f
+
+    var PULSAR_EMP_CHANCE_INCREMENT: Float = 0.01f
+    var PULSAR_EMP_DAMAGE_INCREMENT: Float = 20f
+    var PULSAR_DAMAGE_INCREMENT: Float = 0.5f
 
     @JvmStatic
     fun getHyperstormFearThreshold(): Float {
@@ -93,6 +109,7 @@ object MCTE_settings {
         DUST_CLOUD_EFFECT_ENABLED = configJson.getBoolean("enableDustcloudEffect")
         EXTRA_NEBULA_EFFECTS_ENABLED = configJson.getBoolean("enableExtraNebulaEffects")
         BLACK_HOLE_EFFECT_ENABLED = configJson.getBoolean("enableBlackHoleEffectReplacement")
+        PULSAR_EFFECT_ENABLED = configJson.getBoolean("enablePulsarEffect")
 
         //MAGFIELD
         MAGFIELD_VISION_MULT = configJson.getFloat("magFieldVisionMult")
@@ -148,5 +165,19 @@ object MCTE_settings {
         BLACKHOLE_TIMEMULT_MULT = configJson.getFloat("blackholeTimemultMult")
         BLACKHOLE_PPT_COMPENSATION = configJson.getFloat("blackholePPTCompensation")/100
         BLACKHOLE_BASE_GRAVITY = configJson.getFloat("blackholeBaseGravity")
+        BLACKHOLE_GRAVITY_ENABLED = configJson.getBoolean("blackholeGravityEnabled")
+
+        // PULSAR
+        PULSAR_FORCE_ENABLED = configJson.getBoolean("pulsarForceEnabled")
+        PULSAR_BASE_FORCE = configJson.getFloat("pulsarBaseForce")
+        PULSAR_INTENSITY_BASE_MULT = configJson.getFloat("pulsarIntensityBaseMult")
+        PULSAR_PPT_COMPENSATION = configJson.getFloat("pulsarPPTCompensation")/100
+        PULSAR_HARDFLUX_GEN_INCREMENT = configJson.getFloat("pulsarHardfluxGenIncrement")
+        PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT = configJson.getFloat("pulsarEMPDamageBonusForWeaponsIncrement")
+        PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT = configJson.getFloat("pulsarShieldDestabilizationMultIncrement")
+        PULSAR_EMP_CHANCE_INCREMENT = configJson.getFloat("pulsarEMPChanceIncrement")
+        PULSAR_EMP_DAMAGE_INCREMENT = configJson.getFloat("pulsarEMPDamageIncrement")
+        PULSAR_DAMAGE_INCREMENT = configJson.getFloat("pulsarDamageIncrement")
+
     }
 }

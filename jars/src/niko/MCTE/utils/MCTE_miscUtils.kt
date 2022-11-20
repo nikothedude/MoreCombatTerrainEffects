@@ -5,18 +5,13 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.impl.campaign.ids.Factions
-import com.fs.starfarer.api.impl.campaign.ids.FleetTypes
 import com.fs.starfarer.api.impl.campaign.ids.ShipRoles
-import com.fs.starfarer.api.loading.RoleEntryAPI
 import com.fs.starfarer.api.util.WeightedRandomPicker
 import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import org.lazywizard.lazylib.MathUtils
+import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
-import java.lang.reflect.AccessibleObject
-import java.lang.reflect.Field
-import java.util.Objects
-import javax.management.relation.Role
 
 object MCTE_miscUtils {
     private val debrisFieldShipSourcePicker: WeightedRandomPicker<String> = WeightedRandomPicker()
@@ -209,5 +204,27 @@ object MCTE_miscUtils {
         allEntities.addAll(listOf(ships, projectiles, asteroids).flatten())
 
         return allEntities
+    }
+
+    fun applyForceWithSuppliedMass(entity: CombatEntityAPI, mass: Float, direction: Vector2f, force: Float) {
+        // Filter out forces without a direction
+        var force = force
+        if (VectorUtils.isZeroVector(direction)) {
+            return
+        }
+
+        // Force is far too weak otherwise
+        force *= 100f
+
+        // Avoid divide-by-zero errors...
+        val clampedMass = Math.max(1f, mass)
+        // Calculate the velocity change and its resulting vector
+        // Don't bother going over Starsector's speed cap
+        val velChange = Math.min(1250f, force / clampedMass)
+        val dir = Vector2f()
+        direction.normalise(dir)
+        dir.scale(velChange)
+        // Apply our velocity change
+        Vector2f.add(dir, entity.velocity, entity.velocity)
     }
 }
