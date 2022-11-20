@@ -11,6 +11,7 @@ import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
 import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
+import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
 import java.awt.Color
 import java.util.*
@@ -112,6 +113,7 @@ class SlipstreamEffectScript(
         if (!canAdvance(amount)) return
         for (ship: ShipAPI in affectedShips.keys) {
             if (ship.isFighter) continue
+            if (!ship.isTangible()) continue
             val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
             val engineMult: Float = engine.timeMult.modifiedValue
             val totalMult = timeMult + engineMult-1

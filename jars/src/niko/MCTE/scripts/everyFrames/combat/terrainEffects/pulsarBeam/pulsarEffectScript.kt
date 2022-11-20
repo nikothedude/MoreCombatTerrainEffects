@@ -13,6 +13,7 @@ import niko.MCTE.utils.MCTE_miscUtils.getAllObjects
 import niko.MCTE.utils.MCTE_settings.PULSAR_BASE_FORCE
 import niko.MCTE.utils.MCTE_settings.PULSAR_FORCE_ENABLED
 import niko.MCTE.utils.MCTE_settings.PULSAR_PPT_COMPENSATION
+import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
@@ -121,7 +122,7 @@ class pulsarEffectScript(
             val source: ShipAPI? = projectile.source
             if (source != null) {
                 val effectMult = getEffectMultForShip(source)
-                return bonusEMPDamageForWeapons*effectMult
+                return bonusEMPDamageForWeapons*(effectMult.coerceAtLeast(1f))
             }
         }
         return bonusEMPDamageForWeapons
@@ -140,7 +141,7 @@ class pulsarEffectScript(
     }
 
     private fun getChargeForWeapon(ship: ShipAPI, effectMult: Float, weapon: WeaponAPI): Float {
-        return bonusEMPDamageForWeapons*effectMult
+        return bonusEMPDamageForWeapons*(effectMult.coerceAtLeast(1f))
     }
 
     private fun replaceExistingEffect(ship: ShipAPI, mutableStats: MutableShipStatsAPI, effectMult: Float) {
@@ -174,6 +175,7 @@ class pulsarEffectScript(
 
             for (entity: CombatEntityAPI in engine.getAllObjects()) {
                 if (!engine.isInPlay(entity)) continue
+                if (!entity.isTangible()) continue
                 var mass = entity.mass
                 if (mass == 0f) {
                     if (entity is DamagingProjectileAPI) {
@@ -216,6 +218,7 @@ class pulsarEffectScript(
                 iterator.remove()
                 continue
             }
+            if (!ship.isTangible()) continue
             if (ship.isFighter) continue
             val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
             val engineMult: Float = engine.timeMult.modifiedValue
@@ -255,6 +258,7 @@ class pulsarEffectScript(
 
     private fun shouldEMPship(ship: ShipAPI): Boolean {
         if (!engine.isEntityInPlay(ship)) return false
+        if (!ship.isTangible()) return false
         val shield: ShieldAPI? = ship.shield
         if (shield != null) {
             val shieldArc = shield.activeArc

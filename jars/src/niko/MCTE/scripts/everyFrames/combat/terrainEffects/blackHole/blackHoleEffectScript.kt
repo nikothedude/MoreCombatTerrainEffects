@@ -63,17 +63,15 @@ class blackHoleEffectScript(
     }
 
     private fun getGravityForceForEntity(entity: CombatEntityAPI, baseIntensity: Float): Float {
-        var coronaEffect = 1f
         var timeMult = 1f
         val engineMult: Float = engine.timeMult.modifiedValue
         if (entity is ShipAPI) {
             timeMult = entity.mutableStats.timeMult.modifiedValue
-            coronaEffect = entity.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
         }
         val adjustedIntensity = baseIntensity * BLACKHOLE_BASE_GRAVITY
         val totalTimeMult = timeMult + engineMult-1
         val mult = if (entity is DamagingProjectileAPI) 0.3f else 1f
-        return (((adjustedIntensity)*coronaEffect)*totalTimeMult)*mult
+        return (((adjustedIntensity))*totalTimeMult)*mult
     }
 
     private fun applyStats() {
@@ -118,7 +116,7 @@ class blackHoleEffectScript(
 
     private fun getTimeMultForShip(ship: ShipAPI): Float {
         val coronaEffect = ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
-        return timeMult*coronaEffect
+        return (timeMult*coronaEffect).coerceAtLeast(1f)
     }
 
     override fun handleNotification(amount: Float) {
