@@ -114,6 +114,8 @@ class SlipstreamEffectScript(
         for (ship: ShipAPI in affectedShips.keys) {
             if (ship.isFighter) continue
             if (!ship.isTangible()) continue
+            val maxFlux = ship.maxFlux
+            if (maxFlux <= hardFluxGenerationPerFrame) continue
             val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
             val engineMult: Float = engine.timeMult.modifiedValue
             val totalMult = timeMult + engineMult-1

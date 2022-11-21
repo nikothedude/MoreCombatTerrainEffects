@@ -220,6 +220,8 @@ class pulsarEffectScript(
             }
             if (!ship.isTangible()) continue
             if (ship.isFighter) continue
+            val maxFlux = ship.maxFlux
+            if (maxFlux <= hardFluxGenerationPerFrame) continue
             val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
             val engineMult: Float = engine.timeMult.modifiedValue
             val totalMult = timeMult + engineMult-1
