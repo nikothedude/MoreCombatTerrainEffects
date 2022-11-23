@@ -70,7 +70,7 @@ class pulsarEffectScript(
             if (affectedShips[ship] == null) {
 
                 val effectMult: Float = getEffectMultForShip(ship)
-                val modifiedShieldMult = (shieldDestabilziationMult * effectMult)
+                val modifiedShieldMult = getShieldMultForShip(ship)
 
                 val mutableStats = ship.mutableStats
 
@@ -78,8 +78,8 @@ class pulsarEffectScript(
                 mutableStats.shieldUpkeepMult.modifyMult(terrainCombatEffectIds.pulsarEffect, modifiedShieldMult)
                 mutableStats.dynamic.getStat(Stats.SHIELD_PIERCED_MULT).modifyMult(terrainCombatEffectIds.pulsarEffect, 1/modifiedShieldMult)
 
-                replaceExistingEffect(ship, mutableStats, effectMult)
-                chargeWeapons(ship, mutableStats, effectMult)
+                replaceExistingEffect(ship, mutableStats)
+                chargeWeapons(ship, mutableStats)
                 affectedShips[ship] = true
             }
         }
@@ -96,6 +96,11 @@ class pulsarEffectScript(
                 continue
             }
         }
+    }
+
+    private fun getShieldMultForShip(ship: ShipAPI): Float {
+        val effectMult = getEffectMultForShip(ship)
+        return (shieldDestabilziationMult * effectMult).coerceAtLeast(1f)
     }
 
     private fun isChargedProjectile(projectile: DamagingProjectileAPI): Boolean {
@@ -128,23 +133,30 @@ class pulsarEffectScript(
         return bonusEMPDamageForWeapons
     }
 
-    private fun chargeWeapons(ship: ShipAPI, mutableStats: MutableShipStatsAPI?, effectMult: Float) {
+    private fun chargeWeapons(ship: ShipAPI, mutableStats: MutableShipStatsAPI) {
         for (weapon: WeaponAPI in ship.allWeapons) {
-            chargeWeapon(ship, weapon, effectMult)
+            chargeWeapon(ship, weapon)
         }
     }
 
-    private fun chargeWeapon(ship: ShipAPI, weapon: WeaponAPI, effectMult: Float) {
-        val empAmount: Float = getChargeForWeapon(ship, effectMult, weapon)
+    private fun chargeWeapon(ship: ShipAPI, weapon: WeaponAPI) {
+        val empAmount: Float = getChargeForWeapon(ship, weapon)
         weapon.damage.fluxComponent += empAmount
         chargedWeapons[weapon] = empAmount
     }
 
-    private fun getChargeForWeapon(ship: ShipAPI, effectMult: Float, weapon: WeaponAPI): Float {
+    private fun getChargeForWeapon(ship: ShipAPI, weapon: WeaponAPI): Float {
+        val shipCharge = getChargeForShip(ship)
+        return shipCharge
+    }
+
+    private fun getChargeForShip(ship: ShipAPI): Float {
+        val effectMult = getEffectMultForShip(ship)
         return bonusEMPDamageForWeapons*(effectMult.coerceAtLeast(1f))
     }
 
-    private fun replaceExistingEffect(ship: ShipAPI, mutableStats: MutableShipStatsAPI, effectMult: Float) {
+    private fun replaceExistingEffect(ship: ShipAPI, mutableStats: MutableShipStatsAPI) {
+        val effectMult = getEffectMultForShip(ship)
         var compensation = (PULSAR_PPT_COMPENSATION/(overallIntensity+1)/effectMult).coerceAtMost(1f)
         for (PPTmod in mutableStats.peakCRDuration.multBonuses) {
             if (PPTmod.key.contains("pulsar_beam_stat_mod_", true)) {
@@ -259,22 +271,27 @@ class pulsarEffectScript(
     }
 
     private fun shouldEMPship(ship: ShipAPI): Boolean {
-        if (!engine.isEntityInPlay(ship)) return false
-        if (!ship.isTangible()) return false
+
+        val chance: Float = getEMPChanceForShip(ship)
+        val randomFloat = random.nextFloat()
+
+        return (chance > randomFloat)
+    }
+
+    private fun getEMPChanceForShip(ship: ShipAPI): Float {
+        if (!engine.isEntityInPlay(ship)) return 0f
+        if (!ship.isTangible()) return 0f
         val shield: ShieldAPI? = ship.shield
         if (shield != null) {
             val shieldArc = shield.activeArc
-            if (shieldArc >= 360) return false
+            if (shieldArc >= 360) return 0f
         }
 
         val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
         val engineMult: Float = engine.timeMult.modifiedValue
         val totalMult = timeMult + engineMult-1
 
-        val chance = (EMPChancePerFrame)*totalMult
-        val randomFloat = random.nextFloat()
-
-        return (chance > randomFloat)
+        return EMPChancePerFrame*totalMult
     }
 
     private fun getEMPDamage(ship: ShipAPI): Float {
@@ -299,8 +316,9 @@ class pulsarEffectScript(
 
         val ship = engine.playerShip
 
-        val effectMult: Float = getEffectMultForShip(ship)
-        val modifiedShieldMult = (shieldDestabilziationMult * effectMult)
+        val modifiedShieldMult = getShieldMultForShip(ship)
+        val empChance = getEMPChanceForShip(ship)
+        val empDamage = getEMPDamage(ship)
 
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar1",
@@ -312,19 +330,19 @@ class pulsarEffectScript(
             "niko_MCPE_pulsar3",
             icon,
             "Pulsar Beam",
-            "${(bonusEMPDamageForWeapons*effectMult).roundTo(2)} EMP damage applied to all projectiles",
+            "${(getChargeForShip(ship)).roundTo(2)} EMP damage applied to all projectiles",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar4",
             icon,
             "Pulsar Beam",
-            "Random chance for ship plating to polarize and EMP self",
+            "${empChance.roundTo(2)}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2)} EMP damage",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar2",
             icon,
             "Pulsar Beam",
-            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond().roundTo(2)} per second",
+            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(ship).roundTo(2)} per second",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar5",
@@ -334,8 +352,9 @@ class pulsarEffectScript(
             true)
     }
 
-    private fun calculateFluxGeneratedPerSecond(): Float {
-        return (hardFluxGenerationPerFrame*timesToDoThingPerSecond)
+    private fun calculateFluxGeneratedPerSecond(ship: ShipAPI): Float {
+        val hardFluxPerFrame = getHardFluxGenForShip(ship)
+        return (hardFluxPerFrame*timesToDoThingPerSecond)
     }
 
     override fun handleSounds(amount: Float) {

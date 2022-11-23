@@ -4,16 +4,13 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
-import com.fs.starfarer.api.impl.campaign.terrain.AuroraRenderer
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.renderableEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.terrainCombatEffectIds
-import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
 class magneticFieldEffect(
@@ -27,10 +24,12 @@ class magneticFieldEffect(
     ): baseTerrainEffectScript(), usesDeltaTime {
 
     override var deltaTime = 0f
-
     protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
+
     private val scrambledMissiles: HashMap<MissileAPI, CombatEntityAPI> = HashMap()
-    override val thresholdForAdvancement: Float = 1f
+    private val timesToTryScramblingMissilesPerSecond = 60f
+    override val thresholdForAdvancement: Float = (1/timesToTryScramblingMissilesPerSecond)
+    private val thresholdForRepositon: Float = 2f
 
     var deltaTimeForReposition = deltaTime
 
@@ -46,6 +45,7 @@ class magneticFieldEffect(
         if (Global.getCurrentState() != GameState.COMBAT) return
 
         deltaTimeForReposition += deltaTime
+        if (engine.isPaused) return
         if (canAdvance(amount)) {
             scrambleMissiles(engine)
             handleCurrentlyScrambledMissiles(engine)
@@ -56,67 +56,96 @@ class magneticFieldEffect(
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
                 val mutableStats = ship.mutableStats
-                val ecmMult = mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
-                val shipWeapons = ship.allWeapons
-                var maxRange = 0f
-                val modifiedRangeMult = ((rangeMod)*ecmMult).coerceAtMost(1f)
+                val modifiedRangeMult = getRangeMultForShip(ship)
                 mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
                 mutableStats.energyWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
                 mutableStats.missileWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
                 mutableStats.fighterWingRange.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
 
-                for (weapon: WeaponAPI in shipWeapons) {
-                    val weaponRange = weapon.range
-                    if (weaponRange > maxRange) maxRange = weaponRange
-                }
-                val rangeThresholdForMoreVision = 1000f
-                val weaponRangeVisionMult = (maxRange/rangeThresholdForMoreVision).coerceAtLeast(1f)
-                val modifiedVisionMult = ((visionMod*weaponRangeVisionMult)*ecmMult).coerceAtMost(1f)
-                val modifiedMissileMult = (missileMod*ecmMult).coerceAtMost(1f)
-                mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.magneticField, modifiedVisionMult)
+                val visionMult = getVisionMultForShip(ship)
+                mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.magneticField, visionMult)
 
+                val modifiedMissileMult = getMissileAuxillaryMultForShip(ship)
                 mutableStats.missileGuidance.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
                 mutableStats.missileMaxTurnRateBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedMissileMult)
 
-                mutableStats.eccmChance.modifyMult(terrainCombatEffectIds.magneticField, eccmChanceMod)
+                val eccmChanceMult = getECCMChanceMultForShip(ship)
+                mutableStats.eccmChance.modifyMult(terrainCombatEffectIds.magneticField, eccmChanceMult)
 
                 affectedShips[ship] = true
             }
         }
     }
 
+    private fun getVisionMultForShip(ship: ShipAPI): Float {
+        val eccmMult = getECMMultForShip(ship)
+        val visionMult = visionMod*eccmMult
+        var maxRange = 0f
+        val shipWeapons = ship.allWeapons
+        for (weapon: WeaponAPI in shipWeapons) {
+            val weaponRange = weapon.range
+            if (weaponRange > maxRange) maxRange = weaponRange
+        }
+
+        val rangeThresholdForMoreVision = 1000f
+        val weaponRangeVisionMult = (maxRange/rangeThresholdForMoreVision).coerceAtLeast(1f)
+        val modifiedVisionMult = ((visionMult*weaponRangeVisionMult).coerceAtMost(1f))
+
+        return modifiedVisionMult
+    }
+
+    private fun getECCMChanceMultForShip(ship: ShipAPI): Float {
+        return eccmChanceMod
+    }
+
+    private fun getMissileAuxillaryMultForShip(ship: ShipAPI): Float {
+        val ecmMult = getECMMultForShip(ship)
+        return (missileMod*ecmMult).coerceAtMost(1f)
+    }
+
+    private fun getRangeMultForShip(ship: ShipAPI): Float {
+        val ecmMult = getECMMultForShip(ship)
+        return ((rangeMod)*ecmMult).coerceAtMost(1f)
+    }
+
+    private fun getECMMultForShip(ship: ShipAPI): Float {
+        val mutableStats = ship.mutableStats
+        return mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
+    }
+
     override fun handleNotification(amount: Float) {
+        val ship = engine.playerShip ?: return
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         val stormOrNot = if (isStorm) "storm" else "field"
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference1",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-visionMod*100).roundTo(2)}% less vision",
+            "${(100-(getVisionMultForShip(ship))*100).roundTo(2)}% less vision",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference2",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-missileMod*100).roundTo(2)}% less missile guidance/turn rate",
+            "${(100-(getMissileAuxillaryMultForShip(ship))*100).roundTo(2)}% less missile guidance/turn rate",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference4",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-rangeMod*100).roundTo(2)}% less weapon range and fighter range",
+            "${(100-(getRangeMultForShip(ship))*100).roundTo(2)}% less weapon range and fighter range",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference5",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-eccmChanceMod*100).roundTo(2)}% less ECCM chance",
+            "${(100-(getECCMChanceMultForShip(ship))*100).roundTo(2)}% less ECCM chance",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference6",
             icon,
             "Magnetic $stormOrNot",
-            "${missileBreakLockBaseChance.roundTo(2)}% chance for missiles' guidance to be scrambled per $thresholdForAdvancement seconds",
+            "${getMissileBreakLockChance(ship).roundTo(5)}% chance for missiles' guidance to be scrambled per ${thresholdForAdvancement.roundTo(2)} seconds",
             true)
     }
 
@@ -136,6 +165,15 @@ class magneticFieldEffect(
 
             if (shouldScrambleMissile(missile, missileAI)) scrambleMissile(missile)
         }
+    }
+
+    private fun getMissileBreakLockChance(ship: ShipAPI): Float {
+        val mutableStats = ship.mutableStats
+        var missileBreakLockChance = missileBreakLockBaseChance
+        missileBreakLockChance -= mutableStats.eccmChance.modifiedValue
+        missileBreakLockChance = missileBreakLockChance.coerceAtMost(1f)
+
+        return missileBreakLockChance
     }
 
     private fun getMissileBreakLockChance(missile: MissileAPI, missileAI: GuidedMissileAI): Float {
@@ -211,7 +249,6 @@ class magneticFieldEffect(
     }
 
     private fun shouldReposition(scrambledMissile: MissileAPI, missileAI: GuidedMissileAI): Boolean {
-        val thresholdForRepositon = 2f
         if (deltaTimeForReposition >= thresholdForRepositon) {
             deltaTimeForReposition = 0f
             return true

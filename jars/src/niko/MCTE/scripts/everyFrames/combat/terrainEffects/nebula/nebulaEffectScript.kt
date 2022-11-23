@@ -6,6 +6,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.impl.campaign.ids.HullMods
 import com.fs.starfarer.api.util.Misc
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
@@ -60,17 +61,21 @@ class nebulaEffectScript: baseTerrainEffectScript() {
             val mutableStats = ship.mutableStats
             if (affectedEntities[ship] == null) {
                 if (ship.isAffectedByNebulaSecondary(nebulaHandler!!)) {
-                    mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.nebulaEffect, rangeMult)
-                    mutableStats.energyWeaponRangeBonus.modifyMult(terrainCombatEffectIds.nebulaEffect, rangeMult)
-                    mutableStats.missileWeaponRangeBonus.modifyMult(terrainCombatEffectIds.nebulaEffect, rangeMult)
+                    val modifiedRangeMult = getRangeMultForShip(ship)
+                    
+                    mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.nebulaEffect, modifiedRangeMult)
+                    mutableStats.energyWeaponRangeBonus.modifyMult(terrainCombatEffectIds.nebulaEffect, modifiedRangeMult)
+                    mutableStats.missileWeaponRangeBonus.modifyMult(terrainCombatEffectIds.nebulaEffect, modifiedRangeMult)
 
-                    mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.nebulaEffect, visionMult)
+                    val modifiedVisionMult = getVisionMultForShip(ship)
+                    mutableStats.sightRadiusMod.modifyMult(terrainCombatEffectIds.nebulaEffect, modifiedVisionMult)
 
-                    mutableStats.maxSpeed.modifyFlat(terrainCombatEffectIds.nebulaEffect, speedDecrement)
-                    mutableStats.acceleration.modifyFlat(terrainCombatEffectIds.nebulaEffect, speedDecrement)
-                    mutableStats.deceleration.modifyFlat(terrainCombatEffectIds.nebulaEffect, speedDecrement)
+                    val modifiedSpeedDecrement = getSpeedDecrementForShip(ship)
+                    mutableStats.maxSpeed.modifyFlat(terrainCombatEffectIds.nebulaEffect, modifiedSpeedDecrement)
+                    mutableStats.acceleration.modifyFlat(terrainCombatEffectIds.nebulaEffect, modifiedSpeedDecrement)
+                    mutableStats.deceleration.modifyFlat(terrainCombatEffectIds.nebulaEffect, modifiedSpeedDecrement)
 
-                    if (disableZeroFluxBoost) mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(terrainCombatEffectIds.nebulaEffect, -50f)
+                    if (shouldDisableZeroFluxBoost(ship)) mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(terrainCombatEffectIds.nebulaEffect, -50f)
 
                     affectedEntities[ship] = true
                     amountOfTimeElapsedOutsideOfNebula[ship] = 0f
@@ -98,6 +103,26 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 if (!engine.isEntityInPlay(ship)) affectedEntities -= ship
              }
         }
+    }
+
+    private fun shouldDisableZeroFluxBoost(ship: ShipAPI): Boolean {
+        if (!disableZeroFluxBoost || ship.variant.hasHullMod(HullMods.INSULATEDENGINE)) return false
+        return true
+    }
+
+    private fun getSpeedDecrementForShip(ship: ShipAPI): Float {
+        var decrement = speedDecrement
+        if (ship.variant.hasHullMod(HullMods.INSULATEDENGINE)) decrement -= 20
+
+        return decrement.coerceAtLeast(0f)
+    }
+
+    private fun getVisionMultForShip(ship: ShipAPI): Float {
+        return visionMult
+    }
+
+    private fun getRangeMultForShip(ship: ShipAPI): Float {
+        return rangeMult
     }
 
     private fun handleMissiles(amount: Float) {
@@ -134,29 +159,32 @@ class nebulaEffectScript: baseTerrainEffectScript() {
             (amountOfTimeElapsedOutsideOfNebula[playerShip] != null &&
             amountOfTimeElapsedOutsideOfNebula[playerShip]!! < thresholdForNebulaAdvancement)) {
             val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
-            engine.maintainStatusForPlayerShip(
-                "niko_MCPE_nebulaEffect1",
-                icon,
-                "Nebula",
-                "Zero-flux boost disabled",
-                true)
+            if (shouldDisableZeroFluxBoost(playerShip)) {
+                engine.maintainStatusForPlayerShip(
+                    "niko_MCPE_nebulaEffect1",
+                    icon,
+                    "Nebula",
+                    "Zero-flux boost disabled",
+                    true
+                )
+            }
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect2",
                 icon,
                 "Nebula",
-                "Vision range reduced by ${(100-visionMult*100).roundTo(2)}%",
+                "Vision range reduced by ${(100-(getVisionMultForShip(playerShip))*100).roundTo(2)}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect3",
                 icon,
                 "Nebula",
-                "Weapon range reduced by ${(100-rangeMult*100).roundTo(2)}%",
+                "Weapon range reduced by ${(100-(getRangeMultForShip(playerShip))*100).roundTo(2)}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect4",
                 icon,
                 "Nebula",
-                "Speed reduced by ${-speedDecrement.roundTo(2)} Su",
+                "Speed reduced by ${-(getSpeedDecrementForShip(playerShip)).roundTo(2)} Su",
                 true)
         }
     }
