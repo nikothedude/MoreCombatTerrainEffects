@@ -2,16 +2,17 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace
 
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
-import com.fs.starfarer.api.combat.*
+import com.fs.starfarer.api.combat.CombatEngineAPI
+import com.fs.starfarer.api.combat.CombatEntityAPI
+import com.fs.starfarer.api.combat.MissileAPI
 import com.fs.starfarer.api.input.InputEventAPI
-import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseNikoCombatScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
+import niko.MCTE.utils.MCTE_arcUtils.arc
+import niko.MCTE.utils.MCTE_arcUtils.telegraphArc
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
-import niko.MCTE.utils.MCTE_shipUtils.arc
-import niko.MCTE.utils.MCTE_shipUtils.telegraphArc
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
@@ -19,7 +20,7 @@ import kotlin.math.pow
 
 class hyperstormArcPreparation(
     val parentScript: deepHyperspaceEffectScript,
-    val hyperStormNebula: MutableSet<Cloud>,
+    val hyperStormNebula: cloudCell,
     val target: CombatEntityAPI,
     val coordinatesToSpawnArcFrom: Vector2f,
     val maxRadius: Float,
@@ -48,7 +49,7 @@ class hyperstormArcPreparation(
         }
         parentScript.targettedEntities[target]!! += this
 
-        telegraphArc(hyperStormNebula, parentScript.stormingCellsWithParams[hyperStormNebula], this.engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target,
+        telegraphArc(hyperStormNebula, coordinatesToSpawnArcFrom, parentScript.dummyShip, target,
             volume = getTelegraphVolume())
     }
 
@@ -69,7 +70,7 @@ class hyperstormArcPreparation(
         val randomFloat = random.nextFloat()
         val modifier = parentScript.getActualDamageMultForEntity(target)
         if (randomFloat <= (threshold*modifier)) {
-            telegraphArc(hyperStormNebula,  parentScript.stormingCellsWithParams[hyperStormNebula], engine, getTelegraphArcStartPoint(), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
+            telegraphArc(hyperStormNebula, getTelegraphArcStartPoint(), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())
         }
     }
 
@@ -92,7 +93,7 @@ class hyperstormArcPreparation(
 
         val damage = parentScript.getRawActualDamageForEntity(target)
         val emp = parentScript.getRawEMPDamageForEntity(target)
-        arc(hyperStormNebula, parentScript.stormingCellsWithParams[hyperStormNebula], engine, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, damage, emp)
+        arc(hyperStormNebula, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, damage, emp)
 
         delete()
     }
@@ -101,8 +102,7 @@ class hyperstormArcPreparation(
         val prepScriptsTargettingTarget = parentScript.targettedEntities[target]
         prepScriptsTargettingTarget!! -= this
         if (prepScriptsTargettingTarget.isEmpty()) parentScript.giveGraceToTarget(target)
-        val params = parentScript.stormingCellsWithParams[hyperStormNebula] ?: return
-        params.preparationScript = null
+        hyperStormNebula.preparationScript = null
 
         engine.removePlugin(this)
         deleteThreatIndicator()

@@ -7,8 +7,9 @@ import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.fleet.FleetMemberType
 import com.fs.starfarer.api.impl.campaign.ids.Personalities
 import com.fs.starfarer.api.impl.campaign.ids.Stats
-import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
+import niko.MCTE.utils.MCTE_arcUtils.arc
+import niko.MCTE.utils.MCTE_arcUtils.cosmeticArc
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_settings
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_EMP_DAMAGE
@@ -16,18 +17,15 @@ import niko.MCTE.utils.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_GRACE_INCREMENT
 import niko.MCTE.utils.MCTE_settings.HYPERSTORM_SPEED_THRESHOLD
 import niko.MCTE.utils.MCTE_settings.MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
-import niko.MCTE.utils.MCTE_settings.MIN_TIME_BETWEEN_HYPERSTORM_STRIKES
-import niko.MCTE.utils.MCTE_shipUtils.arc
-import niko.MCTE.utils.MCTE_shipUtils.cosmeticArc
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
 class deepHyperspaceEffectScript(
-    val stormingCellsWithParams: HashMap<MutableSet<Cloud>, cloudParams>,
+    val stormingCells: MutableSet<cloudCell>,
 ): baseTerrainEffectScript() {
 
-    val warnedShipsToCells: MutableMap<ShipAPI, MutableSet<MutableSet<Cloud>>> = HashMap()
+    val warnedShipsToCells: MutableMap<ShipAPI, MutableSet<cloudCell>> = HashMap()
     val targettedEntities: MutableMap<CombatEntityAPI, MutableSet<hyperstormArcPreparation>> = HashMap()
     val entitiesToNotTarget: MutableMap<CombatEntityAPI, Float> = HashMap()
     var nebulaHandler: CombatNebulaAPI = engine.nebula
@@ -47,17 +45,9 @@ class deepHyperspaceEffectScript(
     }
 
     init {
-        for (cell in stormingCellsWithParams.keys) {
-            stormingCellsWithParams[cell]?.let { resetArcCooldown(it) }
+        for (cell in stormingCells) {
+            cell.resetArcCooldown()
         }
-    }
-
-    private fun resetArcCooldown(params: cloudParams): Float {
-        val min = MIN_TIME_BETWEEN_HYPERSTORM_STRIKES
-        val max = MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
-        val cooldown = min + random.nextFloat() * (max - min)
-        params.cooldown = cooldown
-        return cooldown
     }
 
     override fun init(engine: CombatEngineAPI?) {
@@ -72,7 +62,7 @@ class deepHyperspaceEffectScript(
 
     override fun applyEffects(amount: Float) {
         handleWarnedShips(amount)
-        for (cell in ArrayList(stormingCellsWithParams.keys)) {
+        for (cell in ArrayList(stormingCells)) {
             warnNearbyShipsOfCell(cell, amount)
             tryToArc(cell, amount)
         }
@@ -90,8 +80,7 @@ class deepHyperspaceEffectScript(
             val cellIterator = warnedShipsToCells[ship]!!.iterator()
             while (cellIterator.hasNext()) {
                 val cell = cellIterator.next()
-                val params = stormingCellsWithParams[cell]!!
-                if (MathUtils.getDistance(ship.location, params.centroid) < params.radius*10 || !shipCaresAboutBeingInRangeOfStorm(ship, cell)) {
+                if (MathUtils.getDistance(ship.location, cell.centroid) < cell.radius*10 || !shipCaresAboutBeingInRangeOfStorm(ship, cell)) {
                     cellIterator.remove()
                     continue
                 } else {
@@ -106,9 +95,8 @@ class deepHyperspaceEffectScript(
         }
     }
 
-    private fun warnNearbyShipsOfCell(cell: MutableSet<Cloud>, amount: Float) {
-        val params = stormingCellsWithParams[cell]!!
-        val shipIterator = engine.shipGrid.getCheckIterator(params.centroid, params.radius*10, params.radius*10)
+    private fun warnNearbyShipsOfCell(cell: cloudCell, amount: Float) {
+        val shipIterator = engine.shipGrid.getCheckIterator(cell.centroid, cell.radius*10, cell.radius*10)
         while (shipIterator.hasNext()) {
             val ship = shipIterator.next() as ShipAPI
             if (!ship.isAlive) continue
@@ -118,12 +106,11 @@ class deepHyperspaceEffectScript(
         }
     }
 
-    protected fun tryToArc(cell: MutableSet<Cloud>, amount: Float): Boolean {
+    protected fun tryToArc(cell: cloudCell, amount: Float): Boolean {
         if (engine.isPaused) return false
-        val params = stormingCellsWithParams[cell] ?: return false
-        if (params.preparingToArc()) return false
-        params.cooldown = (params.cooldown - amount).coerceAtLeast(0f)
-        val timeTilNextArc = params.cooldown
+        if (cell.preparingToArc()) return false
+        cell.cooldown = (cell.cooldown - amount).coerceAtLeast(0f)
+        val timeTilNextArc = cell.cooldown
 
         if (timeTilNextArc <= 0f) {
             doArc(cell, amount)
@@ -132,15 +119,13 @@ class deepHyperspaceEffectScript(
         return false
     }
 
-    private fun doArc(cell: MutableSet<Cloud>, amount: Float) {
-        val params = stormingCellsWithParams[cell] ?: return
-        resetArcCooldown(params)
-        prepareArc(amount, cell, getArcRange(cell))
+    private fun doArc(cell: cloudCell, amount: Float) {
+        cell.resetArcCooldown()
+        prepareArc(amount, cell, cell.getArcRange())
     }
 
-    private fun prepareArc(amount: Float, cell: MutableSet<Cloud>, maxRadius: Float) {
-        val params = stormingCellsWithParams[cell] ?: return
-        val randomizedPosition = getArcSite(cell)
+    private fun prepareArc(amount: Float, cell: cloudCell, maxRadius: Float) {
+        val randomizedPosition = cell.getArcSite()
         val shipsAndMissiles = HashSet<CombatEntityAPI>()
         shipsAndMissiles.addAll(this.getEntitiesWithinRange(cell, randomizedPosition, maxRadius, amount))
         var target: CombatEntityAPI? = null
@@ -152,19 +137,19 @@ class deepHyperspaceEffectScript(
         }
         if (target != null) {
             if (shouldSkipPrepAndJustArc(target)) {
-                arc(cell, stormingCellsWithParams[cell], engine, randomizedPosition, dummyShip, target, maxRadius, getRawActualDamageForEntity(target), getRawEMPDamageForEntity(target))
+                arc(cell, randomizedPosition, dummyShip, target, maxRadius, getRawActualDamageForEntity(target), getRawEMPDamageForEntity(target))
             } else {
                 val preparationScript = hyperstormArcPreparation(this, cell, target, randomizedPosition, maxRadius)
-                params.preparationScript = preparationScript
+                cell.preparationScript = preparationScript
                 engine.addPlugin(preparationScript)
             }
         } else {
-            val targetVector = getArcSite(cell)
-            cosmeticArc(cell, engine, randomizedPosition, targetVector)
+            val targetVector = cell.getArcSite()
+            cosmeticArc(randomizedPosition, targetVector)
         }
     }
 
-    private fun warnShipItIsInRangeOfStorm(ship: ShipAPI, cell: MutableSet<Cloud>) {
+    private fun warnShipItIsInRangeOfStorm(ship: ShipAPI, cell: cloudCell) {
         if (shipCaresAboutBeingInRangeOfStorm(ship, cell)) {
             ship.aiFlags.setFlag(ShipwideAIFlags.AIFlags.DO_NOT_VENT)
             addShipAndCellToWarnedMap(ship, cell)
@@ -176,7 +161,7 @@ class deepHyperspaceEffectScript(
         if (remove) warnedShipsToCells -= ship
     }
 
-    private fun addShipAndCellToWarnedMap(ship: ShipAPI, cell: MutableSet<Cloud>) {
+    private fun addShipAndCellToWarnedMap(ship: ShipAPI, cell: cloudCell) {
         if (warnedShipsToCells[ship] == null) {
             warnedShipsToCells[ship] = HashSet()
         }
@@ -187,7 +172,7 @@ class deepHyperspaceEffectScript(
         return MAX_TIME_BETWEEN_HYPERSTORM_STRIKES*2
     }
 
-    private fun shipCaresAboutBeingInRangeOfStorm(ship: ShipAPI, cell: MutableSet<Cloud>): Boolean {
+    private fun shipCaresAboutBeingInRangeOfStorm(ship: ShipAPI, cell: cloudCell): Boolean {
         var modifier = getTargettingChanceMult(ship)
 
         val captain: PersonAPI? = ship.captain
@@ -215,9 +200,9 @@ class deepHyperspaceEffectScript(
     }
 
     private fun getEntitiesWithinRange(
-        cell: MutableSet<Cloud>,
-        ourCoordinates: Vector2f = getArcSite(cell),
-        maxRadius: Float = getArcRange(cell),
+        cell: cloudCell,
+        ourCoordinates: Vector2f = cell.getArcSite(),
+        maxRadius: Float = cell.getArcRange(),
         amount: Float): MutableList<CombatEntityAPI> {
 
         val entitiesWithinRange = ArrayList<CombatEntityAPI>()
@@ -235,11 +220,11 @@ class deepHyperspaceEffectScript(
     }
 
     private fun combatEntityIsValidArcTarget(
-        cell: MutableSet<Cloud>,
+        cell: cloudCell,
         amount: Float,
         shipOrMissile: CombatEntityAPI,
         arcCoordinates: Vector2f,
-        maxRadius: Float = getArcRange(cell)): Boolean {
+        maxRadius: Float = cell.getArcRange()): Boolean {
         if (shipOrMissile is ShipAPI && (shipOrMissile.isShuttlePod)) return false
 
         val graceValue = entitiesToNotTarget[shipOrMissile]
@@ -255,31 +240,6 @@ class deepHyperspaceEffectScript(
 
         return (randomFloat <= (((maxRadius - distance)/(maxRadius))*modifier))
     }
-
-    private fun getArcSite(cell: MutableSet<Cloud>): Vector2f {
-        val params = stormingCellsWithParams[cell] ?: return Vector2f(0f, 0f)
-        return params.getArcSite()
-    }
-
-    private fun getArcRange(cell: MutableSet<Cloud>): Float {
-        val params = stormingCellsWithParams[cell] ?: return 0f
-        return params.getArcRange()
-    }
-
-    private fun ensureCellHasRadiusStored(cell: MutableSet<Cloud>) {
-        return
-        /*if (cloudCellToRadius[cell] == null) {
-            cloudCellToRadius[cell] = getRadius(cell, nebulaHandler)
-        }
-        if (cloudCellToCentroid[cell] == null) {
-            val centroid = MCTE_miscUtils.getCellCentroid(nebulaHandler, cell)
-            if (centroid != null) cloudCellToCentroid[cell] = centroid
-        }
-        if (cloudCellToCooldown[cell] == null) {
-            cloudCellToCooldown[cell] = 0f
-        }*/
-    }
-
 
     private fun decrementGracePeriods(amount: Float) {
         for (entity: CombatEntityAPI in entitiesToNotTarget.keys) {
@@ -317,7 +277,7 @@ class deepHyperspaceEffectScript(
         var mult = 1f
         if (entity is ShipAPI) {
             val mutableStats = entity.mutableStats
-            mult += mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
+            mult += mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue - 1
         }
 
         return mult
@@ -337,7 +297,7 @@ class deepHyperspaceEffectScript(
         return HYPERSTORM_EMP_DAMAGE*mult
     }
 
-    private fun getModifiedEMPDamageForEntity(ship: ShipAPI): Float {
+    fun getModifiedEMPDamageForEntity(ship: ShipAPI): Float {
         val rawValue = getRawEMPDamageForEntity(ship)
         var modifiedValue = (rawValue * ship.mutableStats.empDamageTakenMult.modifiedValue)
 
@@ -354,23 +314,7 @@ class deepHyperspaceEffectScript(
         return mult
     }
 
-    override fun handleSounds(amount: Float) {
-        if (isStorming()) {
-            Global.getSoundPlayer().playUILoop("terrain_hyperspace_storm", 1f, 1f)
-        } else {
-            Global.getSoundPlayer().playUILoop("terrain_hyperspace_deep", 1f, 1f)
-        }
-    }
-
-    private fun isStorming(): Boolean {
-        return stormingCellsWithParams.isNotEmpty()
-    }
-
-    private fun shouldSkipPrepAndJustArc(target: CombatEntityAPI): Boolean {
-        return (target is MissileAPI || (target is ShipAPI && target.isFighter && target != engine.playerShip))
-    }
-
-    private fun getTargettingChanceMult(shipOrMissile: CombatEntityAPI): Float {
+    fun getTargettingChanceMult(shipOrMissile: CombatEntityAPI): Float {
         if (!shipOrMissile.isTangible()) return 0f
         val speed = shipOrMissile.velocity.length()
         var modifier: Float = 1f
@@ -380,13 +324,29 @@ class deepHyperspaceEffectScript(
         return modifier.coerceAtLeast(0f)
     }
 
+    fun getGraceIncrement(): Float {
+        return HYPERSTORM_GRACE_INCREMENT
+    }
+
+    override fun handleSounds(amount: Float) {
+        if (isStorming()) {
+            Global.getSoundPlayer().playUILoop("terrain_hyperspace_storm", 1f, 1f)
+        } else {
+            Global.getSoundPlayer().playUILoop("terrain_hyperspace_deep", 1f, 1f)
+        }
+    }
+
+    private fun isStorming(): Boolean {
+        return stormingCells.isNotEmpty()
+    }
+
+    private fun shouldSkipPrepAndJustArc(target: CombatEntityAPI): Boolean {
+        return (target is MissileAPI || (target is ShipAPI && target.isFighter && target != engine.playerShip))
+    }
+
     fun giveGraceToTarget(target: CombatEntityAPI) {
         val value = entitiesToNotTarget[target]
         if (value == null) entitiesToNotTarget[target] = 0f
         entitiesToNotTarget[target] = entitiesToNotTarget[target]!! + getGraceIncrement()
-    }
-
-    private fun getGraceIncrement(): Float {
-        return HYPERSTORM_GRACE_INCREMENT
     }
 }

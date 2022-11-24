@@ -16,16 +16,15 @@ import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudParams
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.utils.MCTE_debugUtils
-import niko.MCTE.utils.MCTE_miscUtils
-import niko.MCTE.utils.MCTE_miscUtils.getCellCentroid
-import niko.MCTE.utils.MCTE_miscUtils.getRadiusOfCell
+import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
+import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
 import niko.MCTE.utils.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.utils.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
 import niko.MCTE.utils.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
@@ -284,30 +283,30 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         }
         if (canAddScript) {
             val deepHyperspaceNebulas: MutableMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
-            val stormingNebulae: MutableSet<MutableSet<Cloud>> = HashSet()
-            val stormingNebulaeToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
-            for (mapOfCellsToCentroid in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[mapOfCellsToCentroid] == true) {
-                stormingNebulae += mapOfCellsToCentroid.keys
-                stormingNebulaeToCentroid += mapOfCellsToCentroid
-            }
-            val stormingNebulaeToRadius = getRadiusOfHyperstorms(stormingNebulaeToCentroid, nebula)
 
-            val stormingNebulaeWithParams = HashMap<MutableSet<Cloud>, cloudParams>()
-            for (cell: MutableSet<Cloud> in stormingNebulae) {
+            val stormingNebulaeToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
+            val stormingNebulae: MutableSet<MutableSet<Cloud>> = HashSet()
+            for (mapOfCloudsToCentroid in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[mapOfCloudsToCentroid] == true) {
+                stormingNebulae += mapOfCloudsToCentroid.keys
+                stormingNebulaeToCentroid += mapOfCloudsToCentroid
+            }
+
+            val cloudCells = HashSet<cloudCell>()
+            for (cell in stormingNebulae) {
                 val centroid = getCellCentroidRepeatadly(nebula, cell)
                 if (centroid == null) {
                     MCTE_debugUtils.displayError("centroid null when making params")
                     continue
                 }
                 val radius = getRadiusOfCell(cell, nebula, centroid)
-                val cloudParams = cloudParams(
+                val cloudCell = cloudCell(
                     centroid,
-                    radius
+                    radius,
+                    cell
                 )
-                stormingNebulaeWithParams[cell] = cloudParams
+                cloudCells += cloudCell
             }
-
-            engine.addPlugin(deepHyperspaceEffectScript(stormingNebulaeWithParams))
+            engine.addPlugin(deepHyperspaceEffectScript(cloudCells))
         }
     }
 
@@ -334,7 +333,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 MCTE_debugUtils.displayError("centroid null during getRadiusOfHyperstorms in terraineffectadder")
                 continue
             }
-            val radius = MCTE_miscUtils.getRadiusOfCell(cell, nebula, centroid)
+            val radius = getRadiusOfCell(cell, nebula, centroid)
             cellsToRadius[cell] = radius
         }
         return cellsToRadius

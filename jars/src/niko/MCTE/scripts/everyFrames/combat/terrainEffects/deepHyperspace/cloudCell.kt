@@ -1,16 +1,22 @@
 package niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace
 
+import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.utils.MCTE_settings
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
-class cloudParams(
+class cloudCell(
     var centroid: Vector2f,
-    var radius: Float
+    var radius: Float,
+    val clouds: MutableSet<Cloud>
 ) {
+
     fun preparingToArc(): Boolean {
         return preparationScript != null
     }
+
+    var cooldown = 0f
+    var preparationScript: hyperstormArcPreparation? = null
 
     fun getArcSite(): Vector2f {
         val radius: Float = radius
@@ -35,6 +41,10 @@ class cloudParams(
         return minRadius + MathUtils.getRandom().nextFloat() * (maxRadius - minRadius)
     }
 
-    var cooldown = 0f
-    var preparationScript: hyperstormArcPreparation? = null
+    fun resetArcCooldown() {
+        val min = MCTE_settings.MIN_TIME_BETWEEN_HYPERSTORM_STRIKES
+        val max = MCTE_settings.MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
+        cooldown = min + MathUtils.getRandom().nextFloat() * (max - min)
+    }
+
 }

@@ -10,6 +10,8 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScri
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
+import niko.MCTE.utils.MCTE_settings
+import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lwjgl.util.vector.Vector2f
 
@@ -145,8 +147,12 @@ class magneticFieldEffect(
             "niko_MCPE_magFieldInterference6",
             icon,
             "Magnetic $stormOrNot",
-            "${getMissileBreakLockChance(ship).roundTo(5)}% chance for missiles' guidance to be scrambled per ${thresholdForAdvancement.roundTo(2)} seconds",
+            "${calculateScrambleChancePerSecond(ship)}% chance for missiles' guidance to be scrambled per 1 second(s)",
             true)
+    }
+
+    private fun calculateScrambleChancePerSecond(ship: ShipAPI): Float {
+        return (getMissileBreakLockChance(ship)*timesToTryScramblingMissilesPerSecond).roundTo(5)
     }
 
     override fun handleSounds(amount: Float) {
@@ -170,18 +176,25 @@ class magneticFieldEffect(
     private fun getMissileBreakLockChance(ship: ShipAPI): Float {
         val mutableStats = ship.mutableStats
         var missileBreakLockChance = missileBreakLockBaseChance
+        var electronicWarfareMult: Float = mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
         missileBreakLockChance -= mutableStats.eccmChance.modifiedValue
-        missileBreakLockChance = missileBreakLockChance.coerceAtMost(1f)
+        missileBreakLockChance *= electronicWarfareMult
 
-        return missileBreakLockChance
+
+        return missileBreakLockChance.coerceAtLeast(0f)
     }
 
     private fun getMissileBreakLockChance(missile: MissileAPI, missileAI: GuidedMissileAI): Float {
+        val source: ShipAPI? = missile.source
+        var electronicWarfareMult: Float = 1f
+        if (source != null) {
+            electronicWarfareMult = source.mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
+        }
         var missileBreakLockChance = missileBreakLockBaseChance
         missileBreakLockChance -= missile.eccmChance
+        missileBreakLockChance *= electronicWarfareMult
 
-        missileBreakLockChance = missileBreakLockChance.coerceAtMost(1f)
-        return missileBreakLockChance
+        return missileBreakLockChance.coerceAtLeast(0f)
     }
 
     private fun shouldScrambleMissile(missile: MissileAPI, missileAI: GuidedMissileAI): Boolean {
@@ -257,9 +270,9 @@ class magneticFieldEffect(
     }
 
     private fun shouldUnscrambleMissile(scrambledMissile: MissileAPI): Boolean {
-        val threshold = 0.95f
+        val threshold = MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
         val randomFloat = random.nextFloat()
-        if (randomFloat >= threshold) return true
+        if (randomFloat < threshold) return true
         return false
     }
 

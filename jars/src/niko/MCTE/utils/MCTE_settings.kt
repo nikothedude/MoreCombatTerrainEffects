@@ -25,6 +25,8 @@ object MCTE_settings {
     var MAGFIELD_RANGE_MULT: Float = 0.8f
     var MAGFIELD_ECCM_MULT: Float = 0.8f
     var MAGFIELD_MISSILE_SCRAMBLE_CHANCE: Float = 0.6f
+
+    var MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE: Float = (0.0005f)
     //MAGSTORM SETTINGS
     var MAGSTORM_VISION_MULT: Float = 0.6f
     var MAGSTORM_MISSILE_MULT: Float = 0.8f
@@ -117,6 +119,7 @@ object MCTE_settings {
         MAGFIELD_RANGE_MULT = configJson.getFloat("magFieldWeaponAndFighterRangeMult")
         MAGFIELD_ECCM_MULT = configJson.getFloat("magFieldEccmChanceMult")
         MAGFIELD_MISSILE_SCRAMBLE_CHANCE = configJson.getFloat("magFieldMissileScrambleChance")
+        MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE = configJson.getFloat("magFieldMissileUnscrambleChance")
         //MAGSTORM
         MAGSTORM_VISION_MULT = configJson.getFloat("magStormVisionMult")
         MAGSTORM_MISSILE_MULT = configJson.getFloat("magStormMissileManeuverabilityAndGuidanceMult")

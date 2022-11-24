@@ -27,8 +27,9 @@
 	"magFieldMissileManeuverabilityAndGuidanceMult":0.8, #default: 0.8
 	"magFieldWeaponAndFighterRangeMult":0.8, #default: 0.8
 	"magFieldEccmChanceMult":0.8, #modifies missile ECCM chance. this is the stuff provided by ECCM package, default: 0.8
-	"magFieldMissileScrambleChance":0.01, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
+	"magFieldMissileScrambleChance":0.005, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
 	# value as a percentage chance to determine if the missile should unlock and fly in random directions, default: 0.01
+	"magFieldMissileUnscrambleChance":0.007,
 	
 	#MAGNETIC STORM SETTINGS
 	#same rules as the ones above, except these values are used for magnetic STORMS.
@@ -37,7 +38,7 @@
 	"magStormMissileManeuverabilityAndGuidanceMult":0.55, #default: 0.55
 	"magStormWeaponAndFighterRangeMult":0.38, #default: 0.38
 	"magStormEccmChanceMult":0.2, #default: 0.2
-	"magStormMissileScrambleChance":0.2, #default: 0.2
+	"magStormMissileScrambleChance":0.015, #default: 0.2
 	
 	#SLIPSTREAM SETTINGS
 	"slipstreamPPTMult":0.45, #default: 0.45

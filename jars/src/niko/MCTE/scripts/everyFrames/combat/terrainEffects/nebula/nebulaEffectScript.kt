@@ -6,10 +6,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.ShipAPI
-import com.fs.starfarer.api.impl.campaign.ids.HullMods
-import com.fs.starfarer.api.util.Misc
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_settings
@@ -17,7 +14,8 @@ import niko.MCTE.utils.MCTE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
 import niko.MCTE.utils.MCTE_settings.NEBULA_RANGE_MULT
 import niko.MCTE.utils.MCTE_settings.NEBULA_SPEED_DECREMENT
 import niko.MCTE.utils.MCTE_settings.NEBULA_VISION_MULT
-import niko.MCTE.utils.MCTE_shipUtils.isAffectedByNebulaSecondary
+import niko.MCTE.utils.MCTE_shipUtils.hasInsulatedEngines
+import niko.MCTE.utils.MCTE_shipUtils.isInsideNebulaAuxillary
 import niko.MCTE.utils.terrainCombatEffectIds
 import kotlin.collections.HashMap
 
@@ -33,8 +31,6 @@ class nebulaEffectScript: baseTerrainEffectScript() {
     val disableZeroFluxBoost = NEBULA_DISABLE_ZERO_FLUX_BOOST
 
     protected val affectedEntities: MutableMap<CombatEntityAPI, Boolean> = HashMap()
-
-    val amountOfTimeElapsedOutsideOfNebula: HashMap<CombatEntityAPI, Float> = HashMap()
 
     override fun init(engine: CombatEngineAPI?) {
         super.init(engine)
@@ -60,7 +56,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
         for (ship: ShipAPI in engine.ships) {
             val mutableStats = ship.mutableStats
             if (affectedEntities[ship] == null) {
-                if (ship.isAffectedByNebulaSecondary(nebulaHandler!!)) {
+                if (ship.isInsideNebulaAuxillary()) {
                     val modifiedRangeMult = getRangeMultForShip(ship)
                     
                     mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.nebulaEffect, modifiedRangeMult)
@@ -78,11 +74,14 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                     if (shouldDisableZeroFluxBoost(ship)) mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(terrainCombatEffectIds.nebulaEffect, -50f)
 
                     affectedEntities[ship] = true
-                    amountOfTimeElapsedOutsideOfNebula[ship] = 0f
+                    //amountOfTimeElapsedOutsideOfNebula[ship] = 0f
                 }
-            } else if (!ship.isAffectedByNebulaSecondary(nebulaHandler!!)) {
-                amountOfTimeElapsedOutsideOfNebula[ship] = amountOfTimeElapsedOutsideOfNebula[ship]!! + amount
-                if (amountOfTimeElapsedOutsideOfNebula[ship]!! >= thresholdForNebulaAdvancement) {
+            } else {
+                if (!engine.isEntityInPlay(ship)){
+                    affectedEntities -= ship
+                    continue
+                }
+                if (!ship.isInsideNebulaAuxillary()) {
                     mutableStats.ballisticWeaponRangeBonus.unmodifyMult(terrainCombatEffectIds.nebulaEffect)
                     mutableStats.energyWeaponRangeBonus.unmodifyMult(terrainCombatEffectIds.nebulaEffect)
                     mutableStats.missileWeaponRangeBonus.unmodifyMult(terrainCombatEffectIds.nebulaEffect)
@@ -96,25 +95,21 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                     mutableStats.zeroFluxMinimumFluxLevel.unmodifyFlat(terrainCombatEffectIds.nebulaEffect)
 
                     affectedEntities -= ship
-                    amountOfTimeElapsedOutsideOfNebula -= ship
                 }
-            } else {
-                amountOfTimeElapsedOutsideOfNebula[ship] = 0f
-                if (!engine.isEntityInPlay(ship)) affectedEntities -= ship
-             }
+            }
         }
     }
 
     private fun shouldDisableZeroFluxBoost(ship: ShipAPI): Boolean {
-        if (!disableZeroFluxBoost || ship.variant.hasHullMod(HullMods.INSULATEDENGINE)) return false
+        if (!disableZeroFluxBoost || ship.hasInsulatedEngines()) return false
         return true
     }
 
     private fun getSpeedDecrementForShip(ship: ShipAPI): Float {
         var decrement = speedDecrement
-        if (ship.variant.hasHullMod(HullMods.INSULATEDENGINE)) decrement -= 20
+        if (ship.hasInsulatedEngines()) decrement += 20
 
-        return decrement.coerceAtLeast(0f)
+        return decrement.coerceAtMost(0f)
     }
 
     private fun getVisionMultForShip(ship: ShipAPI): Float {
@@ -125,49 +120,23 @@ class nebulaEffectScript: baseTerrainEffectScript() {
         return rangeMult
     }
 
-    private fun handleMissiles(amount: Float) {
-        for (missile in engine.missiles) {
-            val mutableStats = missile.damage.stats
-            if (affectedEntities[missile] == null) {
-                if (missile.isAffectedByNebulaSecondary(nebulaHandler!!)) {
-
-                    mutableStats.maxSpeed.modifyFlat(terrainCombatEffectIds.nebulaEffect, 999f)
-                    mutableStats.acceleration.modifyFlat(terrainCombatEffectIds.nebulaEffect, 999f)
-                    mutableStats.deceleration.modifyFlat(terrainCombatEffectIds.nebulaEffect, speedDecrement)
-
-                    affectedEntities[missile] = true
-                    amountOfTimeElapsedOutsideOfNebula[missile] = 0f
-                }
-            } else if (!missile.isAffectedByNebulaSecondary(nebulaHandler!!)) {
-                amountOfTimeElapsedOutsideOfNebula[missile] = amountOfTimeElapsedOutsideOfNebula[missile]!! + amount
-                if (amountOfTimeElapsedOutsideOfNebula[missile]!! >= thresholdForNebulaAdvancement) {
-                    mutableStats.maxSpeed.unmodifyFlat(terrainCombatEffectIds.nebulaEffect)
-                    mutableStats.acceleration.unmodifyFlat(terrainCombatEffectIds.nebulaEffect)
-                    mutableStats.deceleration.unmodifyFlat(terrainCombatEffectIds.nebulaEffect)
-
-                    affectedEntities -= missile
-                    amountOfTimeElapsedOutsideOfNebula -= missile
-                }
-            }
-        }
-    }
-
     override fun handleNotification(amount: Float) {
         if (nebulaHandler == null) return
-        val playerShip = engine.playerShip
-        if (playerShip.isAffectedByNebulaSecondary(nebulaHandler!!) ||
-            (amountOfTimeElapsedOutsideOfNebula[playerShip] != null &&
-            amountOfTimeElapsedOutsideOfNebula[playerShip]!! < thresholdForNebulaAdvancement)) {
+        val playerShip = engine.playerShip ?: return
+        if (playerShip.isInsideNebulaAuxillary()) {
             val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
-            if (shouldDisableZeroFluxBoost(playerShip)) {
-                engine.maintainStatusForPlayerShip(
-                    "niko_MCPE_nebulaEffect1",
-                    icon,
-                    "Nebula",
-                    "Zero-flux boost disabled",
-                    true
-                )
+            val zeroFluxString = if (playerShip.hasInsulatedEngines() && !shouldDisableZeroFluxBoost(playerShip)) {
+                "Insulated engines preventing loss of zero-flux boost and mitigating speed loss"
+            } else {
+                "Zero-flux boost disabled"
             }
+            engine.maintainStatusForPlayerShip(
+                "niko_MCPE_nebulaEffect1",
+                icon,
+                "Nebula",
+                zeroFluxString,
+                true
+            )
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect2",
                 icon,
@@ -194,8 +163,8 @@ class nebulaEffectScript: baseTerrainEffectScript() {
             MCTE_debugUtils.log.debug("null nebula handler")
             return
         }
-        val playerShip = engine.playerShip
-        if (playerShip.isAffectedByNebulaSecondary(nebulaHandler!!)) {
+        val playerShip = engine.playerShip ?: return
+        if (playerShip.isInsideNebulaAuxillary()) {
             Global.getSoundPlayer().playUILoop("terrain_nebula", 1f, 1f)
         }
     }

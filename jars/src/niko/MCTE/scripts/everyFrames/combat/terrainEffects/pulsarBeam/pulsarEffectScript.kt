@@ -251,13 +251,28 @@ class pulsarEffectScript(
         if (engine.isPaused) return
         for (ship: ShipAPI in affectedShips.keys) {
             if (!shouldEMPship(ship)) continue
-            val empAmount = getEMPAmount(ship)
-            val damageAmount = getEMPDamage(ship)
+            val empAmount = getEMPDamage(ship)
+            val damageAmount = getEnergyDamage(ship)
 
             val effectMult = getEffectMultForShip(ship)
             val soundId = if (!ship.isFighter) "tachyon_lance_emp_impact" else null
+            var randomLocation = ship.location
+            val bounds = ship.exactBounds
+            if (bounds != null) {
+                val randomFloat = random.nextFloat()
+                val threshold = 0.3f
 
-            engine.spawnEmpArc(ship, ship.location, ship, ship,
+                if (randomFloat > threshold) {
+                    bounds.update(ship.location, ship.facing)
+                    val randSegment = bounds.segments.randomOrNull()
+                    if (randSegment != null) {
+                        val loc = randSegment.p1 ?: randSegment.p2 ?: ship.location ?: continue
+                        randomLocation = loc
+                    }
+                }
+            }
+
+            engine.spawnEmpArc(ship, randomLocation, ship, ship,
                 DamageType.ENERGY,
                 damageAmount,
                 empAmount,
@@ -294,12 +309,12 @@ class pulsarEffectScript(
         return EMPChancePerFrame*totalMult
     }
 
-    private fun getEMPDamage(ship: ShipAPI): Float {
+    private fun getEnergyDamage(ship: ShipAPI): Float {
         val effectMult = getEffectMultForShip(ship)
         return energyDamage*effectMult
     }
 
-    private fun getEMPAmount(ship: ShipAPI): Float {
+    private fun getEMPDamage(ship: ShipAPI): Float {
         val effectMult = getEffectMultForShip(ship)
         return EMPdamage*effectMult
     }

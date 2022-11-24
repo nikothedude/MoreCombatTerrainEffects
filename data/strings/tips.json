@@ -6,6 +6,7 @@
 		  {"freq":1.0, "tip":"[More Combat Terrain Effects] Slipstreams provide enough excess power to the engines of fighters and missiles to activate their zero-flux boost. Beware of their unusually high range and speed!"},
 		  {"freq":0.3, "tip":"[More Combat Terrain Effects] Slipstreams don't actually color your engines the same color as safety overrides - it's a more purple color."},
 		  {"freq":1.0, "tip":"[More Combat Terrain Effects] While long-ranged sensors are unaffected by nebulae, combat-grade sensors struggle somewhat, resulting in nebulae reducing vision and weapon range somewhat of any ship inside them, alongside the gasses choking out the engines, reducing speed somewhat and disabling the zero-flux boost."},
+		  {"freq":1.0, "tip":"[More Combat Terrain Effects] Insulated engine assemblies are known to significantly mitigate the effect nebula gasses have on a ship's engines."},
 		  {"freq":1.0, "tip":"[More Combat Terrain Effects] In combat, hyperspace clouds are similar in function to nebulae, with one major exception: If storming, they will periodically strike anything nearby with extremely powerful lightning. This lightning's effect is mitigated by solar shielding!"},
 		  {"freq":1.0, "tip":"[More Combat Terrain Effects] Much like the campaign, hyperstorms in combat strike less often the smaller and slower you are!"},
 		  {"freq":1.0, "tip":"[More Combat Terrain Effects] The high gravity of black holes is known to force nearby ships into a state of higher relativity. It's also known, of course, to drag things towards itself."},
