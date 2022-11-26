@@ -197,6 +197,7 @@ object MCTE_nebulaUtils {
         val width: Float = engine.mapWidth + (MCTE_shipUtils.NEBULA_BUFFER_SIZE * 2f)
 
         val cellSize: Float = nebula.tileSizeInPixels
+        if (cellSize == 0f) return null // why can this happen
 
         val x = location.x
         val y = location.y
