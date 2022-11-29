@@ -10,6 +10,7 @@ import com.fs.starfarer.combat.entities.terrain.Cloud
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.ext.plusAssign
 import org.lwjgl.util.vector.Vector2f
+import java.lang.IllegalArgumentException
 import kotlin.math.roundToInt
 
 object MCTE_nebulaUtils {
@@ -202,8 +203,18 @@ object MCTE_nebulaUtils {
         val x = location.x
         val y = location.y
 
-        val modifiedX = (((x)+width/2)/cellSize).roundToInt()
-        val modifiedY = (((y)+height/2)/cellSize).roundToInt()
+        var modifiedX = 0
+        var modifiedY = 0
+        try {
+            modifiedX = (((x) + width / 2) / cellSize).roundToInt()
+            modifiedY = (((y) + height / 2) / cellSize).roundToInt()
+        } catch (ex: IllegalArgumentException) {
+            MCTE_debugUtils.displayError("NaN error caught before game crashed")
+            MCTE_debugUtils.log.debug("Debug variable info of getNebulaTile:" +
+                    "engine variable: $engine, nebula: $nebula, height: $height, width: $width, cellSize: $cellSize," +
+                    "x: $x, y: $y, modifiedX: $modifiedX, modifiedY: $modifiedY", ex)
+            return null
+        }
         val array: IntArray = intArrayOf(modifiedX, modifiedY)
 
         return array
