@@ -12,9 +12,9 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_miscUtils.applyForceWithSuppliedMass
 import niko.MCTE.utils.MCTE_miscUtils.getAllObjects
-import niko.MCTE.utils.MCTE_settings.BLACKHOLE_BASE_GRAVITY
-import niko.MCTE.utils.MCTE_settings.BLACKHOLE_GRAVITY_ENABLED
-import niko.MCTE.utils.MCTE_settings.BLACKHOLE_PPT_COMPENSATION
+import niko.MCTE.settings.MCTE_settings.BLACKHOLE_BASE_GRAVITY
+import niko.MCTE.settings.MCTE_settings.BLACKHOLE_GRAVITY_ENABLED
+import niko.MCTE.settings.MCTE_settings.BLACKHOLE_PPT_COMPENSATION
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f

@@ -11,12 +11,12 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScri
 import niko.MCTE.utils.MCTE_arcUtils.arc
 import niko.MCTE.utils.MCTE_arcUtils.cosmeticArc
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
-import niko.MCTE.utils.MCTE_settings
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_EMP_DAMAGE
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_GRACE_INCREMENT
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_SPEED_THRESHOLD
-import niko.MCTE.utils.MCTE_settings.MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
+import niko.MCTE.settings.MCTE_settings
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EMP_DAMAGE
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_GRACE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_SPEED_THRESHOLD
+import niko.MCTE.settings.MCTE_settings.MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
@@ -194,7 +194,7 @@ class deepHyperspaceEffectScript(
         val currentHull = ship.hullLevel
         if (actualDamage > currentHull*2.3) modifier += 4f
 
-        val score = ((((actualDamage) + (empDamage*MCTE_settings.EMP_DAMAGE_FEAR_MULT)))/hullEfficiency)*modifier
+        val score = ((((actualDamage) + (empDamage* MCTE_settings.EMP_DAMAGE_FEAR_MULT)))/hullEfficiency)*modifier
 
         return (MCTE_settings.getHyperstormFearThreshold() <= score)
     }

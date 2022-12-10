@@ -25,40 +25,40 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.Slipstream
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
 import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
-import niko.MCTE.utils.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
-import niko.MCTE.utils.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.MAGFIELD_ECCM_MULT
-import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_MULT
-import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE
-import niko.MCTE.utils.MCTE_settings.MAGFIELD_RANGE_MULT
-import niko.MCTE.utils.MCTE_settings.MAGFIELD_VISION_MULT
-import niko.MCTE.utils.MCTE_settings.MAGSTORM_ECCM_MULT
-import niko.MCTE.utils.MCTE_settings.MAGSTORM_MISSILE_MULT
-import niko.MCTE.utils.MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE
-import niko.MCTE.utils.MCTE_settings.MAGSTORM_RANGE_MULT
-import niko.MCTE.utils.MCTE_settings.MAGSTORM_VISION_MULT
-import niko.MCTE.utils.MCTE_settings.MAG_FIELD_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.MAX_HYPERCLOUDS_TO_ADD_PER_CELL
-import niko.MCTE.utils.MCTE_settings.MIN_HYPERCLOUDS_TO_ADD_PER_CELL
-import niko.MCTE.utils.MCTE_settings.PULSAR_DAMAGE_INCREMENT
-import niko.MCTE.utils.MCTE_settings.PULSAR_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.PULSAR_EMP_CHANCE_INCREMENT
-import niko.MCTE.utils.MCTE_settings.PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT
-import niko.MCTE.utils.MCTE_settings.PULSAR_EMP_DAMAGE_INCREMENT
-import niko.MCTE.utils.MCTE_settings.PULSAR_HARDFLUX_GEN_INCREMENT
-import niko.MCTE.utils.MCTE_settings.PULSAR_INTENSITY_BASE_MULT
-import niko.MCTE.utils.MCTE_settings.PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT
-import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_EFFECT_ENABLED
-import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT
-import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
-import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
-import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_PPT_MULT
-import niko.MCTE.utils.MCTE_settings.loadSettings
+import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
+import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.MAGFIELD_ECCM_MULT
+import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_MULT
+import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE
+import niko.MCTE.settings.MCTE_settings.MAGFIELD_RANGE_MULT
+import niko.MCTE.settings.MCTE_settings.MAGFIELD_VISION_MULT
+import niko.MCTE.settings.MCTE_settings.MAGSTORM_ECCM_MULT
+import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_MULT
+import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE
+import niko.MCTE.settings.MCTE_settings.MAGSTORM_RANGE_MULT
+import niko.MCTE.settings.MCTE_settings.MAGSTORM_VISION_MULT
+import niko.MCTE.settings.MCTE_settings.MAG_FIELD_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.MAX_HYPERCLOUDS_TO_ADD_PER_CELL
+import niko.MCTE.settings.MCTE_settings.MIN_HYPERCLOUDS_TO_ADD_PER_CELL
+import niko.MCTE.settings.MCTE_settings.PULSAR_DAMAGE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.PULSAR_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.PULSAR_EMP_CHANCE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT
+import niko.MCTE.settings.MCTE_settings.PULSAR_EMP_DAMAGE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.PULSAR_HARDFLUX_GEN_INCREMENT
+import niko.MCTE.settings.MCTE_settings.PULSAR_INTENSITY_BASE_MULT
+import niko.MCTE.settings.MCTE_settings.PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
+import niko.MCTE.settings.MCTE_settings.loadSettings
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
 
@@ -151,20 +151,19 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             canAddScript = true
         }
         if (canAddScript) {
-            engine.addPlugin(
-                pulsarEffectScript(
-                    pulsarPlugins,
-                    pluginToIntensity,
-                    pluginToAngle,
-                    hardFluxGenPerFrame,
-                    bonusEMPDamageForWeapons,
-                    shieldDestabilziationMult,
-                    EMPChancePerFrame,
-                    EMPDamage,
-                    energyDamage
-                    //gravityPointsToIntensity
-                )
+            val pulsarPlugin = pulsarEffectScript(
+                pulsarPlugins,
+                pluginToIntensity,
+                pluginToAngle,
+                hardFluxGenPerFrame,
+                bonusEMPDamageForWeapons,
+                shieldDestabilziationMult,
+                EMPChancePerFrame,
+                EMPDamage,
+                energyDamage
+                //gravityPointsToIntensity
             )
+            pulsarPlugin.start()
         }
     }
 
@@ -193,15 +192,13 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             canAddScript = true
         }
         if (canAddScript) {
-            engine.addPlugin(
-                blackHoleEffectScript(
-                    timeMult,
-                    pluginToIntensity,
-                    pluginToAngle,
-                    playerCoordinates
-                    //gravityPointsToIntensity
-                )
+            val blackHolePlugin = blackHoleEffectScript(
+                timeMult,
+                pluginToIntensity,
+                pluginToAngle,
+                playerCoordinates
             )
+            blackHolePlugin.start()
         }
     }
 
@@ -306,7 +303,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 )
                 cloudCells += cloudCell
             }
-            engine.addPlugin(deepHyperspaceEffectScript(cloudCells))
+            val hyperspacePlugin = deepHyperspaceEffectScript(cloudCells)
+            hyperspacePlugin.start()
         }
     }
 
@@ -453,13 +451,13 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             canAddPlugin = true
         }
         if (canAddPlugin) {
-            engine.addPlugin(
-                SlipstreamEffectScript(
+            val slipstreamPlugin = SlipstreamEffectScript(
                 peakPerformanceMult,
                 fluxDissipationMult,
                 hardFluxGenerationPerFrame,
                 overallSpeedMult
-            ))
+            )
+            slipstreamPlugin.start()
         }
     }
 
@@ -488,7 +486,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
         if (canAddPlugin) {
             missileBreakLockBaseChance = missileBreakLockBaseChance.coerceAtMost(1f)
-            engine.addPlugin(magneticFieldEffect(
+            val magFieldPlugin = magneticFieldEffect(
                 isStorm,
                 visionMod,
                 missileMod,
@@ -496,7 +494,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 eccmChanceMod,
                 missileBreakLockBaseChance,
                 magneticFieldPlugins
-                ))
+            )
+            magFieldPlugin.start()
         }
     }
 }

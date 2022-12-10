@@ -15,5 +15,6 @@
     <orderEntry type="library" name="lazylib" level="project" />
     <orderEntry type="library" name="GraphicsLib" level="project" />
     <orderEntry type="library" name="Console Commands" level="project" />
+    <orderEntry type="library" name="LunaLib" level="project" />
   </component>
 </module>

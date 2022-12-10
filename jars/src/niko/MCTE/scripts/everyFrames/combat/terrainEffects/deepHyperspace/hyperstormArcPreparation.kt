@@ -11,8 +11,8 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_arcUtils.arc
 import niko.MCTE.utils.MCTE_arcUtils.telegraphArc
 import niko.MCTE.utils.MCTE_ids
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
-import niko.MCTE.utils.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f

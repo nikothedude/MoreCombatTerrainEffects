@@ -10,11 +10,12 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_miscUtils
 import niko.MCTE.utils.MCTE_miscUtils.getAllObjects
-import niko.MCTE.utils.MCTE_settings.PULSAR_BASE_FORCE
-import niko.MCTE.utils.MCTE_settings.PULSAR_FORCE_ENABLED
-import niko.MCTE.utils.MCTE_settings.PULSAR_PPT_COMPENSATION
+import niko.MCTE.settings.MCTE_settings.PULSAR_BASE_FORCE
+import niko.MCTE.settings.MCTE_settings.PULSAR_FORCE_ENABLED
+import niko.MCTE.settings.MCTE_settings.PULSAR_PPT_COMPENSATION
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
+import niko.MCTE.utils.terrainScriptsTracker
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 import java.awt.Color
@@ -296,11 +297,11 @@ class pulsarEffectScript(
     private fun getEMPChanceForShip(ship: ShipAPI): Float {
         if (!engine.isEntityInPlay(ship)) return 0f
         if (!ship.isTangible()) return 0f
-        val shield: ShieldAPI? = ship.shield
+        /*val shield: ShieldAPI? = ship.shield
         if (shield != null) {
             val shieldArc = shield.activeArc
             if (shieldArc >= 360) return 0f
-        }
+        }*/
 
         val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
         val engineMult: Float = engine.timeMult.modifiedValue
@@ -333,6 +334,7 @@ class pulsarEffectScript(
 
         val modifiedShieldMult = getShieldMultForShip(ship)
         val empChance = getEMPChanceForShip(ship)
+        val empActualDamage = getEnergyDamage(ship)
         val empDamage = getEMPDamage(ship)
 
         engine.maintainStatusForPlayerShip(
@@ -347,6 +349,11 @@ class pulsarEffectScript(
             "Pulsar Beam",
             "${(getChargeForShip(ship)).roundTo(2)} EMP damage applied to all projectiles",
             true)
+        var randomDamageData = ""
+        if (empActualDamage > 0f) {
+            randomDamageData = "and ${empActualDamage.roundTo(2)} energy damage"
+        }
+        val randomEMPData = "${empChance.roundTo(2)}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2)} EMP damage $randomDamageData"
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar4",
             icon,

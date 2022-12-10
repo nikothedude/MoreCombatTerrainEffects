@@ -1,6 +1,6 @@
 package niko.MCTE.console.commands
 
-import niko.MCTE.utils.MCTE_settings
+import niko.MCTE.settings.MCTE_settings
 import org.apache.log4j.Level
 import org.lazywizard.console.BaseCommand
 import org.lazywizard.console.BaseCommand.CommandContext

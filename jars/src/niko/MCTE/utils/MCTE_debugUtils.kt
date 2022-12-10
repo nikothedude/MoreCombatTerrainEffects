@@ -4,9 +4,9 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.rules.HasMemory
 import com.fs.starfarer.api.campaign.rules.MemoryAPI
+import niko.MCTE.settings.MCTE_settings
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.lwjgl.Sys
 import java.awt.Color
 
 object MCTE_debugUtils {

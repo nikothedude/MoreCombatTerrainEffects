@@ -10,8 +10,8 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScri
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
-import niko.MCTE.utils.MCTE_settings
-import niko.MCTE.utils.MCTE_settings.MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
+import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
+import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_UNSCRAMBLE_CHANCE
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lwjgl.util.vector.Vector2f
 
@@ -270,10 +270,15 @@ class magneticFieldEffect(
     }
 
     private fun shouldUnscrambleMissile(scrambledMissile: MissileAPI): Boolean {
-        val threshold = MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
+        val threshold = getBaseUnscrambleChance()
         val randomFloat = random.nextFloat()
         if (randomFloat < threshold) return true
         return false
+    }
+
+    fun getBaseUnscrambleChance(): Float {
+        if (isStorm) return MAGSTORM_MISSILE_UNSCRAMBLE_CHANCE
+        return MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
     }
 
     private fun unscrambleMissile(scrambledMissile: MissileAPI, iterator: MutableIterator<MissileAPI>?) {

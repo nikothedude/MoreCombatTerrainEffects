@@ -5,8 +5,8 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.DamageType
 import com.fs.starfarer.api.combat.ShipAPI
-import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
+import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import org.dark.shaders.light.LightShader
 import org.dark.shaders.light.StandardLight

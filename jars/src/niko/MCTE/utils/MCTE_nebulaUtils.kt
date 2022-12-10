@@ -7,6 +7,7 @@ import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import com.sun.org.apache.xpath.internal.operations.Bool
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.ext.plusAssign
 import org.lwjgl.util.vector.Vector2f
@@ -14,6 +15,9 @@ import java.lang.IllegalArgumentException
 import kotlin.math.roundToInt
 
 object MCTE_nebulaUtils {
+    @Transient
+    private var caughtNaN: Boolean = false
+
     private const val failuresTilDecision = 900
     private const val incrementValue = 1
 
@@ -209,10 +213,15 @@ object MCTE_nebulaUtils {
             modifiedX = (((x) + width / 2) / cellSize).roundToInt()
             modifiedY = (((y) + height / 2) / cellSize).roundToInt()
         } catch (ex: IllegalArgumentException) {
-            MCTE_debugUtils.displayError("NaN error caught before game crashed")
-            MCTE_debugUtils.log.debug("Debug variable info of getNebulaTile:" +
-                    "engine variable: $engine, nebula: $nebula, height: $height, width: $width, cellSize: $cellSize," +
-                    "x: $x, y: $y, modifiedX: $modifiedX, modifiedY: $modifiedY", ex)
+            if (!caughtNaN) {
+                MCTE_debugUtils.displayError("NaN error caught before game crashed")
+                MCTE_debugUtils.log.debug(
+                    "Debug variable info of getNebulaTile:" +
+                            "engine variable: $engine, nebula: $nebula, height: $height, width: $width, cellSize: $cellSize," +
+                            "x: $x, y: $y, modifiedX: $modifiedX, modifiedY: $modifiedY", ex
+                )
+                caughtNaN = true
+            }
             return null
         }
         val array: IntArray = intArrayOf(modifiedX, modifiedY)

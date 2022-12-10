@@ -25,20 +25,21 @@
 	
 	"magFieldVisionMult":0.6, #default: 0.6
 	"magFieldMissileManeuverabilityAndGuidanceMult":0.8, #default: 0.8
-	"magFieldWeaponAndFighterRangeMult":0.8, #default: 0.8
+	"magFieldWeaponAndFighterRangeMult":0.6, #default: 0.6
 	"magFieldEccmChanceMult":0.8, #modifies missile ECCM chance. this is the stuff provided by ECCM package, default: 0.8
-	"magFieldMissileScrambleChance":0.005, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
+	"magFieldMissileScrambleChance":0.006, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
 	# value as a percentage chance to determine if the missile should unlock and fly in random directions, default: 0.01
-	"magFieldMissileUnscrambleChance":0.007,
+	"magFieldMissileUnscrambleChance":0.007, #default: 0.007
 	
 	#MAGNETIC STORM SETTINGS
 	#same rules as the ones above, except these values are used for magnetic STORMS.
 	
-	"magStormVisionMult":0.38, #default: 0.38
+	"magStormVisionMult":0.35, #default: 0.35
 	"magStormMissileManeuverabilityAndGuidanceMult":0.55, #default: 0.55
-	"magStormWeaponAndFighterRangeMult":0.38, #default: 0.38
+	"magStormWeaponAndFighterRangeMult":0.35, #default: 0.35
 	"magStormEccmChanceMult":0.2, #default: 0.2
-	"magStormMissileScrambleChance":0.015, #default: 0.2
+	"magStormMissileScrambleChance":0.02, #default: 0.2
+	"magStormMissileUnscrambleChance":0.007, #default: 0.007
 	
 	#SLIPSTREAM SETTINGS
 	"slipstreamPPTMult":0.45, #default: 0.45
@@ -82,25 +83,25 @@
 	#BLACK HOLE EFFECTS
 	"blackholeGravityEnabled":true, #if true, black holes will apply a gravitational effect to all combat entities, dragging them towards the actual
 	# black hole campaign entity. ex. if you fight to the exact left of a black hole, everything will be dragged to the right. default: true
-	"blackholeTimemultMult":1.5f, #Multiplies the "intensity" of the black hole by this, then adds the result to the timemult to be applied to all ships. Ex. At the center of a black hole,
-	# the intensity is 1, so it becomes 1*1.5. default: 1.5f
+	"blackholeTimemultMult":2.5f, #Multiplies the "intensity" of the black hole by this, then adds the result to the timemult to be applied to all ships. Ex. At the center of a black hole,
+	# the intensity is 1, so it becomes 1*2f. default: 2f
 	"blackholePPTCompensation":80f, #The percent of the black hole CR debuffs to be removed. default: 80f
-	"blackholeBaseGravity":1.4f, #the base gravity mult. increase for higher gravity, decrease for lower. default: 1.4f
+	"blackholeBaseGravity":1.45f, #the base gravity mult. increase for higher gravity, decrease for lower. default: 1.45f
 	
 	#PULSAR EFFECTS
 	#All values assume intensity of the pulsar is at 100%.
 	#if the value has increment in it, it is added to the actual value for each pulsar influencing the battle
 	"pulsarForceEnabled":true, #if true, combat entities will be blown away from the pulsar. default: true
-	"pulsarBaseForce":0.1f, #controls how strong the pulsar force is. defaukt: 0.1
+	"pulsarBaseForce":0.55f, #controls how strong the pulsar force is. default: 0.3
 	"pulsarIntensityBaseMult":1f, #global modifier for the strength of everything. default: 1
 	"pulsarPPTCompensation":100f, #The percent of the pulsar CR debuffs to be removed. not always the exact value as its affected by the intensity. default: 100f
-	"pulsarHardfluxGenIncrement":2f, #This amount in hardflux will be applied to every ship 60 times a second. default: 2
-	"pulsarEMPDamageBonusForWeaponsIncrement":15f, # The amount of EMP damage to be added to every projectile. Flat buff. default: 15
-	"pulsarShieldDestabilizationMultIncrement":0.4f, # The amount that shield eff, shield upkeep, and shield emp arc pierce chance will be multiplied by.
-	# default: 0.4
-	"pulsarEMPChanceIncrement":0.01f, #the chance, every frame, for a ship to be EMPed. default: 0.01
-	"pulsarEMPDamageIncrement":50f, #the EMP damage a random EMP does. default: 50
-	"pulsarDamageIncrement":0f, # the energy damage a random EMP does. default: 0
+	"pulsarHardfluxGenIncrement":1f, #This amount in hardflux will be applied to every ship 60 times a second. default: 3
+	"pulsarEMPDamageBonusForWeaponsIncrement":30f, # The amount of EMP damage to be added to every projectile. Flat buff. default: 30
+	"pulsarShieldDestabilizationMultIncrement":0.5f, # The amount that shield eff, shield upkeep, and shield emp arc pierce chance will be multiplied by.
+	# default: 0.3
+	"pulsarEMPChanceIncrement":0.05f, #the chance, every frame, for a ship to be EMPed. default: 0.05
+	"pulsarEMPDamageIncrement":85f, #the EMP damage a random EMP does. default: 75
+	"pulsarDamageIncrement":2f, # the energy damage a random EMP does. default: 1
 	
 	
 	#GENERAL

@@ -4,13 +4,12 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.MissileAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.combat.ShipEngineControllerAPI
-import com.fs.starfarer.api.impl.campaign.ids.HullMods
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
-import niko.MCTE.utils.MCTE_settings
-import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
-import niko.MCTE.utils.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
+import niko.MCTE.settings.MCTE_settings
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
 import java.awt.Color

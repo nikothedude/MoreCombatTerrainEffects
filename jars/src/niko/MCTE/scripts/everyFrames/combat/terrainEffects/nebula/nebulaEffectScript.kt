@@ -9,11 +9,11 @@ import com.fs.starfarer.api.combat.ShipAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
-import niko.MCTE.utils.MCTE_settings
-import niko.MCTE.utils.MCTE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
-import niko.MCTE.utils.MCTE_settings.NEBULA_RANGE_MULT
-import niko.MCTE.utils.MCTE_settings.NEBULA_SPEED_DECREMENT
-import niko.MCTE.utils.MCTE_settings.NEBULA_VISION_MULT
+import niko.MCTE.settings.MCTE_settings
+import niko.MCTE.settings.MCTE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
+import niko.MCTE.settings.MCTE_settings.NEBULA_RANGE_MULT
+import niko.MCTE.settings.MCTE_settings.NEBULA_SPEED_DECREMENT
+import niko.MCTE.settings.MCTE_settings.NEBULA_VISION_MULT
 import niko.MCTE.utils.MCTE_shipUtils.hasInsulatedEngines
 import niko.MCTE.utils.MCTE_shipUtils.isInsideNebulaAuxillary
 import niko.MCTE.utils.terrainCombatEffectIds

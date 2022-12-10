@@ -1,7 +1,7 @@
 package niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace
 
 import com.fs.starfarer.combat.entities.terrain.Cloud
-import niko.MCTE.utils.MCTE_settings
+import niko.MCTE.settings.MCTE_settings
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
