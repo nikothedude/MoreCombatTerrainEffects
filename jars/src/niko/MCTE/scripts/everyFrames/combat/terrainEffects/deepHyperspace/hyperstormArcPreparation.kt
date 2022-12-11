@@ -57,8 +57,10 @@ class hyperstormArcPreparation(
         super.advance(amount, events)
         if (Global.getCurrentState() != GameState.COMBAT) return
         if (engine.isPaused) return
-        repositionThreatIndicator(amount)
-        if (canAdvance(amount)) {
+        val engineMult = engine.timeMult.modifiedValue
+        val adjustedAmount = amount * engineMult
+        repositionThreatIndicator(adjustedAmount)
+        if (canAdvance(adjustedAmount)) {
             doArc()
         } else {
             tryToTelegraph()
@@ -66,8 +68,9 @@ class hyperstormArcPreparation(
     }
 
     private fun tryToTelegraph() {
+        val engineMult = engine.timeMult.modifiedValue
         val threshold = getTelegraphThreshold()
-        val randomFloat = random.nextFloat()
+        val randomFloat = (random.nextFloat())/engineMult
         val modifier = parentScript.getActualDamageMultForEntity(target)
         if (randomFloat <= (threshold*modifier)) {
             telegraphArc(hyperStormNebula, getTelegraphArcStartPoint(), parentScript.dummyShip, target, maxRadius, getTelegraphVolume())

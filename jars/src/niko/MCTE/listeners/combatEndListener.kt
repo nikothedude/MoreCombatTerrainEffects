@@ -9,10 +9,12 @@ import niko.MCTE.utils.terrainScriptsTracker
 
 class combatEndListener(permaRegister: Boolean) : BaseCampaignEventListener(permaRegister) {
 
-    override fun reportPlayerEngagement(result: EngagementResultAPI?) {
-        for (script in ArrayList(terrainScriptsTracker.activeScripts)) {
-            script.stop()
+    override fun reportBattleOccurred(primaryWinner: CampaignFleetAPI?, battle: BattleAPI?) {
+        super.reportBattleOccurred(primaryWinner, battle)
+        if (battle?.isPlayerInvolved == true) {
+            for (script in ArrayList(terrainScriptsTracker.activeScripts)) {
+                script.stop()
+            }
         }
     }
-
 }

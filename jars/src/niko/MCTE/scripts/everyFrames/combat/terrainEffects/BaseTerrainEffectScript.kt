@@ -21,7 +21,7 @@ abstract class baseTerrainEffectScript: baseNikoCombatScript() {
 
     override fun init(engine: CombatEngineAPI?) {
         super.init(engine)
-        terrainScriptsTracker.activeScripts += this
+        //terrainScriptsTracker.activeScripts += this
     }
 
     abstract fun handleNotification(amount: Float)
@@ -31,11 +31,11 @@ abstract class baseTerrainEffectScript: baseNikoCombatScript() {
     abstract fun applyEffects(amount: Float)
     fun start() {
         engine.addPlugin(this)
-        terrainScriptsTracker.activeScripts += this
+       // terrainScriptsTracker.activeScripts += this
     }
 
     fun stop() {
         engine.removePlugin(this)
-        terrainScriptsTracker.activeScripts -= this
+        //terrainScriptsTracker.activeScripts -= this
     }
 }

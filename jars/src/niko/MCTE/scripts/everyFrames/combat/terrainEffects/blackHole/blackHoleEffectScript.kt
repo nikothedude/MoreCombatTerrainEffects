@@ -69,7 +69,7 @@ class blackHoleEffectScript(
             timeMult = entity.mutableStats.timeMult.modifiedValue
         }
         val adjustedIntensity = baseIntensity * BLACKHOLE_BASE_GRAVITY
-        val totalTimeMult = timeMult + engineMult-1
+        val totalTimeMult = engineMult
         val mult = if (entity is DamagingProjectileAPI) 0.3f else 1f
         return (((adjustedIntensity))*totalTimeMult)*mult
     }

@@ -217,7 +217,7 @@ class pulsarEffectScript(
             effectMult = getEffectMultForShip(entity)
         }
         val adjustedIntensity = baseIntensity * PULSAR_BASE_FORCE
-        val totalTimeMult = timeMult + engineMult-1
+        val totalTimeMult = engineMult
         val mult = if (entity is DamagingProjectileAPI) 0.3f else 1f
         return (((adjustedIntensity)*effectMult)*totalTimeMult)*mult
     }
@@ -235,17 +235,15 @@ class pulsarEffectScript(
             if (ship.isFighter) continue
             val maxFlux = ship.maxFlux
             if (maxFlux <= hardFluxGenerationPerFrame) continue
-            val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
-            val engineMult: Float = engine.timeMult.modifiedValue
-            val totalMult = timeMult + engineMult-1
-            ship.fluxTracker.increaseFlux(((getHardFluxGenForShip(ship))*totalMult), true)
+            ship.fluxTracker.increaseFlux(((getHardFluxGenForShip(ship))), true)
         }
     }
 
     private fun getHardFluxGenForShip(ship: ShipAPI): Float {
         val effectMult = getEffectMultForShip(ship)
+        val engineMult: Float = engine.timeMult.modifiedValue
 
-        return hardFluxGenerationPerFrame*effectMult
+        return (hardFluxGenerationPerFrame*effectMult)*engineMult
     }
 
     private fun applyEMP() {
@@ -303,9 +301,9 @@ class pulsarEffectScript(
             if (shieldArc >= 360) return 0f
         }*/
 
-        val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
+        //val timeMult: Float = ship.mutableStats.timeMult.modifiedValue
         val engineMult: Float = engine.timeMult.modifiedValue
-        val totalMult = timeMult + engineMult-1
+        val totalMult = engineMult
 
         return EMPChancePerFrame*totalMult
     }

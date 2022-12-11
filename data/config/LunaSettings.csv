@@ -57,15 +57,15 @@ niko_moreCombatTerrainEffects,MCTE_deepHyperspaceMinimumCloudsPerCell,Minimum cl
 niko_moreCombatTerrainEffects,MCTE_deepHyperspaceMaximumCloudsPerCell,Maximum clouds per cell,Int,40,How many nebula clouds a instance of deep hyperspace CAN spawn.,0,999999,spacing:0.5
 ,,,,,,,,
 niko_moreCombatTerrainEffects,MCTE_hyperstormOptionsHeader,Hyperstorm Settings,Text,Hyperstorm Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_hyperstormEnergyDamage,Lightning energy damage,Double,850.0,The base energy damage of a lightning strike.,-999999,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_hyperstormEnergyDamage,Lightning energy damage,Double,650.0,The base energy damage of a lightning strike.,-999999,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_hyperstormEMPDamage,Lightning EMP damage,Double,8000.0,The base EMP damage of a lightning strike.,-999999,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_hyperstormMinTimeBetweenStrikes,Minimum time between lightning strikes,Double,4.0,"Minimum time, in ~seconds, before a cloud can try to arc again.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMaxTimeBetweenStrikes,Maximum time between lightning strikes,Double,6.0,"Maximum time, in ~seconds, before a cloud can try to arc again.",-999999,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_hyperstormMaxTimeBetweenStrikes,Maximum time between lightning strikes,Double,7.0,"Maximum time, in ~seconds, before a cloud can try to arc again.",-999999,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_hyperstormGracePeriod,Grace period,Double,5.0,"How long, in ~seconds, a ship has before a cloud can strike it again, after it has been struck.",0,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_hyperstormMinArcRange,Minimum lightning range,Double,1000,Lower bound of the range that can be picked for an arc attempt.,-999999,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_hyperstormMaxArcRange,Maximum lightning range,Double,1000,Upper bound of the range that can be picked for an arc attempt.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMinChargeTime,Minimum charging time,Double,3.0,Minimum amount of seconds a cloud will telegraph a strike before it actually strikes.,0,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMaxChargeTime,Maximum charging time,Double,3.6,Maximum amount of seconds a cloud will telegraph a strike before it actually strikes.,0,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_hyperstormMinChargeTime,Minimum charging time,Double,4.0,Minimum amount of seconds a cloud will telegraph a strike before it actually strikes.,0,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_hyperstormMaxChargeTime,Maximum charging time,Double,5.0,Maximum amount of seconds a cloud will telegraph a strike before it actually strikes.,0,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_hyperstormLightningForce,Lightning force,Double,3500.0,The amount of force in starsector units (yes i know) a arc will apply to a ship it hits.,-999999,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_hyperstormSpeedThreshold,Speed threshold for targetting,Double,25.0,"The speed at which a ship becomes targettable at, anything below and the lightning won't try to strike you, no matter your mass.",0,999999,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_refinementIterations,Centroid refinement iterations,Int,2500,"Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times.",0,999999,spacing:0.5

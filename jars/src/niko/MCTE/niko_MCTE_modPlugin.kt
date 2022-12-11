@@ -29,7 +29,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         super.onGameLoad(newGame)
 
         Global.getSector().listenerManager.addListener(settingsChangedListener(), true)
-        Global.getSector().listenerManager.addListener(combatEndListener(false), true)
+        //Global.getSector().listenerManager.addListener(combatEndListener(false), true)
     }
 
     class settingsChangedListener : LunaSettingsListener {

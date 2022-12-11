@@ -207,6 +207,8 @@ object MCTE_nebulaUtils {
         val x = location.x
         val y = location.y
 
+        if (x.isNaN() || y.isNaN()) return null //not sure why this happens, but it does
+
         var modifiedX = 0
         var modifiedY = 0
         try {

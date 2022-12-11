@@ -109,11 +109,12 @@ class deepHyperspaceEffectScript(
     protected fun tryToArc(cell: cloudCell, amount: Float): Boolean {
         if (engine.isPaused) return false
         if (cell.preparingToArc()) return false
-        cell.cooldown = (cell.cooldown - amount).coerceAtLeast(0f)
+        val adjustedAmount = (amount * engine.timeMult.modifiedValue)
+        cell.cooldown = (cell.cooldown - adjustedAmount).coerceAtLeast(0f)
         val timeTilNextArc = cell.cooldown
 
         if (timeTilNextArc <= 0f) {
-            doArc(cell, amount)
+            doArc(cell, adjustedAmount)
             return true
         }
         return false
@@ -242,8 +243,9 @@ class deepHyperspaceEffectScript(
     }
 
     private fun decrementGracePeriods(amount: Float) {
+        val adjustedAmount = (amount * engine.timeMult.modifiedValue)
         for (entity: CombatEntityAPI in entitiesToNotTarget.keys) {
-            entitiesToNotTarget[entity] = (entitiesToNotTarget[entity]!! - amount).coerceAtLeast(0f)
+            entitiesToNotTarget[entity] = (entitiesToNotTarget[entity]!! - adjustedAmount).coerceAtLeast(0f)
         }
     }
 
