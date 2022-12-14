@@ -119,4 +119,8 @@ object MCTE_debugUtils {
     fun isMacOS(): Boolean {
         return (systemName == "mac")
     }
+
+    fun isWindows(): Boolean {
+        return (systemName.indexOf("win") >= 0)
+    }
 }
