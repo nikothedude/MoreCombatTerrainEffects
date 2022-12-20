@@ -4,6 +4,7 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.rules.HasMemory
 import com.fs.starfarer.api.campaign.rules.MemoryAPI
+import com.sun.javafx.PlatformUtil
 import niko.MCTE.settings.MCTE_settings
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
@@ -64,7 +65,7 @@ object MCTE_debugUtils {
                 Color.RED
             )
         }
-        campaignUI.addMessage("Please provide the mod author of MORE COMBAT TERRAIN EFFECTS a copy of your logs. These messages can be disabled in the MCTE_settings.json file in the MCTE mod folder.")
+        campaignUI.addMessage("Please provide the mod author of MORE COMBAT TERRAIN EFFECTS a copy of your logs. These messages can be disabled in the mod settings.")
     }
 
     @JvmStatic
@@ -73,7 +74,7 @@ object MCTE_debugUtils {
         val combatUI = engine.combatUI
         combatUI.addMessage(
             1,
-            "Please provide the mod author of MORE COMBAT TERRAIN EFFECTS with a copy of your logs. These messages can be disabled in the MCTE_settings.json file in the MCTE mod folder."
+            "Please provide the mod author of MORE COMBAT TERRAIN EFFECTS with a copy of your logs. These messages can be disabled in the MCTE_settings.json file in the mod settings."
         )
         if (highPriority) {
             Global.getSoundPlayer().playUISound("cr_playership_critical", 1f, 1f)
@@ -118,5 +119,9 @@ object MCTE_debugUtils {
 
     fun isMacOS(): Boolean {
         return (systemName == "mac")
+    }
+
+    fun isWindows(): Boolean {
+        return (PlatformUtil.isWindows())
     }
 }

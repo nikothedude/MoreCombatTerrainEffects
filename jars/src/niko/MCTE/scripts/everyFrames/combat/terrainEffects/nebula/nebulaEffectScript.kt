@@ -106,10 +106,10 @@ class nebulaEffectScript: baseTerrainEffectScript() {
     }
 
     private fun getSpeedDecrementForShip(ship: ShipAPI): Float {
+        if (ship.hasInsulatedEngines()) return 0f
         var decrement = speedDecrement
-        if (ship.hasInsulatedEngines()) decrement += 20
 
-        return decrement.coerceAtMost(0f)
+        return decrement
     }
 
     private fun getVisionMultForShip(ship: ShipAPI): Float {
@@ -153,7 +153,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "niko_MCPE_nebulaEffect4",
                 icon,
                 "Nebula",
-                "Speed reduced by ${-(getSpeedDecrementForShip(playerShip)).roundTo(2)} Su",
+                "Speed reduced by ${(getSpeedDecrementForShip(playerShip)).roundTo(2)} Su",
                 true)
         }
     }
