@@ -14,6 +14,7 @@ import kotlin.jvm.Throws
 
 object MCTE_settings {
 
+    var SLIPSTREAM_AFFECT_INTANGIBLE: Boolean = true
     var SHOW_ERRORS_IN_GAME: Boolean = true
     var MAG_FIELD_EFFECT_ENABLED: Boolean = true
     var DEEP_HYPERSPACE_EFFECT_ENABLED: Boolean = true
@@ -107,7 +108,7 @@ object MCTE_settings {
     @JvmStatic
     @Throws(JSONException::class, IOException::class, NullPointerException::class)
     fun loadSettings() {
-        MCTE_debugUtils.log.info("reloading settings")
+        //MCTE_debugUtils.log.info("reloading settings")
 
         SHOW_ERRORS_IN_GAME = LunaSettings.getBoolean(modId, "MCTE_showErrorsInGame")!!
         MAG_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_magneticFieldToggle")!!
@@ -143,6 +144,8 @@ object MCTE_settings {
         STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO = LunaSettings.getBoolean(modId,"MCTE_slipstreamStackPPTWithSO")!!
         SLIPSTREAM_DISABLE_VENTING = LunaSettings.getBoolean(modId,"MCTE_slipstreamDisableVenting")!!
         SLIPSTREAM_INCREASE_TURN_RATE = LunaSettings.getBoolean(modId,"MCTE_slipstreamIncreaseTurnRate")!!
+
+        SLIPSTREAM_AFFECT_INTANGIBLE = LunaSettings.getBoolean(modId, "MCTE_slipstreamAffectIntangible")!!
 
         SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST = LunaSettings.getBoolean(modId,"MCTE_slipstreamFighterZeroFluxBoost")!!
         SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST = LunaSettings.getBoolean(modId,"MCTE_slipstreamMissileZeroFluxBoost")!!

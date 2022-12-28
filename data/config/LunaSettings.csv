@@ -48,6 +48,7 @@ niko_moreCombatTerrainEffects,MCTE_slipstreamDisableVenting,Disable Venting,Bool
 niko_moreCombatTerrainEffects,MCTE_slipstreamIncreaseTurnRate,Apply speed buffs to turn rate,Boolean,false,"If true, the speed buffs will be applied to turn rate of all ships/fighters as well.",,,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_slipstreamFighterZeroFluxBoost,Fighter zero-flux boost,Boolean,true,"If true, fighters will be given +50 speed.",,,spacing:0.5
 niko_moreCombatTerrainEffects,MCTE_slipstreamMissileZeroFluxBoost,Missile zero-flux boost,Boolean,true,"If true, missiles will be given +50 speed.",,,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_slipstreamAffectIntangible,Affect intangible objects,Boolean,true,"If true, intangible objects (ex. phased objects) will be given SO as well.",,,spacing:0.5
 ,,,,,,,,
 niko_moreCombatTerrainEffects,MCTE_nebulaOptionsHeader,Nebula Settings,Header,Nebula Settings,if you see this niko is dumb,,,noHighlight
 niko_moreCombatTerrainEffects,MCTE_nebulaVisionMult,Vision Mult,Double,0.8,Vision (how much you can see into the fog of war) of ships inside nebulae will be multiplied against this.,-999999,999999,spacing:0.5

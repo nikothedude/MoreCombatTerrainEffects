@@ -1,20 +1,21 @@
 package niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole
 
 import com.fs.starfarer.api.Global
-import com.fs.starfarer.api.combat.CombatEntityAPI
-import com.fs.starfarer.api.combat.DamagingProjectileAPI
-import com.fs.starfarer.api.combat.MutableShipStatsAPI
-import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.impl.campaign.terrain.EventHorizonPlugin
+import com.fs.starfarer.api.util.IntervalUtil
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
+import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_miscUtils.applyForceWithSuppliedMass
 import niko.MCTE.utils.MCTE_miscUtils.getAllObjects
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_BASE_GRAVITY
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_GRAVITY_ENABLED
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_PPT_COMPENSATION
+import niko.MCTE.utils.MCTE_miscUtils
+import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
@@ -31,10 +32,16 @@ class blackHoleEffectScript(
     override var deltaTime: Float = 0f
     override val thresholdForAdvancement: Float = (1/timesToApplyForcePerSecond)
 
-    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
+    val timer: IntervalUtil = IntervalUtil(0.15f, 0.15f)
+
+
+    private val originalValues: MutableMap<ShipAPI, MutableMap<StatBonus, MutableMap<String, MCTE_miscUtils.originalTerrainValue>>> = HashMap(HashMap(HashMap()))
 
     override fun applyEffects(amount: Float) {
-        applyStats()
+        timer.advance(amount)
+        if (timer.intervalElapsed()) {
+            applyStats()
+        }
         applyGravity(amount)
     }
 
@@ -76,15 +83,13 @@ class blackHoleEffectScript(
 
     private fun applyStats() {
         for (ship: ShipAPI in engine.ships) {
-            if (affectedShips[ship] == null) {
 
-                val modifiedTimeMult = getTimeMultForShip(ship)
-                val mutableStats = ship.mutableStats
-                mutableStats.timeMult.modifyMult(terrainCombatEffectIds.blackHoleEffect, modifiedTimeMult)
+            val modifiedTimeMult = getTimeMultForShip(ship)
+            val mutableStats = ship.mutableStats
+            mutableStats.timeMult.modifyMult(terrainCombatEffectIds.blackHoleEffect, modifiedTimeMult)
 
-                replaceExistingEffect(ship, mutableStats)
-                affectedShips[ship] = true
-            }
+            replaceExistingEffect(originalValues, getPPTCompensation(ship), "event_horizon_stat_mod_1", "event_horizon_stat_mod_2", ship, mutableStats)
+
         }
         val playerShip: ShipAPI? = engine.playerShip
         if (playerShip != null) {
@@ -95,23 +100,9 @@ class blackHoleEffectScript(
         }
     }
 
-    private fun replaceExistingEffect(ship: ShipAPI, mutableStats: MutableShipStatsAPI) {
-        for (PPTmod in mutableStats.peakCRDuration.multBonuses) {
-            if (PPTmod.key.contains("event_horizon_stat_mod_", true)) {
-                val value = PPTmod.value.value
-                var compensation = BLACKHOLE_PPT_COMPENSATION
-                if (compensation == 1f) compensation += 0.000000000000001f //since not doing this doesnt cause a recompute
-                mutableStats.peakCRDuration.modifyMult(PPTmod.key, (compensation + value) - (compensation * value))
-            }
-        }
-        for (CRLossMod in mutableStats.crLossPerSecondPercent.multBonuses) {
-            if (CRLossMod.key.contains("event_horizon_stat_mod_", true)) {
-                val value = CRLossMod.value.value
-                var compensation = BLACKHOLE_PPT_COMPENSATION
-                if (compensation == 1f) compensation += 0.00000000000001f
-                mutableStats.crLossPerSecondPercent.modifyMult(CRLossMod.key, (compensation + value) - (compensation * value))
-            }
-        }
+    private fun getPPTCompensation(ship: ShipAPI): Float {
+        //val coronaEffect = (ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue).coerceAtLeast(1f)
+        return BLACKHOLE_PPT_COMPENSATION///coronaEffect)
     }
 
     private fun getTimeMultForShip(ship: ShipAPI): Float {

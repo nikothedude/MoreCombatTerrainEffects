@@ -6,6 +6,7 @@ import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
+import com.fs.starfarer.api.util.IntervalUtil
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
@@ -26,7 +27,6 @@ class magneticFieldEffect(
     ): baseTerrainEffectScript(), usesDeltaTime {
 
     override var deltaTime = 0f
-    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
 
     private val scrambledMissiles: HashMap<MissileAPI, CombatEntityAPI> = HashMap()
     private val timesToTryScramblingMissilesPerSecond = 60f
@@ -34,6 +34,8 @@ class magneticFieldEffect(
     private val thresholdForRepositon: Float = 2f
 
     var deltaTimeForReposition = deltaTime
+
+    val timer: IntervalUtil = IntervalUtil(0.15f, 0.15f)
 
     override fun init(engine: CombatEngineAPI?) {
         super.init(engine)
@@ -55,8 +57,10 @@ class magneticFieldEffect(
     }
 
     override fun applyEffects(amount: Float) {
-        for (ship: ShipAPI in engine.ships) {
-            if (affectedShips[ship] == null) {
+
+        timer.advance(amount)
+        if (timer.intervalElapsed()) {
+            for (ship: ShipAPI in engine.ships) {
                 val mutableStats = ship.mutableStats
                 val modifiedRangeMult = getRangeMultForShip(ship)
                 mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
@@ -73,8 +77,6 @@ class magneticFieldEffect(
 
                 val eccmChanceMult = getECCMChanceMultForShip(ship)
                 mutableStats.eccmChance.modifyMult(terrainCombatEffectIds.magneticField, eccmChanceMult)
-
-                affectedShips[ship] = true
             }
         }
     }
@@ -82,16 +84,8 @@ class magneticFieldEffect(
     private fun getVisionMultForShip(ship: ShipAPI): Float {
         val eccmMult = getECMMultForShip(ship)
         val visionMult = visionMod*eccmMult
-        var maxRange = 0f
-        val shipWeapons = ship.allWeapons
-        for (weapon: WeaponAPI in shipWeapons) {
-            val weaponRange = weapon.range
-            if (weaponRange > maxRange) maxRange = weaponRange
-        }
 
-        val rangeThresholdForMoreVision = 1000f
-        val weaponRangeVisionMult = (maxRange/rangeThresholdForMoreVision).coerceAtLeast(1f)
-        val modifiedVisionMult = ((visionMult*weaponRangeVisionMult).coerceAtMost(1f))
+        val modifiedVisionMult = ((visionMult).coerceAtMost(1f))
 
         return modifiedVisionMult
     }

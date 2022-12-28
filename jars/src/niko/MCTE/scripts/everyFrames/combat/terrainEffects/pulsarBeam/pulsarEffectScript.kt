@@ -1,21 +1,25 @@
 package niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam
 
+import com.fs.starfarer.api.EveryFrameScript
+import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.combat.listeners.DamageDealtModifier
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.impl.campaign.terrain.PulsarBeamTerrainPlugin
+import com.fs.starfarer.api.util.IntervalUtil
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
+import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_miscUtils
 import niko.MCTE.utils.MCTE_miscUtils.getAllObjects
 import niko.MCTE.settings.MCTE_settings.PULSAR_BASE_FORCE
 import niko.MCTE.settings.MCTE_settings.PULSAR_FORCE_ENABLED
 import niko.MCTE.settings.MCTE_settings.PULSAR_PPT_COMPENSATION
+import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
-import niko.MCTE.utils.terrainScriptsTracker
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 import java.awt.Color
@@ -33,15 +37,17 @@ class pulsarEffectScript(
 ): baseTerrainEffectScript(), usesDeltaTime, DamageDealtModifier {
     private val timesToDoThingPerSecond = 60f
     override var deltaTime: Float = 0f
-
     override val thresholdForAdvancement: Float = (1/timesToDoThingPerSecond)
+
     private val color = Color(159, 255, 231, 255)
 
-    protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
     private val chargedProjectiles: MutableMap<DamagingProjectileAPI, Float> = HashMap()
     private val chargedWeapons: MutableMap<WeaponAPI, Float> = HashMap()
-
     var overallIntensity: Float = 0f
+
+    val timer: IntervalUtil = IntervalUtil(0.15f, 0.15f)
+
+    private val originalValues: MutableMap<ShipAPI, MutableMap<StatBonus, MutableMap<String, MCTE_miscUtils.originalTerrainValue>>> = HashMap()
 
     init {
         for (intensity in pluginsToIntensity.values) {
@@ -53,11 +59,43 @@ class pulsarEffectScript(
         super.init(engine)
 
         this.engine.listenerManager.addListener(this)
+        Global.getSector().addScript(pulsarEffectRemovalScript(chargedWeapons))
+    }
+
+    class pulsarEffectRemovalScript(
+        val chargedWeapons: MutableMap<WeaponAPI, Float>
+    ): EveryFrameScript {
+        var done: Boolean = false
+        override fun isDone(): Boolean {
+            return done
+        }
+
+        override fun runWhilePaused(): Boolean {
+            return true
+        }
+
+        override fun advance(amount: Float) {
+            if (Global.getCurrentState() == GameState.COMBAT) return
+            for (weapon in chargedWeapons.keys) {
+                val fluxDamage = chargedWeapons[weapon] ?: continue
+                val damage = weapon.damage
+                damage.fluxComponent -= fluxDamage
+            }
+            stop()
+        }
+
+        private fun stop() {
+            Global.getSector().removeScript(this)
+            done = true
+        }
     }
 
     override fun applyEffects(amount: Float) {
-        applyStats()
-        applyVisuals()
+        timer.advance(amount)
+        if (timer.intervalElapsed()) {
+            applyStats()
+            applyVisuals()
+        }
 
         if (!canAdvance(amount)) return
 
@@ -68,21 +106,17 @@ class pulsarEffectScript(
 
     private fun applyStats() {
         for (ship: ShipAPI in engine.ships) {
-            if (affectedShips[ship] == null) {
 
-                val effectMult: Float = getEffectMultForShip(ship)
-                val modifiedShieldMult = getShieldMultForShip(ship)
+            val modifiedShieldMult = getShieldMultForShip(ship)
 
-                val mutableStats = ship.mutableStats
+            val mutableStats = ship.mutableStats
 
-                mutableStats.shieldDamageTakenMult.modifyMult(terrainCombatEffectIds.pulsarEffect, modifiedShieldMult)
-                mutableStats.shieldUpkeepMult.modifyMult(terrainCombatEffectIds.pulsarEffect, modifiedShieldMult)
-                mutableStats.dynamic.getStat(Stats.SHIELD_PIERCED_MULT).modifyMult(terrainCombatEffectIds.pulsarEffect, 1/modifiedShieldMult)
+            mutableStats.shieldDamageTakenMult.modifyMult(terrainCombatEffectIds.pulsarEffect, modifiedShieldMult)
+            mutableStats.shieldUpkeepMult.modifyMult(terrainCombatEffectIds.pulsarEffect, modifiedShieldMult)
+            mutableStats.dynamic.getStat(Stats.SHIELD_PIERCED_MULT).modifyMult(terrainCombatEffectIds.pulsarEffect, 1/modifiedShieldMult)
 
-                replaceExistingEffect(ship, mutableStats)
-                chargeWeapons(ship, mutableStats)
-                affectedShips[ship] = true
-            }
+            replaceExistingEffect(originalValues, getPPTCompensation(ship), "pulsar_beam_stat_mod_1", "pulsar_beam_stat_mod_2", ship, mutableStats)
+            chargeWeapons(ship, mutableStats)
         }
         for (projectile: DamagingProjectileAPI in engine.projectiles) {
             if (isChargedProjectile(projectile)) return
@@ -100,6 +134,7 @@ class pulsarEffectScript(
     }
 
     private fun getShieldMultForShip(ship: ShipAPI): Float {
+        if (!ship.isTangible()) return 1f
         val effectMult = getEffectMultForShip(ship)
         return (shieldDestabilziationMult * effectMult).coerceAtLeast(1f)
     }
@@ -112,6 +147,7 @@ class pulsarEffectScript(
     }
 
     private fun chargeProjectile(projectile: DamagingProjectileAPI) {
+        if (chargedProjectiles[projectile] != null) return
         val bonusDamage = getChargeForProjectile(projectile)
         val damage = projectile.damage
         damage.fluxComponent += (bonusDamage)
@@ -136,7 +172,9 @@ class pulsarEffectScript(
 
     private fun chargeWeapons(ship: ShipAPI, mutableStats: MutableShipStatsAPI) {
         for (weapon: WeaponAPI in ship.allWeapons) {
-            chargeWeapon(ship, weapon)
+            if (chargedWeapons[weapon] == null) {
+                chargeWeapon(ship, weapon)
+            }
         }
     }
 
@@ -156,23 +194,9 @@ class pulsarEffectScript(
         return bonusEMPDamageForWeapons*(effectMult.coerceAtLeast(1f))
     }
 
-    private fun replaceExistingEffect(ship: ShipAPI, mutableStats: MutableShipStatsAPI) {
-        val effectMult = getEffectMultForShip(ship)
-        var compensation = (PULSAR_PPT_COMPENSATION/(overallIntensity+1)/effectMult).coerceAtMost(1f)
-        for (PPTmod in mutableStats.peakCRDuration.multBonuses) {
-            if (PPTmod.key.contains("pulsar_beam_stat_mod_", true)) {
-                val value = PPTmod.value.value
-                if (compensation == 1f) compensation += 0.000000000000001f //since not doing this doesnt cause a recompute
-                mutableStats.peakCRDuration.modifyMult(PPTmod.key, (compensation + value) - (compensation * value))
-            }
-        }
-        for (CRLossMod in mutableStats.crLossPerSecondPercent.multBonuses) {
-            if (CRLossMod.key.contains("pulsar_beam_stat_mod_", true)) {
-                val value = CRLossMod.value.value
-                if (compensation == 1f) compensation += 0.00000000000001f
-                mutableStats.crLossPerSecondPercent.modifyMult(CRLossMod.key, (compensation + value) - (compensation * value))
-            }
-        }
+    private fun getPPTCompensation(ship: ShipAPI): Float {
+        //val coronaEffect = (ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue).coerceAtLeast(1f)
+        return (PULSAR_PPT_COMPENSATION/(overallIntensity+1))///coronaEffect)
     }
 
     private fun applyVisuals() {
@@ -224,13 +248,7 @@ class pulsarEffectScript(
 
     private fun generateFlux() {
         if (engine.isPaused) return
-        val iterator = affectedShips.keys.iterator()
-        while (iterator.hasNext()) {
-            val ship = iterator.next()
-            if (!engine.isEntityInPlay(ship)) {
-                iterator.remove()
-                continue
-            }
+        for (ship in engine.ships) {
             if (!ship.isTangible()) continue
             if (ship.isFighter) continue
             val maxFlux = ship.maxFlux
@@ -248,7 +266,7 @@ class pulsarEffectScript(
 
     private fun applyEMP() {
         if (engine.isPaused) return
-        for (ship: ShipAPI in affectedShips.keys) {
+        for (ship: ShipAPI in engine.ships) {
             if (!shouldEMPship(ship)) continue
             val empAmount = getEMPDamage(ship)
             val damageAmount = getEnergyDamage(ship)
