@@ -1,0 +1,111 @@
+1.1.3:
+Internal:
+Replaces most timers with intervalutils
+
+Features:
+All effects now constantly re-apply their stat changes, to allow for dynamic changes, such as the slipstream change
+Slipstreams no longer affect intangible ships
+If solar shielding/ECCM/whatever changes during combat, terrain effects will now change their values to account for it
+
+Config:
+New config option: Determine if slipstreams affect intangible entities or not
+
+Bugfixes:
+Fixed a bug where pulsars kept their EMP damage increase applied even after the battle ends, and applied it to all weapons
+Please watch pulsar battles for excessive EMP damage as I realized a flaw in my implementation that may still be broke
+
+1.1.2:
+Adds lunalib headers
+Fixes hyperspace crashes for non-windows
+Some nebula adjustments
+
+1.1.1a:
+Removes magiclib dependency
+
+1.1.1:
+SAVE COMPATABLE
+Removes redundant feature that doesnt work
+Adjusts some values in settings, notably hyperstorm lightning delay
+Makes things like hardflux gen and gravity respect time dilation better
+
+1.1.0:
+MAYBE SAVE COMPATIBLE I DUNNO
+Migrated settings to data/config/LunaSettings.csv (Press F2 to configure your settings in-game)
+Added lunasettings dependency
+Made the code safer and less likely to break the game
+Made pulsars and black holes more intense
+Deep hyperspace now spawns a ton of clouds
+More changes that I do not remember! Woo!
+
+1.0.1b:
+SAVE COMPATABLE
+Brute forces a fix to the NaN crashes. Give me your log if you see an error.
+
+1.0.1a:
+SAVE COMPATABLE
+Fixes a rare crash with nebulae's cellsize being 0, causing division by zero
+
+1.0.1:
+SAVE COMPATABLE
+Fixed a pulsar bug
+Nebulae now slow you down less if you have insulated engine assembly
+Misc polish
+New config settings, adjusted config settings
+
+1.0.0: RELEASE
+SAVE COMPATABLE
+Hyperstorm lightning now launches it's target super fast
+Hyperstorms now respect mass and speed of any ship that it wants to strike
+Some adjustments to hyperstorms to make the AI less likely to vent while in danger of lightning
+Adjusted lightning values to do far less energy damage, as it's really annoying to watch my carriers keep blowing up to lightning because they don't know how to react
+Hyperstorms now properly function when their target is no longer available to be struck
+Adjusted some magfield values to make it more functional
+
+Slipstreams now double your 0 flux boost if you already have the 0 flux boost permanently active
+A few adjustments to slipstreams
+
+The next 2 effects replace or mitigate the vanilla CR penalties, this is configurable in the config
+NEW EFFECT: BLACK HOLE
+Drags all entities in combat towards itself with a rather powerful pull, missiles and projectiles will drift, and slow ships will struggle. Not affected by solar shielding
+Increases timeflow on all ships. This effect is reduced by solar shielding, making solar shielding affect your combat performance negatively
+
+NEW EFFECT: PULSAR
+Pushes all entities in combat away from itself with a modest push, the only things that will struggle are things like MIRV warheads. Affected by solar shielding
+Decreases shield efficiency and EMP arc penetration resist, increases shield upkeep
+Randomly EMPs ships that don't have a 360 degree shield
+Slowly increases hardflux on all ships that arent fighters
+Charges all projectiles with a flat bonus to EMP damage (vulkan spam is now VERY viable), NOT affected by solar shielding
+
+Some more tips
+
+0.3.3: Last update before fully release probably
+I hoenstly forgot most of the changes I made
+Hyperstorms now have a bit of variation in the area they do the telegraph strieks in
+
+0.3.2:
+GraphicsLib enhancements for lightning
+Telegraph arcs now progressively get louder to audibly warn you of your imminent demise
+Some balance tweaks
+A few fixes
+Interstellar Imperium hypercloud integration
+
+0.3.1:
+Significant hyperstorm backend rework
+Nebulae center is now approximated using a config option
+Soem hyperstorm balance changes
+Possibly fixed a crash with nebulae and hyperstorms?
+
+0.3.0:
+Deep hyperspace beta
+
+0.2.0:
+Tips
+A bit of backend work
+Full settings integration-everything is now fully configurable, check the settings
+Nebulae
+
+0.1.0:
+Slipstreams
+
+0.0.0:
+InDev release
