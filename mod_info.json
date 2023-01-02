@@ -3,7 +3,7 @@
 	"name":"More Combat Terrain Effects", # Displayed to the player
 	"author":"Niko",
     "utility":"true",
-	"version":"1.1.3",
+	"version":"1.1.4",
 	"description":"Adds combat effects to magnetic fields, slipstreams, nebulae, hyperstorms, pulsars, and black holes.",
     "gameVersion": "0.95.1a-RC6", 
   	"jars":["jars/niko_MCTE.jar"],

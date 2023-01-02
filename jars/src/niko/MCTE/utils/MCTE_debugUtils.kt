@@ -4,15 +4,18 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.rules.HasMemory
 import com.fs.starfarer.api.campaign.rules.MemoryAPI
+import com.sun.deploy.util.SystemUtils
 import com.sun.javafx.PlatformUtil
 import niko.MCTE.settings.MCTE_settings
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.lazywizard.console.CommonStrings
 import java.awt.Color
 
 object MCTE_debugUtils {
     var graphicsLibEnabled: Boolean = false
-    val systemName = System.getProperty("os.name").lowercase()
+    val systemName = System.getProperty("os.name")
+    val isWindows = systemName.startsWith("Windows")
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 
     init {
@@ -119,9 +122,5 @@ object MCTE_debugUtils {
 
     fun isMacOS(): Boolean {
         return (systemName == "mac")
-    }
-
-    fun isWindows(): Boolean {
-        return (PlatformUtil.isWindows())
     }
 }

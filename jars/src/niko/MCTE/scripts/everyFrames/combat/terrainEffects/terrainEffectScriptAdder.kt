@@ -259,7 +259,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
     private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin>) {
         if (!DEEP_HYPERSPACE_EFFECT_ENABLED || engine.nebula == null || !engine.isInCampaign) return
-        if (!MCTE_debugUtils.isWindows()) {
+        if (!MCTE_debugUtils.isWindows) {
             MCTE_debugUtils.log.info("Rejected hyperspace terrain due to potential non-windows OS crashes.")
             return
         }

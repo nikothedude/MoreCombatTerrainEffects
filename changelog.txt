@@ -1,3 +1,6 @@
+1.1.4:
+Once again, changed how the OS detection works to maybe fix the fucking classnotfound crash
+
 1.1.3:
 Internal:
 Replaces most timers with intervalutils
