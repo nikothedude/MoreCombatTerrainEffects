@@ -15,6 +15,7 @@ import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EMP_DAMAGE
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_GRACE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_PRIMARY_RANDOMNESS_MULT
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_SPEED_THRESHOLD
 import niko.MCTE.settings.MCTE_settings.MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
@@ -249,7 +250,8 @@ class deepHyperspaceEffectScript(
         }
     }
 
-    override fun handleNotification(amount: Float) {
+    override fun handleNotification(amount: Float): Boolean {
+        if (!super.handleNotification(amount)) return false
         if (isStorming()) {
             val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
             val playerShip = engine.playerShip
@@ -266,6 +268,7 @@ class deepHyperspaceEffectScript(
                 "Storming hyperclouds periodically striking ships with lightning",
                 true)
         }
+        return true
     }
 
     fun getRawActualDamageForEntity(entity: CombatEntityAPI?): Float {
@@ -320,8 +323,18 @@ class deepHyperspaceEffectScript(
         if (!shipOrMissile.isTangible()) return 0f
         val speed = shipOrMissile.velocity.length()
         var modifier: Float = 1f
-        modifier *= MathUtils.clamp((((speed - HYPERSTORM_SPEED_THRESHOLD)/HYPERSTORM_SPEED_THRESHOLD)), 0f, 3.5f)
-        modifier *= ((shipOrMissile.mass - 600)/100).coerceAtLeast(1f)
+        modifier *= MathUtils.clamp((((speed - HYPERSTORM_SPEED_THRESHOLD)/HYPERSTORM_SPEED_THRESHOLD)), 0f, 3f)
+        val modifiedMass = (shipOrMissile.mass - 30).coerceAtLeast(5f)
+        modifier *= ((modifiedMass)/10).coerceAtLeast(0.001f)
+
+        if (modifier <= 0f) return modifier.coerceAtLeast(0f)
+
+        modifier *= MathUtils.getRandomNumberInRange(0.8f, 1.2f)
+
+        val randomFloat = MathUtils.getRandom().nextFloat()
+        if (randomFloat < HYPERSTORM_PRIMARY_RANDOMNESS_MULT) {
+            modifier *= MathUtils.getRandomNumberInRange(0.05f, 50f)
+        }
 
         return modifier.coerceAtLeast(0f)
     }

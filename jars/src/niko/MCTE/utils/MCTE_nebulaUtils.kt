@@ -4,10 +4,8 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.BoundsAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
-import com.fs.starfarer.api.combat.ShipAPI
-import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
-import com.sun.org.apache.xpath.internal.operations.Bool
+import com.fs.starfarer.combat.entities.terrain.A
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.ext.plusAssign
 import org.lwjgl.util.vector.Vector2f
@@ -25,7 +23,7 @@ object MCTE_nebulaUtils {
         if (nebulaHandler is A) {
             var ourCoordinates = ourCoordinates
             if (ourCoordinates == null) {
-                ourCoordinates = nebulaCell.firstOrNull()?.`return`() ?: return null
+                ourCoordinates = nebulaCell.firstOrNull()?.location ?: return null
             }
             val firstCloud = nebulaCell.firstOrNull() ?: return null
 
@@ -139,12 +137,12 @@ object MCTE_nebulaUtils {
     fun digToSeeIfCloudInCell(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, cloud: Cloud?): Boolean {
         if (cloud == null) return false
 
-        var possibleCellInhabitant = cloud.Object()
+        var possibleCellInhabitant = cloud.flowDest
         while (possibleCellInhabitant != null) {
             if (nebulaCell.contains(possibleCellInhabitant)) {
                 return true
             }
-            possibleCellInhabitant = possibleCellInhabitant.Object()
+            possibleCellInhabitant = possibleCellInhabitant.flowDest
         }
         return false
     }
@@ -163,7 +161,7 @@ object MCTE_nebulaUtils {
                             MathUtils.getDistance(rightCoord, centroid)
                     )/4
 
-            return combinedValue/2
+            return combinedValue
         }
         MCTE_debugUtils.displayError("$nebula, nebula failed cast to A")
         return 0f
@@ -226,8 +224,7 @@ object MCTE_nebulaUtils {
             }
             return null
         }
-        val array: IntArray = intArrayOf(modifiedX, modifiedY)
 
-        return array
+        return intArrayOf(modifiedX, modifiedY)
     }
 }

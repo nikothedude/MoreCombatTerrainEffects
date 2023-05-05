@@ -117,10 +117,6 @@ class debrisFieldEffectScript(
         return density*10
     }
 
-    override fun handleNotification(amount: Float) {
-        return
-    }
-
     override fun handleSounds(amount: Float) {
         return
     }

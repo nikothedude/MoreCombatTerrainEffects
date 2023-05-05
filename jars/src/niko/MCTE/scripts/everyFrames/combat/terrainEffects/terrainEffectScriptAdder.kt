@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.CampaignTerrainAPI
 import com.fs.starfarer.api.campaign.LocationAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
+import com.fs.starfarer.api.combat.CombatNebulaAPI.CloudAPI
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
@@ -59,7 +60,9 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
+import niko.MCTE.utils.MCTE_nebulaUtils
 import org.lazywizard.lazylib.VectorUtils
+import org.lwjgl.util.vector.Vector
 import org.lwjgl.util.vector.Vector2f
 
 // script to dodge plugin incompatability
@@ -338,7 +341,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
     }
 
     private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> {
-        val nebulaManager = (engine.nebula as? A) ?: return HashMap()
+        val nebulaManager = (engine.nebula as? A ?: return HashMap())
         val mapHeight = engine.mapHeight
         val mapWidth = engine.mapWidth
 
@@ -354,21 +357,29 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             var addedNebulae = 0f
             while (addedNebulae < nebulaeToAdd) {
                 addedNebulae++
-                // copypasted form battlecreationplugin
+                // copypasted from battlecreationplugin
                 val x = random.nextFloat() * mapWidth - mapWidth / 2
                 val y = random.nextFloat() * mapHeight - mapHeight / 2
+
+                val tile: IntArray? = MCTE_nebulaUtils.getNebulaTile(Vector2f(x, y))
+                if (tile == null) {
+                    MCTE_debugUtils.displayError("tile was null in iunstantiateing deep hyerpsace etc")
+                    continue
+                }
+
                 var radius = 100f + random.nextFloat() * 400f
                 radius += 100f + 500f * random.nextFloat()
 
                 nebulaManager.spawnCloud(Vector2f(x, y), radius)
+                val nebula: Cloud = nebulaManager.getCloud(x, y) as Cloud
+
                 val cellToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
-                val nebula: Cloud = nebulaManager.getCloud(x, y)
                 val nebulaCell: MutableSet<Cloud> = HashSet()
                 nebulaCell += nebula
-                var possibleCellInhabitant = nebula.Object()
+                var possibleCellInhabitant = nebula.flowDest //TODO: tesssst
                 while (possibleCellInhabitant != null) {
                     nebulaCell += possibleCellInhabitant
-                    possibleCellInhabitant = possibleCellInhabitant.Object()
+                    possibleCellInhabitant = possibleCellInhabitant.flowDest
                 }
                 val cellCentroid = getCellCentroid(nebulaManager, nebulaCell) ?: return deepHyperspaceNebulae
                 cellToCentroid[nebulaCell] = cellCentroid
@@ -473,7 +484,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         var canAddPlugin = false
 
         for (plugin: MagneticFieldTerrainPlugin in magneticFieldPlugins) {
-            val isInFlare = (plugin.terrainName == "Magnetic Storm")
+            val flareManager = plugin.flareManager
+            val isInFlare = flareManager.isInActiveFlareArc(playerFleet)
             if (isInFlare) isStorm = true
 
             visionMod *= if (isInFlare) MAGSTORM_VISION_MULT else MAGFIELD_VISION_MULT

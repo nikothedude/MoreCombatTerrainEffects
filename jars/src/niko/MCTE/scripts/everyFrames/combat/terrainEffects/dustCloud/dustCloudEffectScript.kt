@@ -29,7 +29,7 @@ class dustCloudEffectScript(
         }
     }
 
-    override fun handleNotification(amount: Float) {
+    /*override fun handleNotification(amount: Float) {
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_dustCloud1",
@@ -37,7 +37,7 @@ class dustCloudEffectScript(
             "Dust Cloud",
             "Ship, Missile, Projectile speed reduced by $baseSpeedMalice",
             true)
-    }
+    }*/
 
     override fun handleSounds(amount: Float) {
         return

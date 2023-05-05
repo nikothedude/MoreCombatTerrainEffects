@@ -1,93 +1,95 @@
-modID,fieldID,fieldName,fieldType,defaultValue,fieldTooltip,minValue,maxValue,tags
-niko_moreCombatTerrainEffects,MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,noHighlight
+modID,fieldID,fieldName,fieldType,defaultValue,fieldTooltip,minValue,maxValue,tab
+niko_moreCombatTerrainEffects,MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,
 niko_moreCombatTerrainEffects,MCTE_magneticFieldToggle,Magnetic Fields,Boolean,true,"Magnetic fields reduce the weapon/fighter range, vision, missile mauneverability/guidance, and ECCM chance of any fleet in it, and
 also have a chance for missiles to randomly break lock, affected by the missile's ECM chance. Magnetic storms are a more intense version of magnetic fields.
 
-The effects are mitigated by electronic warfare resistance, e.g. ECCM package (Not the ECCM chance, which is for missiles, not ships).",,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_deepHyperspaceToggle,Deep Hyperspace,Boolean,true,Deep hyperspace will spawn nebula clouds in combat. Required to be true for hyperstorms to function.,,,spacing:0.5
+The effects are mitigated by electronic warfare resistance, e.g. ECCM package (Not the ECCM chance, which is for missiles, not ships).",,,
+niko_moreCombatTerrainEffects,MCTE_deepHyperspaceToggle,Deep Hyperspace,Boolean,true,Deep hyperspace will spawn nebula clouds in combat. Required to be true for hyperstorms to function.,,,
 niko_moreCombatTerrainEffects,MCTE_hyperstormsToggle,Hyperstorms,Boolean,true,"DOES NOT FUNCTION ON MACOS BECAUSE THE GAME WOULD CRASH. Requires deep hyperspace to be enabled.
 
 Nebulae spawned by storming cells of deep hyperspace will periodically strike nearby ships/missiles with lightning, dealing crippling amounts of EMP damage and sending them flying. 
-Follows the same rules as campaign layer: Solar shielding reduces the damage, moving slowly reduces targetting chance, larger ships have a higher chance of being targetted.",,,spacing:0.5
+Follows the same rules as campaign layer: Solar shielding reduces the damage, moving slowly reduces targetting chance, larger ships have a higher chance of being targetted.",,,
 niko_moreCombatTerrainEffects,MCTE_slipstreamToggle,Slipstreams,Boolean,true,"Slipstreams force safety overrides on all ships/fighters/missiles, with the caveat that venting is allowed (less efficient). If safety overrides (or similar) is already applied, doubles zero-flux boost.
-Slowly generates hardflux on all ships as well.",,,spacing:0.5
+Slowly generates hardflux on all ships as well.",,,
 niko_moreCombatTerrainEffects,MCTE_nebulaToggle,Nebulae,Boolean,true,"Ships within nebulae lose their zero-flux boost, some top speed, and some weapon range. Zero-flux boost and speed are preserved with insulated engine assembly.
 This does not affect the campaign-layer nebulae, only the combat-layer ones, which can spawn anywhere. The nebula terrain only increases how many clouds spawn.
-",,,spacing:0.5
+",,,
 niko_moreCombatTerrainEffects,MCTE_blackholeToggle,Black Holes,Boolean,true,"Black holes lose some of their CR penalty in exchange for increasing timeflow on all ships in combat, as well as gaining an extremely strong gravitational effect which drags all combat entities towards the black hole's campaign location. Effect scales with your proximity to the black hole in the campaign layer.
-Affected by solar shielding, but inversely: The timeflow decreases as effect resistance increases, but the gravity doesn't, so solar shielding is a strict nerf in this case.",,,spacing:0.5
+Affected by solar shielding, but inversely: The timeflow decreases as effect resistance increases, but the gravity doesn't, so solar shielding is a strict nerf in this case.",,,
 niko_moreCombatTerrainEffects,MCTE_pulsarToggle,Pulsars,Boolean,true,"Pulsars lose some of their CR penalty in exchange for decreasing shield efficiency, increasing shield upkeep, decreasing shield EMP arc pierce resist, randomly EMPing all ships, applying a flat EMP damage increase to all projectiles, pushing all combat entities away from it's campaign location, and slowly building hardflux. Effect scales with your proximity to the pulsar in the campaign layer.
-All effects except for the projectile EMP damage increase and push effect are affected by solar shielding.",,,spacing:0.5
+All effects except for the projectile EMP damage increase and push effect are affected by solar shielding.",,,
+niko_moreCombatTerrainEffects,MCTE_showSidebarInfo,Show sidebar info,Boolean,true,"Show the info relating to terrain effects in the info bar, on the left side of the screen, during combat. Useful to disable if you're being spammed.",,,
 ,,,,,,,,
-niko_moreCombatTerrainEffects,MCTE_generalSettingsHeader,General settings,Header,General settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_showErrorsInGame,Show errors in game,Boolean,True,,,,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_generalSettingsHeader,General settings,Header,General settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_showErrorsInGame,Show errors in game,Boolean,True,,,,
 ,,,,,,,,
-niko_moreCombatTerrainEffects,MCTE_terrainOptionsHeader,Terrain-Specific Options,Header,Terrain-Specific Options,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_terrainOptionsInfo,Notice,Text,Notice: Most values stack with multiple terrain instances. For example: A hardflux increment of 2 will increase to 4 with two pulsar instances.,if you see this niko is dumb,,,"noHighlight, spacing:0.5"
-niko_moreCombatTerrainEffects,MCTE_magneticFieldOptionsHeader,Magnetic Field Settings,Header,Magnetic Field Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_magneticFieldVisionMult,Field vision mult,Double,0.6,Vision (how much you can see into the fog of war) will be multiplied against this with magnetic fields.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticStormVisionMult,Storm vision mult,Double,0.35,Vision will be multiplied against this with magnetic storms.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticFieldMissileGuidanceAndManeuverabilityMult,Field missile guidance and maneuverability mult,Double,0.8,Missile guidance and maneuverability will be multiplied against this with magnetic fields.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticStormMissileGuidanceAndManeuverabilityMult,Storm missile guidance and maneuverability mult,Double,0.55,Missile guidance and maneuverability will be multiplied against this with magnetic storm.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticFieldECCMChanceMult,Field ECCM chance mult,Double,0.8,Missile ECCM chance will be multiplied against this with magnetic fields.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticStormECCMChanceMult,Storm ECCM chance mult,Double,0.2,Missile ECCM chance will be multiplied against this with magnetic storms.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticFieldWeaponAndFighterRangeMult,Field weapon and fighter range mult,Double,0.6,Weapon and fighter range will be multiplied against this with magnetic fields.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticStormWeaponAndFighterRangeMult,Storm weapon and fighter range mult,Double,0.35,Weapon and fighter range will be multiplied against this with magnetic storm.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticFieldMissileScrambleChance,Field missile scramble chance,Double,0.006,"Every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated value as a percentage chance to determine if the missile should unlock and fly in random directions.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticStormMissileScrambleChance,Storm missile scramble chance,Double,0.02,"Every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated value as a percentage chance to determine if the missile should unlock and fly in random directions.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticFieldMissileUnscrambleChance,Field missile unscramble chance,Double,0.007,"Every second or so, scrambled missiles have this percentage chance to unscramble and acquire a target.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_magneticStormMissileUnscrambleChance,Storm missile unscramble chance,Double,0.007,"Every second or so, scrambled missiles have this percentage chance to unscramble and acquire a target.",-999999,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_terrainOptionsHeader,Terrain-Specific Options,Header,Terrain-Specific Options,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_terrainOptionsInfo,Notice,Text,Notice: Most values stack with multiple terrain instances. For example: A hardflux increment of 2 will increase to 4 with two pulsar instances.,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_magneticFieldOptionsHeader,Magnetic Field Settings,Header,Magnetic Field Settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_magneticFieldVisionMult,Field vision mult,Double,0.6,Vision (how much you can see into the fog of war) will be multiplied against this with magnetic fields.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticStormVisionMult,Storm vision mult,Double,0.35,Vision will be multiplied against this with magnetic storms.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticFieldMissileGuidanceAndManeuverabilityMult,Field missile guidance and maneuverability mult,Double,0.8,Missile guidance and maneuverability will be multiplied against this with magnetic fields.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticStormMissileGuidanceAndManeuverabilityMult,Storm missile guidance and maneuverability mult,Double,0.55,Missile guidance and maneuverability will be multiplied against this with magnetic storm.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticFieldECCMChanceMult,Field ECCM chance mult,Double,0.8,Missile ECCM chance will be multiplied against this with magnetic fields.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticStormECCMChanceMult,Storm ECCM chance mult,Double,0.2,Missile ECCM chance will be multiplied against this with magnetic storms.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticFieldWeaponAndFighterRangeMult,Field weapon and fighter range mult,Double,0.6,Weapon and fighter range will be multiplied against this with magnetic fields.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticStormWeaponAndFighterRangeMult,Storm weapon and fighter range mult,Double,0.35,Weapon and fighter range will be multiplied against this with magnetic storm.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticFieldMissileScrambleChance,Field missile scramble chance,Double,0.006,"Every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated value as a percentage chance to determine if the missile should unlock and fly in random directions.",0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticStormMissileScrambleChance,Storm missile scramble chance,Double,0.02,"Every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated value as a percentage chance to determine if the missile should unlock and fly in random directions.",0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticFieldMissileUnscrambleChance,Field missile unscramble chance,Double,0.007,"Every second or so, scrambled missiles have this percentage chance to unscramble and acquire a target.",0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_magneticStormMissileUnscrambleChance,Storm missile unscramble chance,Double,0.007,"Every second or so, scrambled missiles have this percentage chance to unscramble and acquire a target.",0.0,1.0,
 ,,,,,,,,
-niko_moreCombatTerrainEffects,MCTE_slipstreamOptionsHeader,Slipstream Settings,Header,Slipstream Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_slipstreamPPTMult,PPT mult,Double,0.45,"Multiplies the PPT of all ships against this, unless it has a type of safety overrides and the PPT-SO stacking option is disabled.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamStackPPTWithSO,Stack PPT mult with SO,Boolean,true,"If false, the PPT mult will not be applied to ships with safety override-type hullmods.",,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamFluxDissipationMult,Flux dissipation mult,Double,3.0,Multiplies the flux dissipation of all ships/fighters against this.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamOverallSpeedMult,Overall speed mult,Double,1.0,"For every slipstream affecting a combat, this number is multiplied against the speed buffs applied to all entities.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamHardfluxGenPerFrame,Hardflux generated per frame,Double,2.0,This amount of hardflux will be applied to all non-fighter ships 60 times a second.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamDisableVenting,Disable Venting,Boolean,false,,,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamIncreaseTurnRate,Apply speed buffs to turn rate,Boolean,false,"If true, the speed buffs will be applied to turn rate of all ships/fighters as well.",,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamFighterZeroFluxBoost,Fighter zero-flux boost,Boolean,true,"If true, fighters will be given +50 speed.",,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamMissileZeroFluxBoost,Missile zero-flux boost,Boolean,true,"If true, missiles will be given +50 speed.",,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_slipstreamAffectIntangible,Affect intangible objects,Boolean,true,"If true, intangible objects (ex. phased objects) will be given SO as well.",,,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_slipstreamOptionsHeader,Slipstream Settings,Header,Slipstream Settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_slipstreamPPTMult,PPT mult,Double,0.45,"Multiplies the PPT of all ships against this, unless it has a type of safety overrides and the PPT-SO stacking option is disabled.",0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_slipstreamStackPPTWithSO,Stack PPT mult with SO,Boolean,true,"If false, the PPT mult will not be applied to ships with safety override-type hullmods.",,,
+niko_moreCombatTerrainEffects,MCTE_slipstreamFluxDissipationMult,Flux dissipation mult,Double,3.0,Multiplies the flux dissipation of all ships/fighters against this.,1.0,100.0,
+niko_moreCombatTerrainEffects,MCTE_slipstreamOverallSpeedMult,Overall speed mult increment,Double,1.0,"For every slipstream affecting a combat, this number is added to a mult which will be multiplied against the speed buffs applied to all entities.",1.0,100.0,
+niko_moreCombatTerrainEffects,MCTE_slipstreamHardfluxGenPerFrame,Hardflux generated per frame,Double,2.0,This amount of hardflux will be applied to all non-fighter ships 60 times a second.,0.0,900.0,
+niko_moreCombatTerrainEffects,MCTE_slipstreamDisableVenting,Disable Venting,Boolean,false,,,,
+niko_moreCombatTerrainEffects,MCTE_slipstreamIncreaseTurnRate,Apply speed buffs to turn rate,Boolean,false,"If true, the speed buffs will be applied to turn rate of all ships/fighters as well.",,,
+niko_moreCombatTerrainEffects,MCTE_slipstreamFighterZeroFluxBoost,Fighter zero-flux boost,Boolean,true,"If true, fighters will be given +50 speed.",,,
+niko_moreCombatTerrainEffects,MCTE_slipstreamMissileZeroFluxBoost,Missile zero-flux boost,Boolean,true,"If true, missiles will be given +50 speed.",,,
+niko_moreCombatTerrainEffects,MCTE_slipstreamAffectIntangible,Affect intangible objects,Boolean,true,"If true, intangible objects (ex. phased objects) will be given SO as well.",,,
 ,,,,,,,,
-niko_moreCombatTerrainEffects,MCTE_nebulaOptionsHeader,Nebula Settings,Header,Nebula Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_nebulaVisionMult,Vision Mult,Double,0.8,Vision (how much you can see into the fog of war) of ships inside nebulae will be multiplied against this.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_nebulaRangeMult,Range Mult,Double,0.8,Weapon range of ships inside nebulae will be multiplied against this.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_nebulaSpeedIncrement,Speed Increment,Double,-10.0,Max speed of ships inside nebula will be altered by this.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_nebulaDisableZeroFluxBoost,Disable zero-flux boost,Boolean,true,"If true, ships inside nebulae will lose their zero-flux boost.",,,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_nebulaOptionsHeader,Nebula Settings,Header,Nebula Settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_nebulaVisionMult,Vision Mult,Double,0.8,Vision (how much you can see into the fog of war) of ships inside nebulae will be multiplied against this.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_nebulaRangeMult,Range Mult,Double,0.8,Weapon range of ships inside nebulae will be multiplied against this.,0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_nebulaSpeedIncrement,Speed Increment,Double,-10.0,Max speed of ships inside nebula will be altered by this.,-300.0,300.0,
+niko_moreCombatTerrainEffects,MCTE_nebulaDisableZeroFluxBoost,Disable zero-flux boost,Boolean,true,"If true, ships inside nebulae will lose their zero-flux boost.",,,
 ,,,,,,,,
-niko_moreCombatTerrainEffects,MCTE_deepHyperspaceOptionsHeader,Deep Hyperspace Settings,Header,Deep Hyperspace Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_deepHyperspaceMinimumCloudsPerCell,Minimum clouds per cell,Int,25,How many nebula clouds a instance of deep hyperspace MUST spawn.,0,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_deepHyperspaceMaximumCloudsPerCell,Maximum clouds per cell,Int,40,How many nebula clouds a instance of deep hyperspace CAN spawn.,0,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_deepHyperspaceOptionsHeader,Deep Hyperspace Settings,Header,Deep Hyperspace Settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_deepHyperspaceMinimumCloudsPerCell,Minimum clouds per cell,Int,25,How many nebula clouds a instance of deep hyperspace MUST spawn.,0,500,
+niko_moreCombatTerrainEffects,MCTE_deepHyperspaceMaximumCloudsPerCell,Maximum clouds per cell,Int,40,How many nebula clouds a instance of deep hyperspace CAN spawn.,0,500,
 ,,,,,,,,
-niko_moreCombatTerrainEffects,MCTE_hyperstormOptionsHeader,Hyperstorm Settings,Header,Hyperstorm Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_hyperstormEnergyDamage,Lightning energy damage,Double,650.0,The base energy damage of a lightning strike.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormEMPDamage,Lightning EMP damage,Double,8000.0,The base EMP damage of a lightning strike.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMinTimeBetweenStrikes,Minimum time between lightning strikes,Double,4.0,"Minimum time, in ~seconds, before a cloud can try to arc again.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMaxTimeBetweenStrikes,Maximum time between lightning strikes,Double,7.0,"Maximum time, in ~seconds, before a cloud can try to arc again.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormGracePeriod,Grace period,Double,5.0,"How long, in ~seconds, a ship has before a cloud can strike it again, after it has been struck.",0,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMinArcRange,Minimum lightning range,Double,1000,Lower bound of the range that can be picked for an arc attempt.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMaxArcRange,Maximum lightning range,Double,1000,Upper bound of the range that can be picked for an arc attempt.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMinChargeTime,Minimum charging time,Double,4.0,Minimum amount of seconds a cloud will telegraph a strike before it actually strikes.,0,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormMaxChargeTime,Maximum charging time,Double,5.0,Maximum amount of seconds a cloud will telegraph a strike before it actually strikes.,0,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormLightningForce,Lightning force,Double,3500.0,The amount of force in starsector units (yes i know) a arc will apply to a ship it hits.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_hyperstormSpeedThreshold,Speed threshold for targetting,Double,25.0,"The speed at which a ship becomes targettable at, anything below and the lightning won't try to strike you, no matter your mass.",0,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_refinementIterations,Centroid refinement iterations,Int,2500,"Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times.",0,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_hyperstormOptionsHeader,Hyperstorm Settings,Header,Hyperstorm Settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_hyperstormEnergyDamage,Lightning energy damage,Double,650.0,The base energy damage of a lightning strike.,0.0,500000.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormEMPDamage,Lightning EMP damage,Double,8000.0,The base EMP damage of a lightning strike.,0.0,500000.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormMinTimeBetweenStrikes,Minimum time between lightning strikes,Double,4.0,"Minimum time, in ~seconds, before a cloud can try to arc again.",0.0,500.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormMaxTimeBetweenStrikes,Maximum time between lightning strikes,Double,7.0,"Maximum time, in ~seconds, before a cloud can try to arc again.",0.0,500.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormGracePeriod,Grace period,Double,3.0,"How long, in ~seconds, a ship has before a cloud can strike it again, after it has been struck.",0.0,500.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormMinArcRange,Minimum lightning range,Double,1000,Lower bound of the range that can be picked for an arc attempt.,0.0,500000.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormMaxArcRange,Maximum lightning range,Double,1000,Upper bound of the range that can be picked for an arc attempt.,0.0,500000.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormMinChargeTime,Minimum charging time,Double,3.0,Minimum amount of seconds a cloud will telegraph a strike before it actually strikes.,0.0,800.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormMaxChargeTime,Maximum charging time,Double,5.0,Maximum amount of seconds a cloud will telegraph a strike before it actually strikes.,0.0,800.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormLightningForce,Lightning force,Double,3500.0,The amount of force in starsector units (yes i know) a arc will apply to a ship it hits.,-900000.0,900000.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormSpeedThreshold,Speed threshold for targetting,Double,25.0,"The speed at which a ship becomes targettable at, anything below and the lightning won't try to strike you, no matter your mass.",0.0,50000.0,
+niko_moreCombatTerrainEffects,MCTE_hyperstormPrimaryRandomnessThreshold,Randomness Threshold,Double,1.0,Percent chance of a hypercloud massively increasing or decreasing a given entity's favorability of targettability during target calculations.,0.0,100.0,
+niko_moreCombatTerrainEffects,MCTE_refinementIterations,Centroid refinement iterations,Int,2500,"Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times.",0,999999,
 ,,,,,,,,
-niko_moreCombatTerrainEffects,MCTE_blackHoleOptionsHeader,Black Hole Settings,Header,Black Hole Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_blackHoleGravityEnabled,Gravity enabled,Boolean,True,"If true, black holes will apply a intense gravitational force on all combat entities.",,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_blackHoleTimemultMult,Timeflow mult,Double,2.5,Timeflow of all ships will be multiplied against this. Assumes you are at the center of the black hole - the effect is weaker further out.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_gravityMult,Gravity mult,Double,1.45,Applied to the gravitational force of the black hole.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_blackHolePPTCompensation,PPT compensation,Double,80.0,The percent of the black hole CR debuffs to be removed.,-999999,999999,spacing:0.5
-,,,,,,-999999,999999,
-niko_moreCombatTerrainEffects,MCTE_pulsarOptionsHeader,Pulsar Settings,Header,Pulsar Settings,if you see this niko is dumb,,,noHighlight
-niko_moreCombatTerrainEffects,MCTE_pulsarForceEnabled,Force enabled,Boolean,True,"If true, pulsars will push all combat entities away from themselves.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarForceMult,Force mult,Double,0.55,Applied to the pulsar's push force. Assumes you are at the center of the pulsar.,,,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarBaseIntensityMult,Base mult,Double,1.0,Applied to all aspects of this effect.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarPPTCompensation,PPT compensation,Double,100.0,The percent of the pulsar CR debuffs to be removed. Not always the exact value as its affected by the intensity and proximity.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarHardFluxGenPerFrame,Hardflux generation per frame,Double,1.0,This amount of hardflux will be applied to all non-fighter ships 60 times a second.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarEMPDamageBonusForWeapons,Bonus EMP damage for weapons,Double,30.0,The flat amount of EMP damage to be applied to all projectiles.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarShieldEffectMult,Shield effect mult,Double,0.5,"The amount that shield eff, shield upkeep, and shield emp arc pierce chance will be multiplied by.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarRandomArcChance,Random EMP chance,Double,0.05,"The chance, every frame, for any given ship to be EMPed randomly.",-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarRandomArcEMPDamage,Random EMP damage,Double,85.0,The EMP damage that a random EMP does.,-999999,999999,spacing:0.5
-niko_moreCombatTerrainEffects,MCTE_pulsarRandomArcEnergyDamage,Random EMP energy damage,Double,2.0,The energy damage that a random EMP does.,-999999,999999,spacing:0.5
+niko_moreCombatTerrainEffects,MCTE_blackHoleOptionsHeader,Black Hole Settings,Header,Black Hole Settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_blackHoleGravityEnabled,Gravity enabled,Boolean,True,"If true, black holes will apply a intense gravitational force on all combat entities.",,,
+niko_moreCombatTerrainEffects,MCTE_blackHoleTimemultMult,Timeflow mult,Double,2.5,Timeflow of all ships will be multiplied against this. Assumes you are at the center of the black hole - the effect is weaker further out.,0.0,10000.0,
+niko_moreCombatTerrainEffects,MCTE_gravityMult,Gravity mult,Double,1.45,Applied to the gravitational force of the black hole.,0.0,10000.0,
+niko_moreCombatTerrainEffects,MCTE_blackHolePPTCompensation,PPT compensation,Double,80.0,The percent of the black hole CR debuffs to be removed.,0.0,100.0,
+,,,,,,,,
+niko_moreCombatTerrainEffects,MCTE_pulsarOptionsHeader,Pulsar Settings,Header,Pulsar Settings,if you see this niko is dumb,,,
+niko_moreCombatTerrainEffects,MCTE_pulsarForceEnabled,Force enabled,Boolean,True,"If true, pulsars will push all combat entities away from themselves.",,,
+niko_moreCombatTerrainEffects,MCTE_pulsarForceMult,Force mult,Double,0.55,Applied to the pulsar's push force. Assumes you are at the center of the pulsar.,,,
+niko_moreCombatTerrainEffects,MCTE_pulsarBaseIntensityMult,Base mult,Double,1.0,Applied to all aspects of this effect.,0,5000.0,
+niko_moreCombatTerrainEffects,MCTE_pulsarPPTCompensation,PPT compensation,Double,100.0,The percent of the pulsar CR debuffs to be removed. Not always the exact value as its affected by the intensity and proximity.,0.0,100.0,
+niko_moreCombatTerrainEffects,MCTE_pulsarHardFluxGenPerFrame,Hardflux generation per frame,Double,1.0,This amount of hardflux will be applied to all non-fighter ships 60 times a second.,0.0,50.0,
+niko_moreCombatTerrainEffects,MCTE_pulsarEMPDamageBonusForWeapons,Bonus EMP damage for weapons,Double,30.0,The flat amount of EMP damage to be applied to all projectiles.,0.0,5000.0,
+niko_moreCombatTerrainEffects,MCTE_pulsarShieldEffectMult,Shield effect mult,Double,0.5,"The amount that shield eff, shield upkeep, and shield emp arc pierce chance will be multiplied by.",0.0,1.0,
+niko_moreCombatTerrainEffects,MCTE_pulsarRandomArcChance,Random EMP chance,Double,0.05,"The chance, every frame, for any given ship to be EMPed randomly.",0.0,100.0,
+niko_moreCombatTerrainEffects,MCTE_pulsarRandomArcEMPDamage,Random EMP damage,Double,85.0,The EMP damage that a random EMP does.,0.0,5000.0,
+niko_moreCombatTerrainEffects,MCTE_pulsarRandomArcEnergyDamage,Random EMP energy damage,Double,2.0,The energy damage that a random EMP does.,0.0,5000.0,

@@ -342,8 +342,9 @@ class pulsarEffectScript(
         return coronaMult
     }
 
-    override fun handleNotification(amount: Float) {
-        if (engine.playerShip == null) return
+    override fun handleNotification(amount: Float): Boolean {
+        if (!super.handleNotification(amount)) return false
+        if (engine.playerShip == null) return false
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
 
         val ship = engine.playerShip
@@ -388,6 +389,7 @@ class pulsarEffectScript(
             "Pulsar Beam",
             "Solar winds interfering with battlespace",
             true)
+        return true
     }
 
     private fun calculateFluxGeneratedPerSecond(ship: ShipAPI): Float {

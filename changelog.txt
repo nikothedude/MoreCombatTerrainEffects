@@ -1,3 +1,23 @@
+1.2.0:
+Update to Starsector 0.96a
+Updated LunaLib config, sliders now work woo
+
+Hyperstorm targetting is now far more random and less predictable
+Hyperstorm targetting now favors fighters and missiles far less
+Hyperstorm targetting now favors mass more
+Hyperstorm radius doubled (Will cause a few visual errors)
+
+Default settings to lunalib changed
+
+New lunalib settings:
+Randomness threshold for hyperstorms - Decide how "random" the targetting is
+Toggle for sidebar info - No more spam in the side of your screen
+
+Fixed a bug where slipstreams would infinitely stack speed onto SO-d ships
+Fixed a bug where slipstreams would consider tangible objects intangible and vice versa
+
+Hyperstorms are now much less likely to strike low-mass targets
+
 1.1.4:
 Once again, changed how the OS detection works to maybe fix the fucking classnotfound crash
 

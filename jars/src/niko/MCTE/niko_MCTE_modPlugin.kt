@@ -2,10 +2,9 @@ package niko.MCTE
 
 import com.fs.starfarer.api.BaseModPlugin
 import com.fs.starfarer.api.Global
+import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
-import niko.MCTE.listeners.combatEndListener
 import niko.MCTE.utils.MCTE_debugUtils
-import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import org.apache.log4j.Level
 
@@ -29,11 +28,12 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         super.onGameLoad(newGame)
 
         Global.getSector().listenerManager.addListener(settingsChangedListener(), true)
+        LunaSettings.addListener(settingsChangedListener())
         //Global.getSector().listenerManager.addListener(combatEndListener(false), true)
     }
 
     class settingsChangedListener : LunaSettingsListener {
-        override fun settingsChanged() {
+        override fun settingsChanged(modID: String) {
             try {
                 loadSettings()
             } catch (ex: Exception) {

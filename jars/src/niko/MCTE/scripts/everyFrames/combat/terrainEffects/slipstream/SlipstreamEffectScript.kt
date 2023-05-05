@@ -51,10 +51,10 @@ class SlipstreamEffectScript(
         timer.advance(amount)
         if (timer.intervalElapsed()) {
             for (ship: ShipAPI in engine.ships) {
-                val isTangible = isShipIntangibleAndDoWeCare(ship)
+                val isIntangible = isShipIntangibleAndDoWeCare(ship)
                 val mutableStats = ship.mutableStats
                 var adjustedSpeedMult = getSpeedMult(ship)
-                if (ship.isFighter && !isTangible) {
+                if (ship.isFighter && !isIntangible) {
                     if (MCTE_settings.SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST) {
                         adjustedSpeedMult += ship.mutableStats.zeroFluxSpeedBoost.modifiedValue
                     }
@@ -75,14 +75,14 @@ class SlipstreamEffectScript(
                 }
                 mutableStats.missileMaxSpeedBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMultWithZeroFluxBoost)
                 mutableStats.missileAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
-                val zeroFluxMinimumIncrement = if (isTangible) 2f else 0f
+                val zeroFluxMinimumIncrement = if (!isIntangible) 2f else 0f
                 val safetiesOverridden = (mutableStats.zeroFluxMinimumFluxLevel.modifiedValue >= zeroFluxMinimumIncrement+1)
                 if (!safetiesOverridden || MCTE_settings.STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO) {
                     val PPTmult = getPPTMult(ship)
                     mutableStats.peakCRDuration.modifyMult(terrainCombatEffectIds.slipstreamEffect, PPTmult)
                 }
                 if (safetiesOverridden) {
-                    val zeroFluxBoostIncrement = if (!isTangible) 0.0000001f else mutableStats.zeroFluxSpeedBoost.modifiedValue
+                    val zeroFluxBoostIncrement = if (isIntangible) 0.0000001f else adjustedSpeedMult/overallSpeedMult
                     mutableStats.zeroFluxSpeedBoost.modifyFlat(terrainCombatEffectIds.slipstreamEffect, zeroFluxBoostIncrement)
                 }
 
@@ -92,10 +92,10 @@ class SlipstreamEffectScript(
                 mutableStats.fluxDissipation.modifyMult(terrainCombatEffectIds.slipstreamEffect, fluxDissipationModifiedMult)
 
                 if (SLIPSTREAM_DISABLE_VENTING) {
-                    val disableMult = if (isTangible) 0f else 1f
+                    val disableMult = if (!isIntangible) 0f else 1f
                     mutableStats.ventRateMult.modifyMult(terrainCombatEffectIds.slipstreamEffect, disableMult)
                 } else {
-                    val slowMult = if (isTangible) 0.62f else 1f
+                    val slowMult = if (!isIntangible) 0.62f else 1f
                     mutableStats.ventRateMult.modifyMult(terrainCombatEffectIds.slipstreamEffect, slowMult)
                 }
             }
@@ -113,7 +113,7 @@ class SlipstreamEffectScript(
     }
 
     private fun isShipIntangibleAndDoWeCare(ship: ShipAPI): Boolean {
-        return (ship.isTangible() || !MCTE_settings.SLIPSTREAM_AFFECT_INTANGIBLE)
+        return (MCTE_settings.SLIPSTREAM_AFFECT_INTANGIBLE && !ship.isTangible())
     }
 
     private fun getFluxDissipationModifiedMult(ship: ShipAPI): Float {
@@ -177,8 +177,9 @@ class SlipstreamEffectScript(
         }
     }
 
-    override fun handleNotification(amount: Float) {
-        val playerShip = engine.playerShip ?: return
+    override fun handleNotification(amount: Float): Boolean {
+        if (!super.handleNotification(amount)) return false
+        val playerShip = engine.playerShip ?: return false
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         if (isShipIntangibleAndDoWeCare(playerShip)) {
         engine.maintainStatusForPlayerShip(
@@ -209,6 +210,7 @@ class SlipstreamEffectScript(
             "Systems overcharge",
             true)
         }
+        return true
     }
 
     override fun handleSounds(amount: Float) {

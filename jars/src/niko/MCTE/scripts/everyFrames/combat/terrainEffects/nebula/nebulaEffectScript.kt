@@ -6,6 +6,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.ShipAPI
+import com.sun.org.apache.xpath.internal.operations.Bool
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
@@ -120,9 +121,10 @@ class nebulaEffectScript: baseTerrainEffectScript() {
         return rangeMult
     }
 
-    override fun handleNotification(amount: Float) {
-        if (nebulaHandler == null) return
-        val playerShip = engine.playerShip ?: return
+    override fun handleNotification(amount: Float): Boolean {
+        if (!super.handleNotification(amount)) return false
+        if (nebulaHandler == null) return false
+        val playerShip = engine.playerShip ?: return false
         if (playerShip.isInsideNebulaAuxillary()) {
             val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
             val zeroFluxString = if (playerShip.hasInsulatedEngines() && !shouldDisableZeroFluxBoost(playerShip)) {
@@ -156,6 +158,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "Speed reduced by ${(getSpeedDecrementForShip(playerShip)).roundTo(2)} Su",
                 true)
         }
+        return true
     }
 
     override fun handleSounds(amount: Float) {

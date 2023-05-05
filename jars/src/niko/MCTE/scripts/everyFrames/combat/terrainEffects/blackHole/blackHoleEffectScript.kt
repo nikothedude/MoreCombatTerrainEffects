@@ -110,7 +110,8 @@ class blackHoleEffectScript(
         return (timeMult*coronaEffect).coerceAtLeast(1f)
     }
 
-    override fun handleNotification(amount: Float) {
+    override fun handleNotification(amount: Float): Boolean {
+        if (!super.handleNotification(amount)) return false
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_blackHole2",
@@ -131,6 +132,8 @@ class blackHoleEffectScript(
             "Extreme gravitational field interfering with battlespace",
             true
         )
+
+        return true
     }
 
     override fun handleSounds(amount: Float) {

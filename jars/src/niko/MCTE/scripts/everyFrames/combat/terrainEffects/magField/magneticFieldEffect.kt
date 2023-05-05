@@ -109,8 +109,9 @@ class magneticFieldEffect(
         return mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
     }
 
-    override fun handleNotification(amount: Float) {
-        val ship = engine.playerShip ?: return
+    override fun handleNotification(amount: Float): Boolean {
+        if (!super.handleNotification(amount)) return false
+        val ship = engine.playerShip ?: return false
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
         val stormOrNot = if (isStorm) "storm" else "field"
         engine.maintainStatusForPlayerShip(
@@ -143,6 +144,7 @@ class magneticFieldEffect(
             "Magnetic $stormOrNot",
             "${calculateScrambleChancePerSecond(ship)}% chance for missiles' guidance to be scrambled per 1 second(s)",
             true)
+        return true
     }
 
     private fun calculateScrambleChancePerSecond(ship: ShipAPI): Float {

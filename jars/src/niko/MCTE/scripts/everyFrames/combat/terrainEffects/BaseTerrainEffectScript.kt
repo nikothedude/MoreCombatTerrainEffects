@@ -5,14 +5,24 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.input.InputEventAPI
+import com.sun.org.apache.xpath.internal.operations.Bool
 import lunalib.lunaSettings.LunaSettingsListener
+import niko.MCTE.settings.MCTE_settings.SHOW_SIDEBAR_INFO
 import niko.MCTE.utils.terrainScriptsTracker
 
 abstract class baseTerrainEffectScript: baseNikoCombatScript() {
 
+    var initialized = false
+
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
         super.advance(amount, events)
         if (Global.getCurrentState() != GameState.COMBAT) return
+        if (!initialized) { // i fucking hate this oml
+            val engine = Global.getCombatEngine() ?: return
+            init(engine)
+            if (!initialized)
+                return
+        }
 
         applyEffects(amount)
         handleSounds(amount)
@@ -21,10 +31,15 @@ abstract class baseTerrainEffectScript: baseNikoCombatScript() {
 
     override fun init(engine: CombatEngineAPI?) {
         super.init(engine)
+        initialized = true
         //terrainScriptsTracker.activeScripts += this
     }
 
-    abstract fun handleNotification(amount: Float)
+    open fun handleNotification(amount: Float): Boolean {
+        if (!SHOW_SIDEBAR_INFO)
+            return false
+        return true
+    }
 
     abstract fun handleSounds(amount: Float)
 

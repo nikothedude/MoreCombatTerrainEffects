@@ -5,7 +5,7 @@
     "utility":"true",
 	"version":"1.1.4",
 	"description":"Adds combat effects to magnetic fields, slipstreams, nebulae, hyperstorms, pulsars, and black holes.",
-    "gameVersion": "0.95.1a-RC6", 
+    "gameVersion": "0.96a-RC7", 
   	"jars":["jars/niko_MCTE.jar"],
   	"modPlugin":"niko.MCTE.niko_MCTE_modPlugin",
 	  	"dependencies": [
@@ -17,7 +17,7 @@
 		{
 			"id": "lunalib",
 			"name": "LunaLib",
-			"version": "1.1.2"
+			"version": "1.7.1"
 		},
     ],
 }

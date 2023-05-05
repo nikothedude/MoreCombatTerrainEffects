@@ -14,6 +14,8 @@ import kotlin.jvm.Throws
 
 object MCTE_settings {
 
+    var SHOW_SIDEBAR_INFO: Boolean = true
+
     var SLIPSTREAM_AFFECT_INTANGIBLE: Boolean = true
     var SHOW_ERRORS_IN_GAME: Boolean = true
     var MAG_FIELD_EFFECT_ENABLED: Boolean = true
@@ -76,6 +78,7 @@ object MCTE_settings {
     var HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = 2500
     var HYPERSTORM_ARC_FORCE: Float = 2000f
     var HYPERSTORM_SPEED_THRESHOLD: Float = 10f
+    var HYPERSTORM_PRIMARY_RANDOMNESS_MULT: Float = 0.2f
 
     var EMP_DAMAGE_FEAR_MULT: Float = 0.3f
 
@@ -110,6 +113,7 @@ object MCTE_settings {
     fun loadSettings() {
         //MCTE_debugUtils.log.info("reloading settings")
 
+        SHOW_SIDEBAR_INFO = LunaSettings.getBoolean(modId, "MCTE_showSidebarInfo")!!
         SHOW_ERRORS_IN_GAME = LunaSettings.getBoolean(modId, "MCTE_showErrorsInGame")!!
         MAG_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_magneticFieldToggle")!!
         DEEP_HYPERSPACE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_deepHyperspaceToggle")!!
@@ -172,6 +176,7 @@ object MCTE_settings {
         HYPERSTORM_MAX_ARC_CHARGE_TIME = (LunaSettings.getFloat(modId,"MCTE_hyperstormMaxChargeTime"))!!.coerceAtLeast(HYPERSTORM_MIN_ARC_CHARGE_TIME)
         HYPERSTORM_ARC_FORCE = LunaSettings.getFloat(modId,"MCTE_hyperstormLightningForce")!!
         HYPERSTORM_SPEED_THRESHOLD = LunaSettings.getFloat(modId,"MCTE_hyperstormSpeedThreshold")!!
+        HYPERSTORM_PRIMARY_RANDOMNESS_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormPrimaryRandomnessThreshold")!!/100
 
         HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = LunaSettings.getInt(modId,"MCTE_refinementIterations")!!
 
