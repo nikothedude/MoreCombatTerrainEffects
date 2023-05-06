@@ -24,7 +24,6 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFiel
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.utils.MCTE_debugUtils
-import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
 import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
@@ -60,6 +59,7 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
+import niko.MCTE.utils.MCTE_mathUtils.expandInRadius
 import niko.MCTE.utils.MCTE_nebulaUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector
@@ -282,51 +282,13 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             pluginToStorming[plugin] = isStorming
         }
         if (canAddScript) {
-            val deepHyperspaceNebulas: MutableMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
-
-            val stormingNebulaeToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
-            val stormingNebulae: MutableSet<MutableSet<Cloud>> = HashSet()
-            for (mapOfCloudsToCentroid in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[mapOfCloudsToCentroid] == true) {
-                stormingNebulae += mapOfCloudsToCentroid.keys
-                stormingNebulaeToCentroid += mapOfCloudsToCentroid
-            }
-
-            val cloudCells = HashSet<cloudCell>()
-            for (cell in stormingNebulae) {
-                val centroid = getCellCentroidRepeatadly(nebula, cell)
-                if (centroid == null) {
-                    MCTE_debugUtils.displayError("centroid null when making params")
-                    continue
-                }
-                val radius = getRadiusOfCell(cell, nebula, centroid)
-                val cloudCell = cloudCell(
-                    centroid,
-                    radius,
-                    cell
-                )
-                cloudCells += cloudCell
-            }
+            val cloudCells: MutableSet<cloudCell> = instantiateDeephyperspaceNebulae(pluginToStorming)
             val hyperspacePlugin = deepHyperspaceEffectScript(cloudCells)
             hyperspacePlugin.start()
         }
     }
 
-    private fun getCellCentroidRepeatadly(nebula: CombatNebulaAPI?, cell: MutableSet<Cloud>): Vector2f? {
-        if (nebula == null) {
-            MCTE_debugUtils.displayError("nebula null during centroid repeat")
-            return Vector2f(0f, 0f)
-        }
-        val amountOfTimes = HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
-        var centroid = getCellCentroid(nebula, cell)
-        var indexVal = 0
-        while (indexVal < amountOfTimes) {
-            indexVal++
-            centroid = getCellCentroid(nebula, cell, centroid)
-        }
-        return centroid
-    }
-
-    fun getRadiusOfHyperstorms(cellMap: MutableMap<MutableSet<Cloud>, Vector2f>, nebula: CombatNebulaAPI): MutableMap<MutableSet<Cloud>, Float> {
+   /* fun getRadiusOfHyperstorms(cellMap: MutableMap<MutableSet<Cloud>, Vector2f>, nebula: CombatNebulaAPI): MutableMap<MutableSet<Cloud>, Float> {
         val cellsToRadius = HashMap<MutableSet<Cloud>, Float>()
         for (cell in cellMap.keys) {
             val centroid = cellMap[cell]
@@ -338,14 +300,14 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             cellsToRadius[cell] = radius
         }
         return cellsToRadius
-    }
+    }*/
 
-    private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> {
-        val nebulaManager = (engine.nebula as? A ?: return HashMap())
+    private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): MutableSet<cloudCell> {
+        val nebulaManager = (engine.nebula as? A ?: return HashSet())
         val mapHeight = engine.mapHeight
         val mapWidth = engine.mapWidth
 
-        val deepHyperspaceNebulae = HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean>()
+        val cloudCells = HashSet<cloudCell>()
 
         for (plugin in pluginToStorming.keys) {
             val isStorming = (pluginToStorming[plugin] == true)
@@ -370,23 +332,28 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 var radius = 100f + random.nextFloat() * 400f
                 radius += 100f + 500f * random.nextFloat()
 
-                nebulaManager.spawnCloud(Vector2f(x, y), radius)
-                val nebula: Cloud = nebulaManager.getCloud(x, y) as Cloud
+                val cellSize: Float = nebulaManager.tileSizeInPixels
+                if (cellSize == 0f) return HashSet() // why can this happen
 
-                val cellToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
-                val nebulaCell: MutableSet<Cloud> = HashSet()
-                nebulaCell += nebula
-                var possibleCellInhabitant = nebula.flowDest //TODO: tesssst
-                while (possibleCellInhabitant != null) {
-                    nebulaCell += possibleCellInhabitant
-                    possibleCellInhabitant = possibleCellInhabitant.flowDest
+                val radiusInTiles: Int = (radius / cellSize).toInt()
+
+                val tilesForClouds = tile.expandInRadius(radiusInTiles)
+
+                val nebulaCell: MutableSet<CloudAPI> = HashSet()
+                for (potentialTile in tilesForClouds) {
+                    nebulaManager.spawnCloud(Vector2f(x, y), radius) // the center
+                    val cloud = nebulaManager.getCloud(potentialTile[0], potentialTile[1]) ?: continue
+                    nebulaCell += cloud
                 }
-                val cellCentroid = getCellCentroid(nebulaManager, nebulaCell) ?: return deepHyperspaceNebulae
-                cellToCentroid[nebulaCell] = cellCentroid
-                deepHyperspaceNebulae[cellToCentroid] = isStorming
+                val coreCloud: CloudAPI = nebulaManager.getCloud(tile[0], tile[1])
+
+                val finalRadius = getRadiusOfCell(nebulaCell, tile, nebulaManager)
+                val cloudCellInstance = cloudCell(coreCloud, nebulaCell, finalRadius)
+
+                cloudCells += cloudCellInstance
             }
         }
-        return deepHyperspaceNebulae
+        return cloudCells
     }
 
     /* private fun instantiateDeephyperspaceNebulae(

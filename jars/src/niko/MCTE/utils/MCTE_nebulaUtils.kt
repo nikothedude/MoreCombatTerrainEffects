@@ -4,10 +4,13 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.BoundsAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
+import com.fs.starfarer.api.combat.CombatNebulaAPI.CloudAPI
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import com.fs.starfarer.combat.entities.terrain.A
 import org.lazywizard.lazylib.MathUtils
+import org.lazywizard.lazylib.ext.plus
 import org.lazywizard.lazylib.ext.plusAssign
+import org.lwjgl.util.vector.Vector
 import org.lwjgl.util.vector.Vector2f
 import java.lang.IllegalArgumentException
 import kotlin.math.roundToInt
@@ -19,7 +22,7 @@ object MCTE_nebulaUtils {
     private const val failuresTilDecision = 900
     private const val incrementValue = 1
 
-    fun getCellCentroid(nebulaHandler: CombatNebulaAPI, nebulaCell: MutableSet<Cloud>, ourCoordinates: Vector2f? = null): Vector2f? {
+   /* fun getCellCentroid(nebulaHandler: CombatNebulaAPI, nebulaCell: MutableSet<Cloud>, ourCoordinates: Vector2f? = null): Vector2f? {
         if (nebulaHandler is A) {
             var ourCoordinates = ourCoordinates
             if (ourCoordinates == null) {
@@ -42,7 +45,7 @@ object MCTE_nebulaUtils {
         return null
     }
 
-    fun getTopCoord(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
+    fun getTopCoord(nebulaHandler: A, nebulaCell: MutableSet<CloudAPI>, rayCastCoordinate: Vector2f): Vector2f {
         var failureIndex = 0
 
         val cachedRayCastCoordinate = Vector2f(rayCastCoordinate)
@@ -132,9 +135,9 @@ object MCTE_nebulaUtils {
         }
 
         return cachedRayCastCoordinate
-    }
+    } */
 
-    fun digToSeeIfCloudInCell(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, cloud: Cloud?): Boolean {
+    fun digToSeeIfCloudInCell(nebulaHandler: A, nebulaCell: MutableSet<CloudAPI>, cloud: Cloud?): Boolean {
         if (cloud == null) return false
 
         var possibleCellInhabitant = cloud.flowDest
@@ -147,24 +150,58 @@ object MCTE_nebulaUtils {
         return false
     }
 
-    fun getRadiusOfCell(cell: MutableSet<Cloud>, nebula: CombatNebulaAPI, centroid: Vector2f): Float {
-        if (nebula is A) {
-            val topCoord = getTopCoord(nebula, cell, Vector2f(centroid))
-            val bottomCoord = getBottomCoord(nebula, cell, Vector2f(centroid))
-            val leftCoord = getLeftCoord(nebula, cell, Vector2f(centroid))
-            val rightCoord = getRightCoord(nebula, cell, Vector2f(centroid))
+    fun getRadiusOfCell(cell: Set<CloudAPI>, coreTile: IntArray, nebula: CombatNebulaAPI): Float {
+        var currentCloud: CloudAPI? = nebula.getCloud(coreTile[0], coreTile[1]) ?: return 0f
+        val center = currentCloud!!.location
+        if (currentCloud !in cell) return 0f
 
-            val combinedValue = (
-                    MathUtils.getDistance(topCoord, centroid) +
-                            MathUtils.getDistance(bottomCoord, centroid) +
-                            MathUtils.getDistance(leftCoord, centroid) +
-                            MathUtils.getDistance(rightCoord, centroid)
-                    )/4
+        val currentTile = coreTile.copyOf()
 
-            return combinedValue
+        while (true) {
+            currentCloud = nebula.getCloud(currentTile[0] + 1, currentTile[1])
+            if (currentCloud == null || currentCloud !in cell) {
+                break
+            }
+            currentTile[0]++
         }
-        MCTE_debugUtils.displayError("$nebula, nebula failed cast to A")
-        return 0f
+        var rightBound = getCoordinatesFromNebulaTile(currentTile) ?: Vector2f(0f, 0f)
+        currentTile[0] = coreTile[0]
+        currentTile[1] = coreTile[1]
+        while (true) {
+            currentCloud = nebula.getCloud(currentTile[0] - 1, currentTile[1])
+            if (currentCloud == null || currentCloud !in cell) {
+                break
+            }
+            currentTile[0]--
+        }
+        val leftBound = getCoordinatesFromNebulaTile(currentTile) ?: Vector2f(0f, 0f)
+        currentTile[0] = coreTile[0]
+        currentTile[1] = coreTile[1]
+        while (true) {
+            currentCloud = nebula.getCloud(currentTile[0], currentTile[1] + 1)
+            if (currentCloud == null || currentCloud !in cell) {
+                break
+            }
+            currentTile[1]++
+        }
+        val upperBound = getCoordinatesFromNebulaTile(currentTile) ?: Vector2f(0f, 0f)
+        currentTile[0] = coreTile[0]
+        currentTile[1] = coreTile[1]
+        while (true) {
+            currentCloud = nebula.getCloud(currentTile[0], currentTile[1] - 1)
+            if (currentCloud == null || currentCloud !in cell) {
+                break
+            }
+            currentTile[1]--
+        }
+        val lowerBound = getCoordinatesFromNebulaTile(currentTile) ?: Vector2f(0f, 0f)
+        currentTile[0] = coreTile[0]
+        currentTile[1] = coreTile[1]
+
+        return (MathUtils.getDistance(upperBound, center) +
+                MathUtils.getDistance(lowerBound, center) +
+                MathUtils.getDistance(rightBound, center) +
+                MathUtils.getDistance(leftBound, center))/4
     }
 
     @JvmStatic
@@ -184,6 +221,24 @@ object MCTE_nebulaUtils {
             }
         }
         return tiles
+    }
+
+    fun getCoordinatesFromNebulaTile(tile: IntArray): Vector2f? {
+        val engine = Global.getCombatEngine() ?: return null
+        val nebula = engine.nebula ?: return null
+        //val height: Float = engine.mapHeight + (MCTE_shipUtils.NEBULA_BUFFER_SIZE * 2f)
+        //val width: Float = engine.mapWidth + (MCTE_shipUtils.NEBULA_BUFFER_SIZE * 2f)
+
+        val cellSize: Float = nebula.tileSizeInPixels
+        if (cellSize == 0f) return null // why can this happen
+
+        var modifiedX = 0f
+        var modifiedY = 0f
+
+        modifiedX = (tile[0] * cellSize)
+        modifiedY = (tile[1] * cellSize)
+
+        return Vector2f(modifiedX, modifiedY)
     }
 
     @JvmStatic
