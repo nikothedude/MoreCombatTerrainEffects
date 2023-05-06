@@ -1,3 +1,9 @@
+1.2.2:
+Fixes a long-standing bug with pulsars making weapons do infinite EMP damage (finally)
+Adjusts hyperstorm targetting math again
+
+Adjusts default lunalib settings, please reset your configs to default
+
 1.2.1:
 Update to newest version, again
 

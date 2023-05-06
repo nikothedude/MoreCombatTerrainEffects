@@ -401,12 +401,11 @@ class deepHyperspaceEffectScript(
 
         val modifiedMass = (shipOrMissile.mass - 30).coerceAtLeast(minMass)
         val difference = (((modifiedMass - HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD) / (HYPERSTORM_SPEED_THRESHOLD)) - HYPERSTORM_SPEED_THRESHOLD)
-        val modifiedSpeedThreshold = MathUtils.clamp((HYPERSTORM_SPEED_THRESHOLD - difference), 3f, HYPERSTORM_SPEED_THRESHOLD)
+        val modifiedSpeedThreshold = MathUtils.clamp((HYPERSTORM_SPEED_THRESHOLD - difference), 1f, HYPERSTORM_SPEED_THRESHOLD)
 
         modifier *= MathUtils.clamp((speed - modifiedSpeedThreshold) * HYPERSTORM_SPEED_TARGETTING_COEFFICIENT, 0f, HYPERSTORM_SPEED_MAX_TARGETTING_MULT)
-        modifier *= MathUtils.clamp(((modifiedMass)* HYPERSTORM_MASS_TARGETTING_COEFFICIENT), 0.3f, HYPERSTORM_MASS_MAX_TARGETTING_MULT)
-
         if (modifier <= 0f) return modifier.coerceAtLeast(0f)
+        modifier += MathUtils.clamp(((modifiedMass)* HYPERSTORM_MASS_TARGETTING_COEFFICIENT), 0.0f, HYPERSTORM_MASS_MAX_TARGETTING_MULT)
 
         modifier *= MathUtils.getRandomNumberInRange(0.8f, 1.2f)
 

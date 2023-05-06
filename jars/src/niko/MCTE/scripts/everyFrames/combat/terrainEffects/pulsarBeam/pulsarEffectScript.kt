@@ -42,7 +42,7 @@ class pulsarEffectScript(
     private val color = Color(159, 255, 231, 255)
 
     private val chargedProjectiles: MutableMap<DamagingProjectileAPI, Float> = HashMap()
-    private val chargedWeapons: MutableMap<WeaponAPI, Float> = HashMap()
+    private val chargedWeapons: MutableMap<DamageAPI, Float> = HashMap()
     var overallIntensity: Float = 0f
 
     val timer: IntervalUtil = IntervalUtil(0.15f, 0.15f)
@@ -63,7 +63,7 @@ class pulsarEffectScript(
     }
 
     class pulsarEffectRemovalScript(
-        val chargedWeapons: MutableMap<WeaponAPI, Float>
+        val chargedWeapons: MutableMap<DamageAPI, Float>
     ): EveryFrameScript {
         var done: Boolean = false
         override fun isDone(): Boolean {
@@ -76,9 +76,8 @@ class pulsarEffectScript(
 
         override fun advance(amount: Float) {
             if (Global.getCurrentState() == GameState.COMBAT) return
-            for (weapon in chargedWeapons.keys) {
-                val fluxDamage = chargedWeapons[weapon] ?: continue
-                val damage = weapon.damage
+            for (damage in chargedWeapons.keys) {
+                val fluxDamage = chargedWeapons[damage] ?: continue
                 damage.fluxComponent -= fluxDamage
             }
             stop()
@@ -142,7 +141,7 @@ class pulsarEffectScript(
     private fun isChargedProjectile(projectile: DamagingProjectileAPI): Boolean {
         if (chargedProjectiles[projectile] != null) return true
         val weapon: WeaponAPI? = projectile.weapon
-        if (weapon != null && chargedWeapons[weapon] != null) return true
+        if (weapon != null && chargedWeapons[weapon.damage] != null) return true
         return false
     }
 
@@ -157,8 +156,8 @@ class pulsarEffectScript(
     private fun getChargeForProjectile(projectile: DamagingProjectileAPI): Float {
         val weapon: WeaponAPI? = projectile.weapon
         if (weapon != null) {
-            if (chargedWeapons[weapon] != null) {
-                return chargedWeapons[weapon]!!
+            if (chargedWeapons[weapon.damage] != null) {
+                return chargedWeapons[weapon.damage]!!
             }
         } else {
             val source: ShipAPI? = projectile.source
@@ -172,7 +171,7 @@ class pulsarEffectScript(
 
     private fun chargeWeapons(ship: ShipAPI, mutableStats: MutableShipStatsAPI) {
         for (weapon: WeaponAPI in ship.allWeapons) {
-            if (chargedWeapons[weapon] == null) {
+            if (chargedWeapons[weapon.damage] == null) {
                 chargeWeapon(ship, weapon)
             }
         }
@@ -181,7 +180,7 @@ class pulsarEffectScript(
     private fun chargeWeapon(ship: ShipAPI, weapon: WeaponAPI) {
         val empAmount: Float = getChargeForWeapon(ship, weapon)
         weapon.damage.fluxComponent += empAmount
-        chargedWeapons[weapon] = empAmount
+        chargedWeapons[weapon.damage] = empAmount
     }
 
     private fun getChargeForWeapon(ship: ShipAPI, weapon: WeaponAPI): Float {
@@ -405,7 +404,7 @@ class pulsarEffectScript(
         if (chargedProjectiles[projectile] != null) return chargedProjectiles[projectile]!!
         val weapon = projectile.weapon
         if (weapon != null) {
-            if (chargedWeapons[weapon] != null) return chargedWeapons[weapon]!!
+            if (chargedWeapons[weapon.damage] != null) return chargedWeapons[weapon.damage]!!
         }
         return 0f
     }
