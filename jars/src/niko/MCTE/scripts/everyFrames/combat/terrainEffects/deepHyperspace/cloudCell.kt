@@ -1,5 +1,6 @@
 package niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace
 
+import com.fs.starfarer.api.Global
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.settings.MCTE_settings
 import org.lazywizard.lazylib.MathUtils
@@ -19,19 +20,20 @@ class cloudCell(
     var preparationScript: hyperstormArcPreparation? = null
 
     fun getArcSite(): Vector2f {
-        val radius: Float = radius
-        val ourCoordinates = centroid
-        val currentx = ourCoordinates.x
-        val minx = currentx - radius/1.1f
-        val maxx = currentx + radius/1.1f
-        val currenty = ourCoordinates.y
-        val miny = currenty - radius/1.1f
-        val maxy = currenty + radius/1.1f
+        val engine = Global.getCombatEngine() ?: return Vector2f(0f, 0f)
+        val nebula = engine.nebula ?: return Vector2f(0f, 0f)
 
-        val adjustedx = (minx + MathUtils.getRandom().nextFloat() * (maxx - minx))
-        val adjustedy = (miny + MathUtils.getRandom().nextFloat() * (maxy - miny))
+        val randomLocation = clouds.randomOrNull()?.location ?: return Vector2f(0f, 0f)
 
-        val arcSite = Vector2f(adjustedx, adjustedy)
+        val upperBoundX: Float = (randomLocation.x) + (nebula.tileSizeInPixels)/2
+        val lowerBoundX: Float = (randomLocation.x) - (nebula.tileSizeInPixels)/2
+        val upperBoundY = (randomLocation.y) + (nebula.tileSizeInPixels)/2
+        val lowerBoundY = (randomLocation.y) - (nebula.tileSizeInPixels)/2
+
+        val randX = MathUtils.getRandomNumberInRange(lowerBoundX, upperBoundX)
+        val randY = MathUtils.getRandomNumberInRange(lowerBoundY, upperBoundY)
+
+        val arcSite = Vector2f(randX, randY)
         return arcSite
     }
 

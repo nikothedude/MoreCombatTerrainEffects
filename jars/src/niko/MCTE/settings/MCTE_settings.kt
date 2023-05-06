@@ -78,7 +78,13 @@ object MCTE_settings {
     var HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = 2500
     var HYPERSTORM_ARC_FORCE: Float = 2000f
     var HYPERSTORM_SPEED_THRESHOLD: Float = 10f
+    var HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD: Float = 400f
     var HYPERSTORM_PRIMARY_RANDOMNESS_MULT: Float = 0.2f
+
+    var HYPERSTORM_MASS_TARGETTING_COEFFICIENT: Float = 0.01f
+    var HYPERSTORM_SPEED_TARGETTING_COEFFICIENT: Float = 0.3f
+    var HYPERSTORM_MASS_MAX_TARGETTING_MULT: Float = 8f
+    var HYPERSTORM_SPEED_MAX_TARGETTING_MULT: Float = 6f
 
     var EMP_DAMAGE_FEAR_MULT: Float = 0.3f
 
@@ -176,6 +182,11 @@ object MCTE_settings {
         HYPERSTORM_MAX_ARC_CHARGE_TIME = (LunaSettings.getFloat(modId,"MCTE_hyperstormMaxChargeTime"))!!.coerceAtLeast(HYPERSTORM_MIN_ARC_CHARGE_TIME)
         HYPERSTORM_ARC_FORCE = LunaSettings.getFloat(modId,"MCTE_hyperstormLightningForce")!!
         HYPERSTORM_SPEED_THRESHOLD = LunaSettings.getFloat(modId,"MCTE_hyperstormSpeedThreshold")!!
+        HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD = LunaSettings.getFloat(modId, "MCTE_hyperstormSpeedUntargetabilityThreshold")!!
+        HYPERSTORM_MASS_TARGETTING_COEFFICIENT = LunaSettings.getFloat(modId, "MCTE_hyperstormMassTargettingCoefficient")!!
+        HYPERSTORM_SPEED_TARGETTING_COEFFICIENT = LunaSettings.getFloat(modId, "MCTE_hyperstormSpeedTargettingCoefficient")!!
+        HYPERSTORM_MASS_MAX_TARGETTING_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormMassTargettingMaxMult")!!
+        HYPERSTORM_SPEED_MAX_TARGETTING_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormSpeedTargettingMaxMult")!!
         HYPERSTORM_PRIMARY_RANDOMNESS_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormPrimaryRandomnessThreshold")!!/100
 
         HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = LunaSettings.getInt(modId,"MCTE_refinementIterations")!!

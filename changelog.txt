@@ -1,3 +1,16 @@
+1.2.1:
+Update to newest version, again
+
+Hyperstorm nebula creation now works better and can even arc across clouds
+Hyperstorm targetting now lowers your speed-to-not-get-hit threshold if your mass is above the given threshold
+
+New lunalib settings:
+Untargetability mass threshold
+Targetting coefficient: Mass
+Maximum multiplier: Mass
+Targetting coefficient: Speed
+Maximum multiplier: Speed
+
 1.2.0:
 Update to Starsector 0.96a
 Updated LunaLib config, sliders now work woo

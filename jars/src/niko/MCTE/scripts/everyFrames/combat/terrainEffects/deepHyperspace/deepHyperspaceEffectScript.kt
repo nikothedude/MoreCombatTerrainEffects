@@ -7,20 +7,30 @@ import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.fleet.FleetMemberType
 import com.fs.starfarer.api.impl.campaign.ids.Personalities
 import com.fs.starfarer.api.impl.campaign.ids.Stats
+import com.fs.starfarer.api.util.IntervalUtil
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
-import niko.MCTE.utils.MCTE_arcUtils.arc
-import niko.MCTE.utils.MCTE_arcUtils.cosmeticArc
-import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EMP_DAMAGE
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_ENERGY_DAMAGE
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_GRACE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_MASS_MAX_TARGETTING_MULT
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_MASS_TARGETTING_COEFFICIENT
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_PRIMARY_RANDOMNESS_MULT
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_SPEED_MAX_TARGETTING_MULT
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_SPEED_TARGETTING_COEFFICIENT
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_SPEED_THRESHOLD
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD
 import niko.MCTE.settings.MCTE_settings.MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
+import niko.MCTE.utils.MCTE_arcUtils.arc
+import niko.MCTE.utils.MCTE_arcUtils.cosmeticArc
+import niko.MCTE.utils.MCTE_mathUtils.roundTo
+import niko.MCTE.utils.MCTE_shipUtils
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import org.lazywizard.lazylib.MathUtils
+import org.lwjgl.opengl.GL11.*
 import org.lwjgl.util.vector.Vector2f
+import java.awt.Color
+
 
 class deepHyperspaceEffectScript(
     val stormingCells: MutableSet<cloudCell>,
@@ -61,6 +71,7 @@ class deepHyperspaceEffectScript(
         }
     }
 
+    val textinterval = IntervalUtil(2f, 2f)
     override fun applyEffects(amount: Float) {
         handleWarnedShips(amount)
         for (cell in ArrayList(stormingCells)) {
@@ -68,8 +79,70 @@ class deepHyperspaceEffectScript(
             tryToArc(cell, amount)
         }
         decrementGracePeriods(amount)
+
+
+        if (Global.getSettings().isDevMode) {
+            var cantext = false
+            textinterval.advance(amount)
+            if (textinterval.intervalElapsed()) cantext = true
+
+            val nebulaGrid = Global.getCombatEngine().nebula
+            val height: Float = Global.getCombatEngine().mapHeight + MCTE_shipUtils.NEBULA_BUFFER_SIZE * 2f
+            val width: Float = Global.getCombatEngine().mapWidth + MCTE_shipUtils.NEBULA_BUFFER_SIZE * 2f
+            val cellSize = nebulaGrid.tileSizeInPixels
+            val xSize = nebulaGrid.tilesWide
+            val ySize = nebulaGrid.tilesHigh
+
+            val xStart = -height / 2
+            val yStart = -width / 2
+
+            if (cantext) {
+                for (x in 0 until xSize) {
+                    for (y in 0 until ySize) {
+                        val cloud = nebulaGrid.getCloud(x, y) ?: continue
+                        engine.addFloatingText(cloud.location, "b", 10f, Color.GREEN, null, 0f, 0.5f)
+
+                    }
+                }
+            }
+
+            if (cantext) {
+                for (cell in stormingCells) {
+                    val random = MathUtils.getRandom()
+                    val r = random.nextFloat()
+                    val g = random.nextFloat()
+                    val b = random.nextFloat()
+
+                    engine.addFloatingText(cell.centroid, "CENTROID", 70f, Color(r, g, b), null, 0f, 0.0f)
+                    for (cloud in cell.clouds) {
+                        val cloudLoc = cloud.location
+                        engine.addFloatingText(cloudLoc, "aa", 30f, Color(r, g, b), null, 0f, 0.0f)
+
+                        /* val tile = MCTE_nebulaUtils.getNebulaTile(cloudLoc)
+                val p1 = Vector2f(cloudLoc.x + cellSize, cloudLoc.y + cellSize)
+                val p2 = Vector2f(cloudLoc.x - cellSize, cloudLoc.y - cellSize)
+                //drawRect(p1, p2, p3, p4)
+
+                drawRect(
+                    Vector2f(xStart + cellSize * tile!![0], yStart + cellSize * tile[1]),
+                    Vector2f(xStart + cellSize * tile!![0] + cellSize, yStart + cellSize * tile[1] + cellSize)
+                ) */
+                    }
+                }
+            }
+        }
     }
 
+    fun drawRect(bl: Vector2f, br: Vector2f, tr: Vector2f? = null, tl: Vector2f? = null) {
+        glBegin(GL_LINE_LOOP)
+
+        glVertex2f(bl.x, bl.y);
+        glVertex2f(br.x, bl.y);
+        glVertex2f(br.x, bl.y);
+        glVertex2f(bl.x, br.y);
+
+        glEnd();
+    }
     private fun handleWarnedShips(amount: Float) {
         val shipIterator = warnedShipsToCells.keys.iterator()
         while (shipIterator.hasNext()) {
@@ -196,7 +269,7 @@ class deepHyperspaceEffectScript(
         val currentHull = ship.hullLevel
         if (actualDamage > currentHull*2.3) modifier += 4f
 
-        val score = ((((actualDamage) + (empDamage* MCTE_settings.EMP_DAMAGE_FEAR_MULT)))/hullEfficiency)*modifier
+        val score = ((((actualDamage) + (empDamage * MCTE_settings.EMP_DAMAGE_FEAR_MULT)))/hullEfficiency)*modifier
 
         return (MCTE_settings.getHyperstormFearThreshold() <= score)
     }
@@ -323,9 +396,15 @@ class deepHyperspaceEffectScript(
         if (!shipOrMissile.isTangible()) return 0f
         val speed = shipOrMissile.velocity.length()
         var modifier: Float = 1f
-        modifier *= MathUtils.clamp((((speed - HYPERSTORM_SPEED_THRESHOLD)/HYPERSTORM_SPEED_THRESHOLD)), 0f, 3f)
-        val modifiedMass = (shipOrMissile.mass - 30).coerceAtLeast(5f)
-        modifier *= ((modifiedMass)/10).coerceAtLeast(0.001f)
+
+        val minMass = 5f
+
+        val modifiedMass = (shipOrMissile.mass - 30).coerceAtLeast(minMass)
+        val difference = (((modifiedMass - HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD) / (HYPERSTORM_SPEED_THRESHOLD)) - HYPERSTORM_SPEED_THRESHOLD)
+        val modifiedSpeedThreshold = MathUtils.clamp((HYPERSTORM_SPEED_THRESHOLD - difference), 3f, HYPERSTORM_SPEED_THRESHOLD)
+
+        modifier *= MathUtils.clamp((speed - modifiedSpeedThreshold) * HYPERSTORM_SPEED_TARGETTING_COEFFICIENT, 0f, HYPERSTORM_SPEED_MAX_TARGETTING_MULT)
+        modifier *= MathUtils.clamp(((modifiedMass)* HYPERSTORM_MASS_TARGETTING_COEFFICIENT), 0.3f, HYPERSTORM_MASS_MAX_TARGETTING_MULT)
 
         if (modifier <= 0f) return modifier.coerceAtLeast(0f)
 

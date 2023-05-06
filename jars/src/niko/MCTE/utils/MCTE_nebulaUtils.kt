@@ -10,6 +10,8 @@ import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.ext.plusAssign
 import org.lwjgl.util.vector.Vector2f
 import java.lang.IllegalArgumentException
+import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 object MCTE_nebulaUtils {
@@ -18,6 +20,39 @@ object MCTE_nebulaUtils {
 
     private const val failuresTilDecision = 900
     private const val incrementValue = 1
+
+    fun Cloud.getCloudsInRadius(radiusInTiles: Int, nebulaHandler: CombatNebulaAPI): MutableSet<Cloud> {
+        val coreTile = getNebulaTile(location) ?: return HashSet()
+        val cloudsToReturn = HashSet<Cloud>()
+
+        val halvedRadius: Int = (ceil(radiusInTiles/2f)).toInt()
+
+        val startingX = (coreTile[0] - halvedRadius)
+        val startingY = (coreTile[1] - halvedRadius)
+
+        val endingX = (coreTile[0] + halvedRadius)
+        val endingY = (coreTile[1] + halvedRadius)
+
+        var currX = startingX
+        var currY = startingY
+
+        while (true) {
+            while(currY++ < endingY) {
+                if (abs(coreTile[1] - currY) > radiusInTiles)
+                    break
+                val cloud = nebulaHandler.getCloud(currX, currY) as? Cloud ?: continue
+                cloudsToReturn += cloud
+            }
+            currX++
+            if (abs(coreTile[0] - currX) > radiusInTiles)
+                break
+            val cloud = nebulaHandler.getCloud(currX, currY) as? Cloud
+            if (cloud != null) cloudsToReturn += cloud
+            if (currX >= endingX) break
+            currY = startingY
+        }
+        return cloudsToReturn
+    }
 
     fun getCellCentroid(nebulaHandler: CombatNebulaAPI, nebulaCell: MutableSet<Cloud>, ourCoordinates: Vector2f? = null): Vector2f? {
         if (nebulaHandler is A) {

@@ -61,6 +61,7 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.utils.MCTE_nebulaUtils
+import niko.MCTE.utils.MCTE_nebulaUtils.getCloudsInRadius
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector
 import org.lwjgl.util.vector.Vector2f
@@ -370,11 +371,17 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 var radius = 100f + random.nextFloat() * 400f
                 radius += 100f + 500f * random.nextFloat()
 
+                val cellSize: Float = nebulaManager.tileSizeInPixels
+                if (cellSize == 0f) return HashMap() // why can this happen
+
+                val radiusInTiles: Int = (radius / cellSize).toInt()
+
                 nebulaManager.spawnCloud(Vector2f(x, y), radius)
                 val nebula: Cloud = nebulaManager.getCloud(x, y) as Cloud
 
+                val nebulaCell: MutableSet<Cloud> = nebula.getCloudsInRadius(radiusInTiles, engine.nebula)
+
                 val cellToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
-                val nebulaCell: MutableSet<Cloud> = HashSet()
                 nebulaCell += nebula
                 var possibleCellInhabitant = nebula.flowDest //TODO: tesssst
                 while (possibleCellInhabitant != null) {
