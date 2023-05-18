@@ -6,6 +6,7 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.combat.listeners.DamageDealtModifier
 import com.fs.starfarer.api.impl.campaign.ids.Stats
+import com.fs.starfarer.api.impl.campaign.ids.Stats.CORONA_EFFECT_MULT
 import com.fs.starfarer.api.impl.campaign.terrain.PulsarBeamTerrainPlugin
 import com.fs.starfarer.api.util.IntervalUtil
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
@@ -17,6 +18,7 @@ import niko.MCTE.utils.MCTE_miscUtils.getAllObjects
 import niko.MCTE.settings.MCTE_settings.PULSAR_BASE_FORCE
 import niko.MCTE.settings.MCTE_settings.PULSAR_FORCE_ENABLED
 import niko.MCTE.settings.MCTE_settings.PULSAR_PPT_COMPENSATION
+import niko.MCTE.settings.MCTE_settings.SOLAR_SHIELDING_EFFECT_MULT
 import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
@@ -336,9 +338,13 @@ class pulsarEffectScript(
     }
 
     private fun getEffectMultForShip(ship: ShipAPI): Float {
-        val coronaMult = ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
 
-        return coronaMult
+        val baseEffect = (ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).baseValue)
+        val currentEffect = (ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue)
+        val solarShieldingEffect = (baseEffect - currentEffect) * SOLAR_SHIELDING_EFFECT_MULT
+        val adjustedEffect = (baseEffect - solarShieldingEffect)
+
+        return adjustedEffect
     }
 
     override fun handleNotification(amount: Float): Boolean {

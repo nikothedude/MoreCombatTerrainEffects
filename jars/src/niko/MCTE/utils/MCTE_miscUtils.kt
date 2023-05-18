@@ -17,7 +17,6 @@ object MCTE_miscUtils {
         }
         return debrisFieldShipSourcePicker
     }
-
     private fun buildDebrisFieldSource() {
         val sector = Global.getSector() ?: return MCTE_debugUtils.displayError("buildDebrisFieldSource called with null sector")
         val settings = Global.getSettings()
@@ -41,7 +40,6 @@ object MCTE_miscUtils {
             }
         }
     }
-
     fun CombatEngineAPI.getAllObjects(): MutableSet<CombatEntityAPI> {
         val allEntities = HashSet<CombatEntityAPI>()
         allEntities.addAll(listOf(ships, projectiles, asteroids).flatten())

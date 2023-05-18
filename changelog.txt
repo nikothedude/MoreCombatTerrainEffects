@@ -1,3 +1,15 @@
+1.2.3:
+
+New settings:
+
+Solar Shielding Effect Mult: Control the multipler applied to solar shielding for effects that use them
+    E.g. Black holes
+
+Updated tips.json to reflect the fact we use lunalib
+
+Default lunalib settings changed
+    Nebula no longer removes zero flux boost
+
 1.2.2:
 Fixes a long-standing bug with pulsars making weapons do infinite EMP damage (finally)
 Adjusts hyperstorm targetting math again

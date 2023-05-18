@@ -14,7 +14,7 @@
 		  {"freq":1.0, "tip":"[More Combat Terrain Effects] Neutron stars' jet streams are incredibly hostile environments. Anything inside of them will suffer worse shield stats, random EMP arcs, worse CR, solar winds, and all projectiles having extra EMP damage."},
 		  {"freq":0.5, "tip":"[More Combat Terrain Effects] Solar shielding is effective in mitigating the in-combat effects of a neutron star's jetstream - but it does nothing to stop the supercharging of launched projectiles. Not that that's a bad thing!"},
 		  #{"freq":1, "tip":"[More Combat Terrain Effects] Oftentimes, debris fields are the aftermath of a battle. Fighting inside them can be a challenge, what with the large ship pieces floating around, leftover munitions/mines, drones with their combat program still active..."},
-		  {"freq":1.6, "tip":"[More Combat Terrain Effects] Literally EVERYTHING about this mod is configurable in MCTE_settings.json. From disabling/enabling effects individually, to tweaking their values, you have a lot of control!"},
+		  {"freq":1.6, "tip":"[More Combat Terrain Effects] Literally EVERYTHING about this mod is configurable via LunaLib, using the F10 key. From disabling/enabling effects individually, to tweaking their values, you have a lot of control!"},
 		  {"freq":0.0001, "tip":"[More Combat Terrain Effects] Unlike \"some\" modders, I prefix my annoying tips so you know which mod needs to have tips removed!"},
     ],
 }

@@ -14,6 +14,7 @@ import niko.MCTE.utils.MCTE_miscUtils.getAllObjects
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_BASE_GRAVITY
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_GRAVITY_ENABLED
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_PPT_COMPENSATION
+import niko.MCTE.settings.MCTE_settings.SOLAR_SHIELDING_EFFECT_MULT
 import niko.MCTE.utils.MCTE_miscUtils
 import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.terrainCombatEffectIds
@@ -106,8 +107,12 @@ class blackHoleEffectScript(
     }
 
     private fun getTimeMultForShip(ship: ShipAPI): Float {
-        val coronaEffect = ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue
-        return (timeMult*coronaEffect).coerceAtLeast(1f)
+        val baseEffect = (ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).baseValue)
+        val currentEffect = (ship.mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue)
+        val solarShieldingEffect = (baseEffect - currentEffect) * SOLAR_SHIELDING_EFFECT_MULT
+        val adjustedEffect = (baseEffect - solarShieldingEffect)
+
+        return (timeMult*adjustedEffect).coerceAtLeast(1f)
     }
 
     override fun handleNotification(amount: Float): Boolean {

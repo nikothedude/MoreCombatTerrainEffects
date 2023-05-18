@@ -18,6 +18,7 @@ object MCTE_settings {
 
     var SLIPSTREAM_AFFECT_INTANGIBLE: Boolean = true
     var SHOW_ERRORS_IN_GAME: Boolean = true
+    var SOLAR_SHIELDING_EFFECT_MULT: Float = 1f
     var MAG_FIELD_EFFECT_ENABLED: Boolean = true
     var DEEP_HYPERSPACE_EFFECT_ENABLED: Boolean = true
     var HYPERSTORM_EFFECT_ENABLED: Boolean = true
@@ -121,6 +122,7 @@ object MCTE_settings {
 
         SHOW_SIDEBAR_INFO = LunaSettings.getBoolean(modId, "MCTE_showSidebarInfo")!!
         SHOW_ERRORS_IN_GAME = LunaSettings.getBoolean(modId, "MCTE_showErrorsInGame")!!
+        SOLAR_SHIELDING_EFFECT_MULT = LunaSettings.getFloat(modId, "MCTE_solarShieldingMult")!!
         MAG_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_magneticFieldToggle")!!
         DEEP_HYPERSPACE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_deepHyperspaceToggle")!!
         HYPERSTORM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_hyperstormsToggle")!!

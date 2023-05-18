@@ -127,18 +127,20 @@ class nebulaEffectScript: baseTerrainEffectScript() {
         val playerShip = engine.playerShip ?: return false
         if (playerShip.isInsideNebulaAuxillary()) {
             val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
-            val zeroFluxString = if (playerShip.hasInsulatedEngines() && !shouldDisableZeroFluxBoost(playerShip)) {
-                "Insulated engines preventing loss of zero-flux boost and mitigating speed loss"
-            } else {
-                "Zero-flux boost disabled"
+            if (shouldDisableZeroFluxBoost(playerShip)) {
+                val zeroFluxString = if (playerShip.hasInsulatedEngines()) {
+                    "Insulated engines preventing loss of zero-flux boost and mitigating speed loss"
+                } else {
+                    "Zero-flux boost disabled"
+                }
+                engine.maintainStatusForPlayerShip(
+                    "niko_MCPE_nebulaEffect1",
+                    icon,
+                    "Nebula",
+                    zeroFluxString,
+                    true
+                )
             }
-            engine.maintainStatusForPlayerShip(
-                "niko_MCPE_nebulaEffect1",
-                icon,
-                "Nebula",
-                zeroFluxString,
-                true
-            )
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect2",
                 icon,
@@ -155,7 +157,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "niko_MCPE_nebulaEffect4",
                 icon,
                 "Nebula",
-                "Speed reduced by ${(getSpeedDecrementForShip(playerShip)).roundTo(2)} Su",
+                "Speed reduced by ${(-getSpeedDecrementForShip(playerShip)).roundTo(2)} Su",
                 true)
         }
         return true

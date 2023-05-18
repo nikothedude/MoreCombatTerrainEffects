@@ -21,6 +21,7 @@ import niko.MCTE.settings.MCTE_settings.HYPERSTORM_SPEED_TARGETTING_COEFFICIENT
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_SPEED_THRESHOLD
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD
 import niko.MCTE.settings.MCTE_settings.MAX_TIME_BETWEEN_HYPERSTORM_STRIKES
+import niko.MCTE.settings.MCTE_settings.SOLAR_SHIELDING_EFFECT_MULT
 import niko.MCTE.utils.MCTE_arcUtils.arc
 import niko.MCTE.utils.MCTE_arcUtils.cosmeticArc
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
@@ -386,7 +387,13 @@ class deepHyperspaceEffectScript(
         var mult = 1f
         if (entity is ShipAPI) {
             val mutableStats = entity.mutableStats
-            mult += mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue - 1
+
+            val baseEffect = (mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).baseValue)
+            val currentEffect = (mutableStats.dynamic.getStat(Stats.CORONA_EFFECT_MULT).modifiedValue)
+            val solarShieldingEffect = (baseEffect - currentEffect) * SOLAR_SHIELDING_EFFECT_MULT
+            val adjustedEffect = (baseEffect - solarShieldingEffect)
+
+            mult += (adjustedEffect - 1)
         }
 
         return mult
