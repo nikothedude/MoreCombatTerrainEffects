@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../SEEKER_UC/jar/SEEKER.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../SEEKER_UC/src" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,3 +1,32 @@
+1.2.4:
+
+Migrated most lunalib settings to json
+    Allows me to change settings between versions
+        If you had any custom settings, migrate them, please
+    Some settings may have been erronously changed in this migration
+    You can now use MCTE_reloadSettings config in-combat and some things may change to config
+
+New settings
+    Hyperstorm
+        MCTE_hyperstormTimesToArc: 5
+            The amount of arcs the final damaging arc will be split into
+                Higher = more spread out damage
+                High EMP damage values spread out across many points = devastating
+    Slipstream
+        Add SO range debuffs
+            If range threshold isnt modified, SO range is mimicked
+            Not guaranteed to always work, especially if you have psuedo-SO like forced overdrive from tahlan!
+
+Pulsar
+    EMP damage of projectiles -> 70 base
+        You REALLY feel the damage, now
+Hyperstorm
+    Range of arcs -> 1200 from 1000
+    Min/Max strike timers -> 2/5 from 5/7
+    Grace period -> 3 from 5
+    Arc emp damage -> 12000
+        For such a rare effect, you'd better bet the effects are gonna be pretty significant
+
 1.2.3:
 
 New settings:

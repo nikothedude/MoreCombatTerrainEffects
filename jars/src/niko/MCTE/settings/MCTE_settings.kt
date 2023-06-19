@@ -2,10 +2,8 @@ package niko.MCTE.settings
 
 import com.fs.starfarer.api.Global
 import lunalib.lunaSettings.LunaSettings
-import niko.MCTE.utils.MCTE_debugUtils
-import niko.MCTE.utils.MCTE_ids
+import niko.MCTE.utils.MCTE_ids.masterConfig
 import niko.MCTE.utils.MCTE_ids.modId
-import niko.MCTE.utils.terrainScriptsTracker
 import org.json.JSONException
 import org.lazywizard.lazylib.ext.json.getFloat
 import java.io.IOException
@@ -56,6 +54,7 @@ object MCTE_settings {
     var SLIPSTREAM_INCREASE_TURN_RATE: Boolean = false
     var SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST: Boolean = false
     var SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST: Boolean = false
+    var SLIPSTREAM_REDUCE_WEAPON_RANGE: Boolean = true
     //NEBULA SETTINGS
     var NEBULA_VISION_MULT: Float = 0.8f
 
@@ -81,6 +80,8 @@ object MCTE_settings {
     var HYPERSTORM_SPEED_THRESHOLD: Float = 10f
     var HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD: Float = 400f
     var HYPERSTORM_PRIMARY_RANDOMNESS_MULT: Float = 0.2f
+
+    var HYPERSTORM_TIMES_TO_ARC_AGAINST_SHIP = 5
 
     var HYPERSTORM_MASS_TARGETTING_COEFFICIENT: Float = 0.01f
     var HYPERSTORM_SPEED_TARGETTING_COEFFICIENT: Float = 0.3f
@@ -118,11 +119,12 @@ object MCTE_settings {
     @JvmStatic
     @Throws(JSONException::class, IOException::class, NullPointerException::class)
     fun loadSettings() {
+        val configJson = Global.getSettings().loadJSON(masterConfig)
         //MCTE_debugUtils.log.info("reloading settings")
 
-        SHOW_SIDEBAR_INFO = LunaSettings.getBoolean(modId, "MCTE_showSidebarInfo")!!
-        SHOW_ERRORS_IN_GAME = LunaSettings.getBoolean(modId, "MCTE_showErrorsInGame")!!
-        SOLAR_SHIELDING_EFFECT_MULT = LunaSettings.getFloat(modId, "MCTE_solarShieldingMult")!!
+        SHOW_SIDEBAR_INFO = configJson.getBoolean("MCTE_showSidebarInfo")!!
+        SHOW_ERRORS_IN_GAME = configJson.getBoolean( "MCTE_showErrorsInGame")!!
+        SOLAR_SHIELDING_EFFECT_MULT = configJson.getFloat( "MCTE_solarShieldingMult")!!
         MAG_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_magneticFieldToggle")!!
         DEEP_HYPERSPACE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_deepHyperspaceToggle")!!
         HYPERSTORM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_hyperstormsToggle")!!
@@ -134,82 +136,85 @@ object MCTE_settings {
         PULSAR_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_pulsarToggle")!!
 
         //MAGFIELD
-        MAGFIELD_VISION_MULT = LunaSettings.getFloat(modId,"MCTE_magneticFieldVisionMult")!!
-        MAGFIELD_MISSILE_MULT = LunaSettings.getFloat(modId,"MCTE_magneticFieldMissileGuidanceAndManeuverabilityMult")!!
-        MAGFIELD_RANGE_MULT = LunaSettings.getFloat(modId,"MCTE_magneticFieldWeaponAndFighterRangeMult")!!
-        MAGFIELD_ECCM_MULT = LunaSettings.getFloat(modId,"MCTE_magneticFieldECCMChanceMult")!!
-        MAGFIELD_MISSILE_SCRAMBLE_CHANCE = LunaSettings.getFloat(modId,"MCTE_magneticFieldMissileScrambleChance")!!
-        MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE = LunaSettings.getFloat(modId,"MCTE_magneticFieldMissileUnscrambleChance")!!
+        MAGFIELD_VISION_MULT = configJson.getFloat("MCTE_magneticFieldVisionMult")!!
+        MAGFIELD_MISSILE_MULT = configJson.getFloat("MCTE_magneticFieldMissileGuidanceAndManeuverabilityMult")!!
+        MAGFIELD_RANGE_MULT = configJson.getFloat("MCTE_magneticFieldWeaponAndFighterRangeMult")!!
+        MAGFIELD_ECCM_MULT = configJson.getFloat("MCTE_magneticFieldECCMChanceMult")!!
+        MAGFIELD_MISSILE_SCRAMBLE_CHANCE = configJson.getFloat("MCTE_magneticFieldMissileScrambleChance")!!
+        MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE = configJson.getFloat("MCTE_magneticFieldMissileUnscrambleChance")!!
         //MAGSTORM
-        MAGSTORM_VISION_MULT = LunaSettings.getFloat(modId,"MCTE_magneticStormVisionMult")!!
-        MAGSTORM_MISSILE_MULT = LunaSettings.getFloat(modId,"MCTE_magneticStormMissileGuidanceAndManeuverabilityMult")!!
-        MAGSTORM_RANGE_MULT = LunaSettings.getFloat(modId,"MCTE_magneticStormWeaponAndFighterRangeMult")!!
-        MAGSTORM_ECCM_MULT = LunaSettings.getFloat(modId,"MCTE_magneticStormECCMChanceMult")!!
-        MAGSTORM_MISSILE_SCRAMBLE_CHANCE = LunaSettings.getFloat(modId,"MCTE_magneticStormMissileScrambleChance")!!
-        MAGSTORM_MISSILE_UNSCRAMBLE_CHANCE = LunaSettings.getFloat(modId,"MCTE_magneticStormMissileUnscrambleChance")!!
+        MAGSTORM_VISION_MULT = configJson.getFloat("MCTE_magneticStormVisionMult")!!
+        MAGSTORM_MISSILE_MULT = configJson.getFloat("MCTE_magneticStormMissileGuidanceAndManeuverabilityMult")!!
+        MAGSTORM_RANGE_MULT = configJson.getFloat("MCTE_magneticStormWeaponAndFighterRangeMult")!!
+        MAGSTORM_ECCM_MULT = configJson.getFloat("MCTE_magneticStormECCMChanceMult")!!
+        MAGSTORM_MISSILE_SCRAMBLE_CHANCE = configJson.getFloat("MCTE_magneticStormMissileScrambleChance")!!
+        MAGSTORM_MISSILE_UNSCRAMBLE_CHANCE = configJson.getFloat("MCTE_magneticStormMissileUnscrambleChance")!!
 
         //SLIPSTREAM
-        SLIPSTREAM_PPT_MULT = LunaSettings.getFloat(modId,"MCTE_slipstreamPPTMult")!!
-        SLIPSTREAM_FLUX_DISSIPATION_MULT = LunaSettings.getFloat(modId,"MCTE_slipstreamFluxDissipationMult")!!
-        SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT = LunaSettings.getFloat(modId,"MCTE_slipstreamOverallSpeedMult")!!
-        SLIPSTREAM_HARDFLUX_GEN_PER_FRAME = LunaSettings.getFloat(modId,"MCTE_slipstreamHardfluxGenPerFrame")!!
-        STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO = LunaSettings.getBoolean(modId,"MCTE_slipstreamStackPPTWithSO")!!
-        SLIPSTREAM_DISABLE_VENTING = LunaSettings.getBoolean(modId,"MCTE_slipstreamDisableVenting")!!
-        SLIPSTREAM_INCREASE_TURN_RATE = LunaSettings.getBoolean(modId,"MCTE_slipstreamIncreaseTurnRate")!!
+        SLIPSTREAM_PPT_MULT = configJson.getFloat("MCTE_slipstreamPPTMult")!!
+        SLIPSTREAM_FLUX_DISSIPATION_MULT = configJson.getFloat("MCTE_slipstreamFluxDissipationMult")!!
+        SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT = configJson.getFloat("MCTE_slipstreamOverallSpeedMultIncrement")!!
+        SLIPSTREAM_HARDFLUX_GEN_PER_FRAME = configJson.getFloat("MCTE_slipstreamHardfluxGenPerFrame")!!
+        STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO = configJson.getBoolean("MCTE_slipstreamStackPPTWithSO")!!
+        SLIPSTREAM_DISABLE_VENTING = configJson.getBoolean("MCTE_slipstreamDisableVenting")!!
+        SLIPSTREAM_INCREASE_TURN_RATE = configJson.getBoolean("MCTE_slipstreamIncreaseTurnRate")!!
 
-        SLIPSTREAM_AFFECT_INTANGIBLE = LunaSettings.getBoolean(modId, "MCTE_slipstreamAffectIntangible")!!
+        SLIPSTREAM_AFFECT_INTANGIBLE = configJson.getBoolean("MCTE_slipstreamAffectIntangible")!!
 
-        SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST = LunaSettings.getBoolean(modId,"MCTE_slipstreamFighterZeroFluxBoost")!!
-        SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST = LunaSettings.getBoolean(modId,"MCTE_slipstreamMissileZeroFluxBoost")!!
+        SLIPSTREAM_FIGHTER_ZERO_FLUX_BOOST = configJson.getBoolean("MCTE_slipstreamFighterZeroFluxBoost")!!
+        SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST = configJson.getBoolean("MCTE_slipstreamMissileZeroFluxBoost")!!
+        SLIPSTREAM_REDUCE_WEAPON_RANGE = configJson.getBoolean("MCTE_slipstreamWeaponRangeReduction")!!
 
         //NEBULA
-        NEBULA_VISION_MULT = LunaSettings.getFloat(modId,"MCTE_nebulaVisionMult")!!
-        NEBULA_RANGE_MULT = LunaSettings.getFloat(modId,"MCTE_nebulaRangeMult")!!
-        NEBULA_SPEED_DECREMENT = LunaSettings.getFloat(modId,"MCTE_nebulaSpeedIncrement")!!
-        NEBULA_DISABLE_ZERO_FLUX_BOOST = LunaSettings.getBoolean(modId,"MCTE_nebulaDisableZeroFluxBoost")!!
+        NEBULA_VISION_MULT = configJson.getFloat("MCTE_nebulaVisionMult")!!
+        NEBULA_RANGE_MULT = configJson.getFloat("MCTE_nebulaRangeMult")!!
+        NEBULA_SPEED_DECREMENT = configJson.getFloat("MCTE_nebulaSpeedIncrement")!!
+        NEBULA_DISABLE_ZERO_FLUX_BOOST = configJson.getBoolean("MCTE_nebulaDisableZeroFluxBoost")!!
 
         //HYPERCLOUD
-        MIN_HYPERCLOUDS_TO_ADD_PER_CELL = LunaSettings.getInt(modId,"MCTE_deepHyperspaceMinimumCloudsPerCell")!!
-        MAX_HYPERCLOUDS_TO_ADD_PER_CELL = LunaSettings.getInt(modId,"MCTE_deepHyperspaceMaximumCloudsPerCell")!!
+        MIN_HYPERCLOUDS_TO_ADD_PER_CELL = configJson.getInt("MCTE_deepHyperspaceMinimumCloudsPerCell")!!
+        MAX_HYPERCLOUDS_TO_ADD_PER_CELL = configJson.getInt("MCTE_deepHyperspaceMaximumCloudsPerCell")!!
 
         //HYPERSTORM
-        HYPERSTORM_ENERGY_DAMAGE = LunaSettings.getFloat(modId,"MCTE_hyperstormEnergyDamage")!!
-        HYPERSTORM_EMP_DAMAGE = LunaSettings.getFloat(modId,"MCTE_hyperstormEMPDamage")!!
-        MIN_TIME_BETWEEN_HYPERSTORM_STRIKES = LunaSettings.getFloat(modId,"MCTE_hyperstormMinTimeBetweenStrikes")!!
-        MAX_TIME_BETWEEN_HYPERSTORM_STRIKES = LunaSettings.getFloat(modId,"MCTE_hyperstormMaxTimeBetweenStrikes")!!
-        HYPERSTORM_GRACE_INCREMENT = LunaSettings.getFloat(modId,"MCTE_hyperstormGracePeriod")!!
-        HYPERSTORM_MIN_ARC_RANGE = LunaSettings.getFloat(modId,"MCTE_hyperstormMinArcRange")!!
-        HYPERSTORM_MAX_ARC_RANGE = LunaSettings.getFloat(modId,"MCTE_hyperstormMaxArcRange")!!
-        HYPERSTORM_MIN_ARC_CHARGE_TIME = (LunaSettings.getFloat(modId,"MCTE_hyperstormMinChargeTime"))!!.coerceAtLeast(0f)
-        HYPERSTORM_MAX_ARC_CHARGE_TIME = (LunaSettings.getFloat(modId,"MCTE_hyperstormMaxChargeTime"))!!.coerceAtLeast(HYPERSTORM_MIN_ARC_CHARGE_TIME)
-        HYPERSTORM_ARC_FORCE = LunaSettings.getFloat(modId,"MCTE_hyperstormLightningForce")!!
-        HYPERSTORM_SPEED_THRESHOLD = LunaSettings.getFloat(modId,"MCTE_hyperstormSpeedThreshold")!!
-        HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD = LunaSettings.getFloat(modId, "MCTE_hyperstormSpeedUntargetabilityThreshold")!!
-        HYPERSTORM_MASS_TARGETTING_COEFFICIENT = LunaSettings.getFloat(modId, "MCTE_hyperstormMassTargettingCoefficient")!!
-        HYPERSTORM_SPEED_TARGETTING_COEFFICIENT = LunaSettings.getFloat(modId, "MCTE_hyperstormSpeedTargettingCoefficient")!!
-        HYPERSTORM_MASS_MAX_TARGETTING_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormMassTargettingMaxMult")!!
-        HYPERSTORM_SPEED_MAX_TARGETTING_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormSpeedTargettingMaxMult")!!
-        HYPERSTORM_PRIMARY_RANDOMNESS_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormPrimaryRandomnessThreshold")!!/100
+        HYPERSTORM_ENERGY_DAMAGE = configJson.getFloat("MCTE_hyperstormEnergyDamage")!!
+        HYPERSTORM_EMP_DAMAGE = configJson.getFloat("MCTE_hyperstormEMPDamage")!!
+        MIN_TIME_BETWEEN_HYPERSTORM_STRIKES = configJson.getFloat("MCTE_hyperstormMinTimeBetweenStrikes")!!
+        MAX_TIME_BETWEEN_HYPERSTORM_STRIKES = configJson.getFloat("MCTE_hyperstormMaxTimeBetweenStrikes")!!
+        HYPERSTORM_GRACE_INCREMENT = configJson.getFloat("MCTE_hyperstormGracePeriod")!!
+        HYPERSTORM_MIN_ARC_RANGE = configJson.getFloat("MCTE_hyperstormMinArcRange")!!
+        HYPERSTORM_MAX_ARC_RANGE = configJson.getFloat("MCTE_hyperstormMaxArcRange")!!
+        HYPERSTORM_MIN_ARC_CHARGE_TIME = (configJson.getFloat("MCTE_hyperstormMinChargeTime"))!!.coerceAtLeast(0f)
+        HYPERSTORM_MAX_ARC_CHARGE_TIME = (configJson.getFloat("MCTE_hyperstormMaxChargeTime"))!!.coerceAtLeast(HYPERSTORM_MIN_ARC_CHARGE_TIME)
+        HYPERSTORM_ARC_FORCE = configJson.getFloat("MCTE_hyperstormLightningForce")!!
+        HYPERSTORM_SPEED_THRESHOLD = configJson.getFloat("MCTE_hyperstormSpeedThreshold")!!
+        HYPERSTORM_UNTARGETABILITY_MASS_THRESHOLD = configJson.getFloat( "MCTE_hyperstormSpeedUntargetabilityThreshold")!!
+        HYPERSTORM_MASS_TARGETTING_COEFFICIENT = configJson.getFloat( "MCTE_hyperstormMassTargettingCoefficient")!!
+        HYPERSTORM_SPEED_TARGETTING_COEFFICIENT = configJson.getFloat( "MCTE_hyperstormSpeedTargettingCoefficient")!!
+        HYPERSTORM_MASS_MAX_TARGETTING_MULT = configJson.getFloat( "MCTE_hyperstormMassTargettingMaxMult")!!
+        HYPERSTORM_SPEED_MAX_TARGETTING_MULT = configJson.getFloat( "MCTE_hyperstormSpeedTargettingMaxMult")!!
+        HYPERSTORM_PRIMARY_RANDOMNESS_MULT = configJson.getFloat( "MCTE_hyperstormPrimaryRandomnessThreshold")!!/100
 
         HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = LunaSettings.getInt(modId,"MCTE_refinementIterations")!!
 
+        HYPERSTORM_TIMES_TO_ARC_AGAINST_SHIP = configJson.getInt("MCTE_hyperstormTimesToArc")
+
         // BLACK HOLE
-        BLACKHOLE_TIMEMULT_MULT = LunaSettings.getFloat(modId,"MCTE_blackHoleTimemultMult")!!
-        BLACKHOLE_PPT_COMPENSATION = LunaSettings.getFloat(modId,"MCTE_blackHolePPTCompensation")!!/100
-        BLACKHOLE_BASE_GRAVITY = LunaSettings.getFloat(modId,"MCTE_gravityMult")!!
+        BLACKHOLE_TIMEMULT_MULT = configJson.getFloat("MCTE_blackHoleTimemultMult")!!
+        BLACKHOLE_PPT_COMPENSATION = configJson.getFloat("MCTE_blackHolePPTCompensation")!!/100
+        BLACKHOLE_BASE_GRAVITY = configJson.getFloat("MCTE_gravityMult")!!
         BLACKHOLE_GRAVITY_ENABLED = LunaSettings.getBoolean(modId,"MCTE_blackHoleGravityEnabled")!!
 
         // PULSAR
         PULSAR_FORCE_ENABLED = LunaSettings.getBoolean(modId,"MCTE_pulsarForceEnabled")!!
-        PULSAR_BASE_FORCE = LunaSettings.getFloat(modId,"MCTE_pulsarForceMult")!!
-        PULSAR_INTENSITY_BASE_MULT = LunaSettings.getFloat(modId,"MCTE_pulsarBaseIntensityMult")!!
-        PULSAR_PPT_COMPENSATION = LunaSettings.getFloat(modId,"MCTE_pulsarPPTCompensation")!!/100
-        PULSAR_HARDFLUX_GEN_INCREMENT = LunaSettings.getFloat(modId,"MCTE_pulsarHardFluxGenPerFrame")!!
-        PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT = LunaSettings.getFloat(modId,"MCTE_pulsarEMPDamageBonusForWeapons")!!
-        PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT = LunaSettings.getFloat(modId,"MCTE_pulsarShieldEffectMult")!!
-        PULSAR_EMP_CHANCE_INCREMENT = LunaSettings.getFloat(modId,"MCTE_pulsarRandomArcChance")!!
-        PULSAR_EMP_DAMAGE_INCREMENT = LunaSettings.getFloat(modId,"MCTE_pulsarRandomArcEMPDamage")!!
-        PULSAR_DAMAGE_INCREMENT = LunaSettings.getFloat(modId,"MCTE_pulsarRandomArcEnergyDamage")!!
+        PULSAR_BASE_FORCE = configJson.getFloat("MCTE_pulsarForceMult")!!
+        PULSAR_INTENSITY_BASE_MULT = configJson.getFloat("MCTE_pulsarBaseIntensityMult")!!
+        PULSAR_PPT_COMPENSATION = configJson.getFloat("MCTE_pulsarPPTCompensation")!!/100
+        PULSAR_HARDFLUX_GEN_INCREMENT = configJson.getFloat("MCTE_pulsarHardFluxGenPerFrameIncrement")!!
+        PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT = configJson.getFloat("MCTE_pulsarEMPDamageBonusForWeaponsIncrement")!!
+        PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT = configJson.getFloat("MCTE_pulsarShieldEffectMultIncrement")!!
+        PULSAR_EMP_CHANCE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcChanceIncrement")!!
+        PULSAR_EMP_DAMAGE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcEMPDamageIncrement")!!
+        PULSAR_DAMAGE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcEnergyDamageIncrement")!!
 
     }
 }

@@ -1,109 +1,111 @@
 {
-	#TOGGLES
-	"enableMagFieldEffect":true, #if true, magnetic fields will reduce the weapon range, vision, missile mauneverability/guidance, of any fleet in it, and
-	# also have a chance for missiles to randomly break lock. defaults to true.
-	"enableDeepHyperspaceEffect":true, #if true, deep hyperspace will spawn nebula clouds in combat.
-	"enableHyperstormEffect":true, #if true, nebuale spawned from hyperspace storms will be storming, and will periodically strike anything near them with
-	# powerful EMP arcs. defaults to true
-	"enableSlipstreamEffect":true, #if true, slipstreams will force psuedo-safety overrides onto all deployed ships/missiles, with the caveat that venting is allowed,
-	# and that deployed ships will all slowly accumulate hard flux. defaults to true
-	"enableExtraNebulaEffects":true, #if true, nebula clouds in combat will also slightly reduce the weapon range and vision radius of any ships inside of them.
-	# defaults to true
-	"enableBlackHoleEffectReplacement":true, #if true, black holes, depending on the distance from the black hole, will apply a time mult to all deployed ships,
-	# and also apply a gravitational effect to all entities, dragging them towards the black hole. defaults to true
-	"enablePulsarEffect":true, #if true, pulsars, depending on the player's distance from the pulsar, will randomly emp ships, reduce shield eff/upkeep/emp arc pierce chance,
-	# generate hardflux, buff all projectiles with a flat EMP damage increase, and blow entities away from the pulsar. defualts to true
-	# !!!BELOW IS UNIMPLEMENTED!!!
-	"enableDebrisFieldEffect":true, #if true, debris fields will cause misc ship debris to spawn in the battlefield, with a rare chance for a few mines to spawn,
-	# and potentially fighter drones hostile to both sides. defaults to true
-	"enableDustcloudEffect":true, #if true, dust rings, clouds, etc will cause all movement to be slightly slowed, including ship, msisile, projectile, fighter, etc.
-	# defaults to true
+	#General toggles
+	#default:true
+	"MCTE_showSidebarInfo":true, #Show the info relating to terrain effects in the info bar, on the left side of the screen, during combat. Useful to disable if you're being spammed.
+	
+	#GENERAL
+	#default: 1.0
+	"MCTE_solarShieldingMult":1.0, #A ship's solar shielding value is multiplied against this before applying solar shielding effects.
+	#default: true
+	"MCTE_showErrorsInGame":true, #Disable and run MCTE_reloadSettings if being spammed.
+	
+	#TERRAIN-SPECIFIC
+	#Notice: Most values stack with multiple terrain instances. For example: A hardflux increment of 2 will increase to 4 with two pulsar instances.
 	
 	#MAGNETIC FIELD SETTINGS
 	#each individual magnetic field you are in sequentially multiplies/adds these settings to 1, then the value of the last calculation, etc.
 	#ex. 3 magfields, all non-storm, with visionMult = 0.6: You get visionModifier = 1*0.6*(0.6*(0.6))
 	
-	"magFieldVisionMult":0.6, #default: 0.6
-	"magFieldMissileManeuverabilityAndGuidanceMult":0.8, #default: 0.8
-	"magFieldWeaponAndFighterRangeMult":0.6, #default: 0.6
-	"magFieldEccmChanceMult":0.8, #modifies missile ECCM chance. this is the stuff provided by ECCM package, default: 0.8
-	"magFieldMissileScrambleChance":0.006, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
-	# value as a percentage chance to determine if the missile should unlock and fly in random directions, default: 0.01
-	"magFieldMissileUnscrambleChance":0.007, #default: 0.007
+	"MCTE_magneticFieldVisionMult":0.7, #default: 0.7
+	"MCTE_magneticFieldMissileGuidanceAndManeuverabilityMult":0.8, #default: 0.8
+	"MCTE_magneticFieldWeaponAndFighterRangeMult":0.7, #default: 0.7
+	"MCTE_magneticFieldECCMChanceMult":0.8, #modifies missile ECCM chance. this is the stuff provided by ECCM package, default: 0.8
+	"MCTE_magneticFieldMissileScrambleChance":0.006, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
+	# value as a percentage chance to determine if the missile should unlock and fly in random directions, default: 0.006
+	"MCTE_magneticFieldMissileUnscrambleChance":0.007, #default: 0.007
 	
 	#MAGNETIC STORM SETTINGS
 	#same rules as the ones above, except these values are used for magnetic STORMS.
 	
-	"magStormVisionMult":0.35, #default: 0.35
-	"magStormMissileManeuverabilityAndGuidanceMult":0.55, #default: 0.55
-	"magStormWeaponAndFighterRangeMult":0.35, #default: 0.35
-	"magStormEccmChanceMult":0.2, #default: 0.2
-	"magStormMissileScrambleChance":0.02, #default: 0.2
-	"magStormMissileUnscrambleChance":0.007, #default: 0.007
+	"MCTE_magneticStormVisionMult":0.35, #default: 0.35
+	"MCTE_magneticStormMissileGuidanceAndManeuverabilityMult":0.55, #default: 0.55
+	"MCTE_magneticStormWeaponAndFighterRangeMult":0.35, #default: 0.35
+	"MCTE_magneticStormECCMChanceMult":0.2, #default: 0.2
+	"MCTE_magneticStormMissileScrambleChance":0.02, #default: 0.2
+	"MCTE_magneticStormMissileUnscrambleChance":0.007, #default: 0.007
 	
 	#SLIPSTREAM SETTINGS
-	"slipstreamPPTMult":0.45, #default: 0.45
-	"slipstreamFluxDissipationMult":3, #default: 3
-	"slipstreamOverallSpeedMultIncrement":1, #default: 1
+	"MCTE_slipstreamPPTMult":0.45, #default: 0.45
+	"MCTE_slipstreamWeaponRangeReduction":true, #if true, ships will receive the usual weapon range reduction, usually. default: true
+	"MCTE_slipstreamFluxDissipationMult":3, #default: 3
+	"MCTE_slipstreamOverallSpeedMultIncrement":1, #default: 1
 	#^ every slipstream will add this to the overall speed mult, which multiplies the hullsize-specific speed mult by itself
-	"slipstreamHardFluxGenPerFrame":2, #default: 2
-	"stackSlipstreamPPTDebuffWithSO":true, #if true, the slipstream PPT debuff stacks with SO. defualts to true.
-	"slipstreamDisableVenting":false, #if true, disables venting. duh. default: false
-	"slipstreamIncreaseTurnRate":false, #if true, the speed buff will be applied to turnrate for missiles and ships. default: false
+	"MCTE_slipstreamHardfluxGenPerFrame":2, #default: 2
+	"MCTE_slipstreamStackPPTWithSO":true, #if true, the slipstream PPT debuff stacks with SO. defualts to true.
+	"MCTE_slipstreamDisableVenting":false, #if true, disables venting. duh. default: false
+	"MCTE_slipstreamIncreaseTurnRate":false, #if true, the speed buff will be applied to turnrate for missiles and ships. default: false
 	
-	"slipstreamFighterZeroFluxBoost":true, #if true, fighters will have an additional speed boost applied to emulate a zero-flux boost. default: true
-	"slipstreamMissileZeroFluxBoost":true, #if true, missiles will have an additional speed boost applied to emulate a zero-flux boost. default: true
+	"MCTE_slipstreamFighterZeroFluxBoost":true, #if true, fighters will have an additional speed boost applied to emulate a zero-flux boost. default: true
+	"MCTE_slipstreamMissileZeroFluxBoost":true, #if true, missiles will have an additional speed boost applied to emulate a zero-flux boost. default: true
+	"MCTE_slipstreamAffectIntangible":false, #if true, phased ships will be affected. default: false
 	
 	#NEBULA SETTINGS
-	"nebulaVisionMult":0.8, #default: 0.8
-	"nebulaRangeMult":0.8, #default: 0.8
-	"nebulaSpeedDecrement":-10, #default: -10
-	"nebulaDisableZeroFluxBoost":true, #default: true
+	"MCTE_nebulaVisionMult":0.8, #default: 0.8
+	"MCTE_nebulaRangeMult":0.8, #default: 0.8
+	"MCTE_nebulaSpeedIncrement":-10, #default: -10
+	"MCTE_nebulaDisableZeroFluxBoost":false, #default: false
 	
 	#HYPERCLOUD EFFECTS, all effects here are for hyperstorms too
-	"minimumHypercloudsPerCell":8, #controls how many nebulae hyperclouds spawn. default: 8
-	"maximumHypercloudsPerCell":20, #default: 20
+	"MCTE_deepHyperspaceMinimumCloudsPerCell":25, #controls how many nebulae hyperclouds spawn. default: 8
+	"MCTE_deepHyperspaceMaximumCloudsPerCell":40, #default: 20
 	
 	#HYPERSTORM EFFECTS
-	"hyperstormEnergyDamage":850, #energy damage the final purple bolt will do. default: 850
-	"hyperstormEMPDamage":8000, #EMP damage the final purple bolt will do. default: 8000
-	"minTimeBetweenHyperstormStrikes":4, #Minimum time, in ~seconds, between arc attempts. default: 4
-	"maxTimeBetweenHyperstormStrikes":6, #Maximum time, in ~seconds, between arc attempts. default: 6
-	"amountOfTimeShipsHaveBetweenStrikes":5, #After all active arc attempts on a target finish, the target is given this amount of time in 
-	#~seconds before they can be targetted again. default: 5
-	"hyperstormMaxArcChargeTime":3.6, #Max time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.6
-	"hyperstormMinArcChargeTime":3.0, #Minimum time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.0
-	"hyperstormMinArcRange":1000, #Lower bound of the range that can be picked for an arc attempt. Default: 1000
-	"hyperstormMaxArcRange":1000, #Upper bound of the range that can be picked for an arc attempt. Default: 1000
-	"hyperstormArcForce":3500, #The amount of force in starsector units (yes i know) a arc will apply to a ship it hits. Default: 3500
-	"hyperstormSpeedThreshold":25.0, #The speed at which the hyperstorm lightning becomes able to hit a ship at. Ex. At default speed, youre immune. At 2x the default speed, youre 2x as likely to be hit. Default: 25.0 
+	"MCTE_hyperstormEnergyDamage":650.0, #energy damage the final purple bolt will do. default: 650
+	"MCTE_hyperstormEMPDamage":12000.0, #EMP damage the final purple bolts will do in total. default: 16000
+	"MCTE_hyperstormMinTimeBetweenStrikes":2, #Minimum time, in ~seconds, between arc attempts. default: 2
+	"MCTE_hyperstormMaxTimeBetweenStrikes":5, #Maximum time, in ~seconds, between arc attempts. default: 5
+	"MCTE_hyperstormGracePeriod":3, #After all active arc attempts on a target finish, the target is given this amount of time in 
+	#~seconds before they can be targetted again. default: 3
+	"MCTE_hyperstormMinChargeTime":3.6, #Max time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.6
+	"MCTE_hyperstormMaxChargeTime":3.0, #Minimum time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.0
+	"MCTE_hyperstormMinArcRange":1200, #Lower bound of the range that can be picked for an arc attempt. Default: 1200
+	"MCTE_hyperstormMaxArcRange":1200, #Upper bound of the range that can be picked for an arc attempt. Default: 1200
+	"MCTE_hyperstormLightningForce":4500, #The amount of force in starsector units (yes i know) a arc will apply to a ship it hits. Default: 4500
+	"MCTE_hyperstormTimesToArc":5, #The amount of times a damaging ar will strike a ship. Higher = more dispersed damage. default: 5
+	"MCTE_hyperstormSpeedThreshold":50.0, #The speed at which a ship becomes targettable at, anything below and the lightning won't try to strike you, unless your mass is higher than the untargettability mass threshold. 
+										  #Also affects general targetting chance.
+										  #default :50
+	"MCTE_hyperstormSpeedUntargetabilityThreshold":400.0, #The "anchor point" for speed untargetability mass calculations. Anything below this will be untargetable at or under the speed threshold,
+	#and anything more will have their speed threshold progressively lowered, to a minimum of 1 speed. #default: 400
+	"MCTE_hyperstormMassTargettingCoefficient":0.09, #Coefficient that determines the weight of a entity's mass when calculating targetting chance. default: 0.09
+	"MCTE_hyperstormMassTargettingMaxMult":6.0, #The maximum targetting chance multiplier that mass can grant. default: 6
+	"MCTE_hyperstormSpeedTargettingCoefficient":0.35, #Coefficient that determines the weight of a entity's velocity when calculating targetting chance. Default: 0.35
+	"MCTE_hyperstormSpeedTargettingMaxMult":8.0, #The maximum targetting chance multiplier that velocity can grant. default: 8
+	"MCTE_hyperstormPrimaryRandomnessThreshold":1.0, #Percent chance of a hypercloud massively increasing or decreasing a given entity's favorability of targettability during target calculations.	
 	
-	"hyperstormCentroidRefinementIterations":2500, #Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times. default: 2500
+	"MCTE_refinementIterations":2500, #Amount of iterations that will be ran to refine the centroid (center) of the hyperstorms. Higher = Better functionality, worse loading times. default: 2500
 	
 	#BLACK HOLE EFFECTS
-	"blackholeGravityEnabled":true, #if true, black holes will apply a gravitational effect to all combat entities, dragging them towards the actual
+	"MCTE_blackHoleGravityEnabled":true, #if true, black holes will apply a gravitational effect to all combat entities, dragging them towards the actual
 	# black hole campaign entity. ex. if you fight to the exact left of a black hole, everything will be dragged to the right. default: true
-	"blackholeTimemultMult":2.5f, #Multiplies the "intensity" of the black hole by this, then adds the result to the timemult to be applied to all ships. Ex. At the center of a black hole,
+	"MCTE_blackHoleTimemultMult":2.5f, #Multiplies the "intensity" of the black hole by this, then adds the result to the timemult to be applied to all ships. Ex. At the center of a black hole,
 	# the intensity is 1, so it becomes 1*2f. default: 2f
-	"blackholePPTCompensation":80f, #The percent of the black hole CR debuffs to be removed. default: 80f
-	"blackholeBaseGravity":1.45f, #the base gravity mult. increase for higher gravity, decrease for lower. default: 1.45f
+	"MCTE_blackHolePPTCompensation":80f, #The percent of the black hole CR debuffs to be removed. default: 80f
+	"MCTE_gravityMult":1.7f, #the base gravity mult. increase for higher gravity, decrease for lower. default: 1.7f
 	
 	#PULSAR EFFECTS
 	#All values assume intensity of the pulsar is at 100%.
 	#if the value has increment in it, it is added to the actual value for each pulsar influencing the battle
-	"pulsarForceEnabled":true, #if true, combat entities will be blown away from the pulsar. default: true
-	"pulsarBaseForce":0.55f, #controls how strong the pulsar force is. default: 0.3
-	"pulsarIntensityBaseMult":1f, #global modifier for the strength of everything. default: 1
-	"pulsarPPTCompensation":100f, #The percent of the pulsar CR debuffs to be removed. not always the exact value as its affected by the intensity. default: 100f
-	"pulsarHardfluxGenIncrement":1f, #This amount in hardflux will be applied to every ship 60 times a second. default: 3
-	"pulsarEMPDamageBonusForWeaponsIncrement":30f, # The amount of EMP damage to be added to every projectile. Flat buff. default: 30
-	"pulsarShieldDestabilizationMultIncrement":0.5f, # The amount that shield eff, shield upkeep, and shield emp arc pierce chance will be multiplied by.
-	# default: 0.3
-	"pulsarEMPChanceIncrement":0.05f, #the chance, every frame, for a ship to be EMPed. default: 0.05
-	"pulsarEMPDamageIncrement":85f, #the EMP damage a random EMP does. default: 75
-	"pulsarDamageIncrement":2f, # the energy damage a random EMP does. default: 1
+	"MCTE_pulsarForceEnabled":true, #if true, combat entities will be blown away from the pulsar. default: true
+	"MCTE_pulsarForceMult":0.55f, #controls how strong the pulsar force is. default: 0.55
+	"MCTE_pulsarBaseIntensityMult":1f, #global modifier for the strength of everything. default: 1
+	"MCTE_pulsarPPTCompensation":100f, #The percent of the pulsar CR debuffs to be removed. not always the exact value as its affected by the intensity. default: 100f
+	"MCTE_pulsarHardFluxGenPerFrameIncrement":1f, #This amount in hardflux will be applied to every ship 60 times a second. default: 3
+	"MCTE_pulsarEMPDamageBonusForWeaponsIncrement":70f, # The amount of EMP damage to be added to every projectile. Flat buff. default: 70
+	"MCTE_pulsarShieldEffectMultIncrement":0.5f, # The amount that shield eff, shield upkeep, and shield emp arc pierce chance will be multiplied by.
+	# default: 0.5
+	"MCTE_pulsarRandomArcChanceIncrement":0.05f, #the chance, every frame, for a ship to be EMPed. default: 0.05
+	"MCTE_pulsarRandomArcEMPDamageIncrement":85f, #the EMP damage a random EMP does. default: 85
+	"MCTE_pulsarRandomArcEnergyDamageIncrement":2f, # the energy damage a random EMP does. default: 2
 	
-	
-	#GENERAL
-	"showErrorsInGame":true,
 }

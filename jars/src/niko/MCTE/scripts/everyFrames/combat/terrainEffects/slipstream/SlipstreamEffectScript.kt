@@ -7,16 +7,16 @@ import com.fs.starfarer.api.combat.ShipEngineControllerAPI
 import com.fs.starfarer.api.util.IntervalUtil
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
-import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
+import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_REDUCE_WEAPON_RANGE
+import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
+import niko.MCTE.utils.terrainCombatEffectIds.slipstreamEffect
 import java.awt.Color
 import java.util.*
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 class SlipstreamEffectScript(
     val peakPerformanceMult: Float,
@@ -25,6 +25,9 @@ class SlipstreamEffectScript(
     val overallSpeedMult: Float):
     baseTerrainEffectScript(), usesDeltaTime {
 
+    private val weaponRangeThresholdForSOThreshold: Float = 0f
+    private val RANGE_THRESHOLD: Float = 450f
+    private val RANGE_MULT = 0.25f
     val speed: MutableMap<ShipAPI.HullSize, Float> = EnumMap(ShipAPI.HullSize::class.java)
     private val color = Color(212, 55, 255, 255)
     private val timesToGenerateFluxPerSecond = 60f
@@ -64,39 +67,55 @@ class SlipstreamEffectScript(
                 if (MCTE_settings.SLIPSTREAM_MISSILE_ZERO_FLUX_BOOST) {
                     adjustedMissileSpeedMultWithZeroFluxBoost = ((adjustedMissileSpeedMult + missileZeroFluxApproximation))
                 }
-                mutableStats.maxSpeed.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
-                mutableStats.acceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
-                mutableStats.deceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
+                mutableStats.maxSpeed.modifyFlat(slipstreamEffect, adjustedSpeedMult)
+                mutableStats.acceleration.modifyFlat(slipstreamEffect, adjustedSpeedMult)
+                mutableStats.deceleration.modifyFlat(slipstreamEffect, adjustedSpeedMult)
                 if (SLIPSTREAM_INCREASE_TURN_RATE) {
-                    mutableStats.turnAcceleration.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
-                    mutableStats.maxTurnRate.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedSpeedMult)
-                    mutableStats.missileTurnAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
-                    mutableStats.missileMaxTurnRateBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
+                    mutableStats.turnAcceleration.modifyFlat(slipstreamEffect, adjustedSpeedMult)
+                    mutableStats.maxTurnRate.modifyFlat(slipstreamEffect, adjustedSpeedMult)
+                    mutableStats.missileTurnAccelerationBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMult)
+                    mutableStats.missileMaxTurnRateBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMult)
                 }
-                mutableStats.missileMaxSpeedBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMultWithZeroFluxBoost)
-                mutableStats.missileAccelerationBonus.modifyFlat(terrainCombatEffectIds.slipstreamEffect, adjustedMissileSpeedMult)
+                mutableStats.missileMaxSpeedBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMultWithZeroFluxBoost)
+                mutableStats.missileAccelerationBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMult)
                 val zeroFluxMinimumIncrement = if (!isIntangible) 2f else 0f
                 val safetiesOverridden = (mutableStats.zeroFluxMinimumFluxLevel.modifiedValue >= zeroFluxMinimumIncrement+1)
                 if (!safetiesOverridden || MCTE_settings.STACK_SLIPSTREAM_PPT_DEBUFF_WITH_SO) {
                     val PPTmult = getPPTMult(ship)
-                    mutableStats.peakCRDuration.modifyMult(terrainCombatEffectIds.slipstreamEffect, PPTmult)
+                    mutableStats.peakCRDuration.modifyMult(slipstreamEffect, PPTmult)
                 }
                 if (safetiesOverridden) {
                     val zeroFluxBoostIncrement = if (isIntangible) 0.0000001f else adjustedSpeedMult/overallSpeedMult
-                    mutableStats.zeroFluxSpeedBoost.modifyFlat(terrainCombatEffectIds.slipstreamEffect, zeroFluxBoostIncrement)
+                    mutableStats.zeroFluxSpeedBoost.modifyFlat(slipstreamEffect, zeroFluxBoostIncrement)
                 }
 
-                mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(terrainCombatEffectIds.slipstreamEffect, zeroFluxMinimumIncrement)
+                mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(slipstreamEffect, zeroFluxMinimumIncrement)
                 //mutableStats.allowZeroFluxAtAnyLevel.modifyFlat(terrainCombatEffectIds.slipstreamEffect, 1f)
                 val fluxDissipationModifiedMult = getFluxDissipationModifiedMult(ship)
-                mutableStats.fluxDissipation.modifyMult(terrainCombatEffectIds.slipstreamEffect, fluxDissipationModifiedMult)
+                mutableStats.fluxDissipation.modifyMult(slipstreamEffect, fluxDissipationModifiedMult)
 
                 if (SLIPSTREAM_DISABLE_VENTING) {
                     val disableMult = if (!isIntangible) 0f else 1f
-                    mutableStats.ventRateMult.modifyMult(terrainCombatEffectIds.slipstreamEffect, disableMult)
+                    mutableStats.ventRateMult.modifyMult(slipstreamEffect, disableMult)
                 } else {
                     val slowMult = if (!isIntangible) 0.62f else 1f
-                    mutableStats.ventRateMult.modifyMult(terrainCombatEffectIds.slipstreamEffect, slowMult)
+                    mutableStats.ventRateMult.modifyMult(slipstreamEffect, slowMult)
+                }
+
+                if (SLIPSTREAM_REDUCE_WEAPON_RANGE) {
+                    val appliedBefore = mutableStats.weaponRangeThreshold.getMultStatMod(slipstreamEffect) != null
+                    val baseWeaponRangeThreshold = mutableStats.weaponRangeThreshold.modifiedValue
+                    val shouldTryToApply = (!(!appliedBefore && baseWeaponRangeThreshold > weaponRangeThresholdForSOThreshold))
+                    // havent applied before but we have a threshold? uh oh
+                    if (shouldTryToApply) {
+                        if (!isIntangible) {
+                            mutableStats.weaponRangeThreshold.modifyFlat(slipstreamEffect, RANGE_THRESHOLD)
+                            mutableStats.weaponRangeMultPastThreshold.modifyMult(slipstreamEffect, RANGE_MULT)
+                        } else {
+                            mutableStats.weaponRangeThreshold.unmodifyFlat(slipstreamEffect)
+                            mutableStats.weaponRangeMultPastThreshold.unmodifyMult(slipstreamEffect)
+                        }
+                    }
                 }
             }
         }

@@ -2,11 +2,13 @@ package niko.MCTE
 
 import com.fs.starfarer.api.BaseModPlugin
 import com.fs.starfarer.api.Global
+import com.fs.starfarer.api.impl.campaign.terrain.StarCoronaAkaMainyuTerrainPlugin
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import org.apache.log4j.Level
+import org.apache.log4j.lf5.LogLevel
 
 class niko_MCTE_modPlugin : BaseModPlugin() {
 
@@ -28,7 +30,8 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         super.onGameLoad(newGame)
 
         Global.getSector().listenerManager.addListener(settingsChangedListener(), true)
-        LunaSettings.addListener(settingsChangedListener())
+        LunaSettings.addSettingsListener(settingsChangedListener())
+
         //Global.getSector().listenerManager.addListener(combatEndListener(false), true)
     }
 

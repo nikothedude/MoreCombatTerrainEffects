@@ -13,6 +13,7 @@ import niko.MCTE.utils.MCTE_arcUtils.telegraphArc
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_MAX_ARC_CHARGE_TIME
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_MIN_ARC_CHARGE_TIME
+import niko.MCTE.settings.MCTE_settings.HYPERSTORM_TIMES_TO_ARC_AGAINST_SHIP
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
@@ -94,9 +95,12 @@ class hyperstormArcPreparation(
 
     private fun doArc() {
 
-        val damage = parentScript.getRawActualDamageForEntity(target)
-        val emp = parentScript.getRawEMPDamageForEntity(target)
-        arc(hyperStormNebula, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, damage, emp)
+        val timesToArc = HYPERSTORM_TIMES_TO_ARC_AGAINST_SHIP
+
+        val damage = (parentScript.getRawActualDamageForEntity(target) / timesToArc)
+        val emp = (parentScript.getRawEMPDamageForEntity(target) / timesToArc)
+
+        arc(hyperStormNebula, coordinatesToSpawnArcFrom, parentScript.dummyShip, target, maxRadius, damage, emp, timesToArc)
 
         delete()
     }

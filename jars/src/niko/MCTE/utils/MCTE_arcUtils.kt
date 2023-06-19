@@ -21,7 +21,9 @@ object MCTE_arcUtils {
     @JvmStatic
     @JvmOverloads
     fun arc(cell: cloudCell, coordinatesToSpawnArcFrom: Vector2f, source: ShipAPI, target: CombatEntityAPI,
-            maxDistance: Float = Float.MAX_VALUE, actualDamage: Float, empDamage: Float) {
+            maxDistance: Float = Float.MAX_VALUE, actualDamage: Float, empDamage: Float, times: Int = 1) {
+
+        var timesLeft = times
 
         val engine = Global.getCombatEngine() ?: return
         val distance = MathUtils.getDistance(coordinatesToSpawnArcFrom, target.location)
@@ -31,21 +33,24 @@ object MCTE_arcUtils {
         }
         val modifier = getArcOverallDamageMod(target)
 
-        engine.spawnEmpArc(
-            source,
-            coordinatesToSpawnArcFrom,
-            null,
-            target,
-            DamageType.ENERGY,
-            actualDamage*modifier,
-            empDamage*modifier,
-            maxDistance,
-            null,
-            MCTE_shipUtils.damageArcThickness,
-            MCTE_shipUtils.arcFringeColor,
-            MCTE_shipUtils.arcCoreColor
-        ) // manually play sounds, since no sound normally plays when striking hulks
-        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.3f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
+        while (timesLeft > 0) {
+            timesLeft--
+            engine.spawnEmpArc(
+                source,
+                coordinatesToSpawnArcFrom,
+                null,
+                target,
+                DamageType.ENERGY,
+                actualDamage * modifier,
+                empDamage * modifier,
+                maxDistance,
+                null,
+                MCTE_shipUtils.damageArcThickness,
+                MCTE_shipUtils.arcFringeColor,
+                MCTE_shipUtils.arcCoreColor
+            ) // manually play sounds, since no sound normally plays when striking hulks
+        }
+        Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.5f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
         Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
         doMainArcLighting(target.location, coordinatesToSpawnArcFrom)
 
@@ -127,12 +132,12 @@ object MCTE_arcUtils {
         val dist: Float = MathUtils.getDistance(coordinatesToSpawnArcFrom, target)
         val engine = Global.getCombatEngine()
         val viewPort = engine.viewport
-        val size = (33f * sqrt(dist))
+        val size = (34f * sqrt(dist))
         if (!viewPort.isNearViewport(target, size) || !viewPort.isNearViewport(coordinatesToSpawnArcFrom, size)) return
-        val intensity = MathUtils.getRandomNumberInRange(1.05f, 1.1f)
-        val specIntensity = MathUtils.getRandomNumberInRange(1.6f, 1.7f)
-        val specSize = (50f * sqrt(dist))
-        val specMult = 3f
+        val intensity = MathUtils.getRandomNumberInRange(1.7f, 1.8f)
+        val specIntensity = MathUtils.getRandomNumberInRange(1.4f, 1.9f)
+        val specSize = (59f * sqrt(dist))
+        val specMult = 5f
         doArcLighting(target, coordinatesToSpawnArcFrom, intensity, size, specIntensity, specSize, specMult,
             0.39f, 0.47f, 0.5f, 0.6f)
     }
