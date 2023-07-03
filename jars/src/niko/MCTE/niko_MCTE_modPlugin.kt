@@ -12,7 +12,6 @@ import org.apache.log4j.lf5.LogLevel
 
 class niko_MCTE_modPlugin : BaseModPlugin() {
 
-    @Throws(RuntimeException::class)
     override fun onApplicationLoad() {
         super.onApplicationLoad()
 
@@ -29,7 +28,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
     override fun onGameLoad(newGame: Boolean) {
         super.onGameLoad(newGame)
 
-        Global.getSector().listenerManager.addListener(settingsChangedListener(), true)
+        //Global.getSector().listenerManager.addListener(settingsChangedListener(), true)
         LunaSettings.addSettingsListener(settingsChangedListener())
 
         //Global.getSector().listenerManager.addListener(combatEndListener(false), true)

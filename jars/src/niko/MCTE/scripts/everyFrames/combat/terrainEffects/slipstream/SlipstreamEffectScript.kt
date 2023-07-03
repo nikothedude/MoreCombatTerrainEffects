@@ -13,7 +13,6 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_REDUCE_WEAPON_RANGE
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
-import niko.MCTE.utils.terrainCombatEffectIds
 import niko.MCTE.utils.terrainCombatEffectIds.slipstreamEffect
 import java.awt.Color
 import java.util.*
@@ -70,12 +69,6 @@ class SlipstreamEffectScript(
                 mutableStats.maxSpeed.modifyFlat(slipstreamEffect, adjustedSpeedMult)
                 mutableStats.acceleration.modifyFlat(slipstreamEffect, adjustedSpeedMult)
                 mutableStats.deceleration.modifyFlat(slipstreamEffect, adjustedSpeedMult)
-                if (SLIPSTREAM_INCREASE_TURN_RATE) {
-                    mutableStats.turnAcceleration.modifyFlat(slipstreamEffect, adjustedSpeedMult)
-                    mutableStats.maxTurnRate.modifyFlat(slipstreamEffect, adjustedSpeedMult)
-                    mutableStats.missileTurnAccelerationBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMult)
-                    mutableStats.missileMaxTurnRateBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMult)
-                }
                 mutableStats.missileMaxSpeedBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMultWithZeroFluxBoost)
                 mutableStats.missileAccelerationBonus.modifyFlat(slipstreamEffect, adjustedMissileSpeedMult)
                 val zeroFluxMinimumIncrement = if (!isIntangible) 2f else 0f
@@ -87,6 +80,21 @@ class SlipstreamEffectScript(
                 if (safetiesOverridden) {
                     val zeroFluxBoostIncrement = if (isIntangible) 0.0000001f else adjustedSpeedMult/overallSpeedMult
                     mutableStats.zeroFluxSpeedBoost.modifyFlat(slipstreamEffect, zeroFluxBoostIncrement)
+                }
+
+                if (SLIPSTREAM_INCREASE_TURN_RATE) {
+                    val isFighter = ship.isFighter
+                    if (safetiesOverridden || isFighter) {
+                        val turnIncrement = if (isIntangible) 0f else getTurnRateIncrement(ship)
+                        if (!isFighter) {
+                            mutableStats.turnAcceleration.modifyFlat(slipstreamEffect, turnIncrement)
+                        }
+                        mutableStats.maxTurnRate.modifyFlat(slipstreamEffect, turnIncrement)
+                    }
+                    val missileTurnIncrement = if (isIntangible) 0f else getMissileTurnRateIncrement(ship)
+                    // logically speaking, a missile with zero-flux boost would turn a lot faster
+                    //mutableStats.missileTurnAccelerationBonus.modifyFlat(slipstreamEffect, missileTurnMult)
+                    mutableStats.missileMaxTurnRateBonus.modifyFlat(slipstreamEffect, missileTurnIncrement)
                 }
 
                 mutableStats.zeroFluxMinimumFluxLevel.modifyFlat(slipstreamEffect, zeroFluxMinimumIncrement)
@@ -111,10 +119,11 @@ class SlipstreamEffectScript(
                         if (!isIntangible) {
                             mutableStats.weaponRangeThreshold.modifyFlat(slipstreamEffect, RANGE_THRESHOLD)
                             mutableStats.weaponRangeMultPastThreshold.modifyMult(slipstreamEffect, RANGE_MULT)
-                        } else {
-                            mutableStats.weaponRangeThreshold.unmodifyFlat(slipstreamEffect)
-                            mutableStats.weaponRangeMultPastThreshold.unmodifyMult(slipstreamEffect)
                         }
+                    }
+                    if (isIntangible) {
+                        mutableStats.weaponRangeThreshold.unmodifyFlat(slipstreamEffect)
+                        mutableStats.weaponRangeMultPastThreshold.unmodifyMult(slipstreamEffect)
                     }
                 }
             }
@@ -129,6 +138,14 @@ class SlipstreamEffectScript(
         generateFlux(amount)
 
         handleEngines()
+    }
+
+    private fun getMissileTurnRateIncrement(ship: ShipAPI): Float {
+        return 10f
+    }
+
+    private fun getTurnRateIncrement(ship: ShipAPI): Float {
+        return 10f
     }
 
     private fun isShipIntangibleAndDoWeCare(ship: ShipAPI): Boolean {
@@ -200,13 +217,13 @@ class SlipstreamEffectScript(
         if (!super.handleNotification(amount)) return false
         val playerShip = engine.playerShip ?: return false
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
-        if (isShipIntangibleAndDoWeCare(playerShip)) {
-        engine.maintainStatusForPlayerShip(
-            "niko_MCPE_slipstream3",
-            icon,
-            "Slipstream",
-            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(playerShip).roundTo(2)} per second",
-            true)
+        if (!isShipIntangibleAndDoWeCare(playerShip)) {
+            engine.maintainStatusForPlayerShip(
+                "niko_MCPE_slipstream3",
+                icon,
+                "Slipstream",
+                "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(playerShip).roundTo(2)} per second",
+                true)
         }
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_slipstream2",
@@ -214,20 +231,20 @@ class SlipstreamEffectScript(
             "Slipstream",
             "Safety overrides applied to all tangible ships, fighters, and missiles",
             true)
-        if (isShipIntangibleAndDoWeCare(playerShip)) {
-        engine.maintainStatusForPlayerShip(
-            "niko_MCPE_slipstream4",
-            icon,
-            "Slipstream",
-            "Venting effectiveness reduced",
-            true)
+        if (!isShipIntangibleAndDoWeCare(playerShip)) {
+            engine.maintainStatusForPlayerShip(
+                "niko_MCPE_slipstream4",
+                icon,
+                "Slipstream",
+                "Venting effectiveness reduced",
+                true)
 
-        engine.maintainStatusForPlayerShip(
-            "niko_MCPE_slipstream1",
-            icon,
-            "Slipstream",
-            "Systems overcharge",
-            true)
+            engine.maintainStatusForPlayerShip(
+                "niko_MCPE_slipstream1",
+                icon,
+                "Slipstream",
+                "Systems overcharge",
+                true)
         }
         return true
     }

@@ -43,7 +43,7 @@
 	"MCTE_slipstreamHardfluxGenPerFrame":2, #default: 2
 	"MCTE_slipstreamStackPPTWithSO":true, #if true, the slipstream PPT debuff stacks with SO. defualts to true.
 	"MCTE_slipstreamDisableVenting":false, #if true, disables venting. duh. default: false
-	"MCTE_slipstreamIncreaseTurnRate":false, #if true, the speed buff will be applied to turnrate for missiles and ships. default: false
+	"MCTE_slipstreamIncreaseTurnRate":true, #if true, the speed buff will be applied to turnrate for SO-d ships, all missiles, and all fighters. default: true
 	
 	"MCTE_slipstreamFighterZeroFluxBoost":true, #if true, fighters will have an additional speed boost applied to emulate a zero-flux boost. default: true
 	"MCTE_slipstreamMissileZeroFluxBoost":true, #if true, missiles will have an additional speed boost applied to emulate a zero-flux boost. default: true
