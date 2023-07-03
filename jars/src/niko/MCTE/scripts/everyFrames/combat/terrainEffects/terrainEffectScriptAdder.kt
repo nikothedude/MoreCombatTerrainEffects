@@ -97,16 +97,25 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
         val blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin> = HashSet()
         val pulsarPlugins: MutableSet<PulsarBeamTerrainPlugin> = HashSet()
+        val coronaPlugins: MutableSet<StarCoronaTerrainPlugin> = HashSet()
+        val ionStormPlugins: MutableSet<StarCoronaAkaMainyuTerrainPlugin> = HashSet()
 
         for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
             val terrainPlugin = terrain.plugin
-                if (terrainPlugin.containsEntity(playerFleet)) {
+            if (terrainPlugin.containsEntity(playerFleet)) {
                 if (terrainPlugin is PulsarBeamTerrainPlugin) pulsarPlugins += terrainPlugin
                 if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
                 if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
                 //if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
                 if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
                 if (terrainPlugin is EventHorizonPlugin) blackHoleTerrainPlugins += terrainPlugin
+                if (terrainPlugin is StarCoronaTerrainPlugin) {
+                    if (terrainPlugin is StarCoronaAkaMainyuTerrainPlugin) {
+                        ionStormPlugins += terrainPlugin
+                    } else {
+                        coronaPlugins += terrainPlugin
+                    }
+                }
             }
         }
         addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)

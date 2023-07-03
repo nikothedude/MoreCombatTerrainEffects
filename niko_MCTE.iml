@@ -15,5 +15,11 @@
     <orderEntry type="library" name="GraphicsLib" level="project" />
     <orderEntry type="library" name="Console Commands" level="project" />
     <orderEntry type="library" name="LunaLib" level="project" />
+    <orderEntry type="library" name="niko_morePlanetaryConditions" level="project" />
+    <orderEntry type="library" name="indevo" level="project" />
+    <orderEntry type="library" name="src" level="project" />
+    <orderEntry type="library" name="jar" level="project" />
+    <orderEntry type="library" name="Interstellar Imperium" level="project" />
+    <orderEntry type="library" name="al_arkleg" level="project" />
   </component>
 </module>
