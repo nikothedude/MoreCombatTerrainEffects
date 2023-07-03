@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="niko_morePlanetaryConditions">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../More Planetary Conditions/jars/niko_morePlanetaryConditions.jar!/" />
+      <root url="file://$PROJECT_DIR$/../More Planetary Conditions" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../More Planetary Conditions/src" />
+      <root url="file://$PROJECT_DIR$/../More Planetary Conditions/src" />
+      <root url="file://$PROJECT_DIR$/../More Planetary Conditions" />
+      <root url="file://$PROJECT_DIR$/../More Planetary Conditions/src" />
+    </SOURCES>
+  </library>
+</component>
