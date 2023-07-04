@@ -194,7 +194,7 @@ object MCTE_settings {
         HYPERSTORM_SPEED_MAX_TARGETTING_MULT = configJson.getFloat( "MCTE_hyperstormSpeedTargettingMaxMult")!!
         HYPERSTORM_PRIMARY_RANDOMNESS_MULT = configJson.getFloat( "MCTE_hyperstormPrimaryRandomnessThreshold")!!/100
 
-        HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = LunaSettings.getInt(modId,"MCTE_refinementIterations")!!
+        HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS = configJson.getInt("MCTE_refinementIterations")
 
         HYPERSTORM_TIMES_TO_ARC_AGAINST_SHIP = configJson.getInt("MCTE_hyperstormTimesToArc")
 
@@ -202,10 +202,10 @@ object MCTE_settings {
         BLACKHOLE_TIMEMULT_MULT = configJson.getFloat("MCTE_blackHoleTimemultMult")!!
         BLACKHOLE_PPT_COMPENSATION = configJson.getFloat("MCTE_blackHolePPTCompensation")!!/100
         BLACKHOLE_BASE_GRAVITY = configJson.getFloat("MCTE_gravityMult")!!
-        BLACKHOLE_GRAVITY_ENABLED = LunaSettings.getBoolean(modId,"MCTE_blackHoleGravityEnabled")!!
+        BLACKHOLE_GRAVITY_ENABLED = configJson.getBoolean("MCTE_blackHoleGravityEnabled")!!
 
         // PULSAR
-        PULSAR_FORCE_ENABLED = LunaSettings.getBoolean(modId,"MCTE_pulsarForceEnabled")!!
+        PULSAR_FORCE_ENABLED = configJson.getBoolean("MCTE_pulsarForceEnabled")!!
         PULSAR_BASE_FORCE = configJson.getFloat("MCTE_pulsarForceMult")!!
         PULSAR_INTENSITY_BASE_MULT = configJson.getFloat("MCTE_pulsarBaseIntensityMult")!!
         PULSAR_PPT_COMPENSATION = configJson.getFloat("MCTE_pulsarPPTCompensation")!!/100
