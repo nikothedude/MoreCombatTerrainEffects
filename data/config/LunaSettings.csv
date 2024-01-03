@@ -1,4 +1,5 @@
 modID,fieldID,fieldName,fieldType,defaultValue,fieldTooltip,minValue,maxValue,tab
+niko_moreCombatTerrainEffects,MCTE_settingsReminder,irrelevant,Header,See MCTE_settings.json for more specific settings,,,,
 niko_moreCombatTerrainEffects,MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,
 niko_moreCombatTerrainEffects,MCTE_magneticFieldToggle,Magnetic Fields,Boolean,true,"Magnetic fields reduce the weapon/fighter range, vision, missile mauneverability/guidance, and ECCM chance of any fleet in it, and
 also have a chance for missiles to randomly break lock, affected by the missile's ECM chance. Magnetic storms are a more intense version of magnetic fields.
@@ -11,7 +12,7 @@ Nebulae spawned by storming cells of deep hyperspace will periodically strike ne
 Follows the same rules as campaign layer: Solar shielding reduces the damage, moving slowly reduces targetting chance, larger ships have a higher chance of being targetted.",,,
 niko_moreCombatTerrainEffects,MCTE_slipstreamToggle,Slipstreams,Boolean,true,"Slipstreams force safety overrides on all ships/fighters/missiles, with the caveat that venting is allowed (less efficient). If safety overrides (or similar) is already applied, doubles zero-flux boost.
 Slowly generates hardflux on all ships as well.",,,
-niko_moreCombatTerrainEffects,MCTE_nebulaToggle,Nebulae,Boolean,true,"Ships within nebulae lose their zero-flux boost, some top speed, and some weapon range. Zero-flux boost and speed are preserved with insulated engine assembly.
+niko_moreCombatTerrainEffects,MCTE_nebulaToggle,Nebulae,Boolean,false,"Ships within nebulae lose their zero-flux boost, some top speed, and some weapon range. Zero-flux boost and speed are preserved with insulated engine assembly.
 This does not affect the campaign-layer nebulae, only the combat-layer ones, which can spawn anywhere. The nebula terrain only increases how many clouds spawn.
 ",,,
 niko_moreCombatTerrainEffects,MCTE_blackholeToggle,Black Holes,Boolean,true,"Black holes lose some of their CR penalty in exchange for increasing timeflow on all ships in combat, as well as gaining an extremely strong gravitational effect which drags all combat entities towards the black hole's campaign location. Effect scales with your proximity to the black hole in the campaign layer.

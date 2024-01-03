@@ -5,9 +5,11 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.CampaignFleetAPI
 import com.fs.starfarer.api.campaign.CampaignTerrainAPI
 import com.fs.starfarer.api.campaign.LocationAPI
+import com.fs.starfarer.api.campaign.SectorEntityToken
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI.CloudAPI
+import com.fs.starfarer.api.impl.campaign.ids.Tags
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
@@ -28,6 +30,7 @@ import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
 import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.COMMS_RELAY_MAX_DISTANCE
 import niko.MCTE.settings.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
@@ -62,6 +65,7 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.utils.MCTE_nebulaUtils
 import niko.MCTE.utils.MCTE_nebulaUtils.getCloudsInRadius
+import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector
 import org.lwjgl.util.vector.Vector2f
@@ -81,6 +85,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val playerCoordinates = playerFleet.location ?: return
 
         evaluateTerrainAndAddScripts(engine, playerFleet, playerLocation, playerCoordinates)
+        evaluateStrategicEmplacements(engine, playerFleet, playerLocation, playerCoordinates)
 
         engine.removePlugin(this)
     }
@@ -126,6 +131,46 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, blackHoleTerrainPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
         // dust clouds already have an effect
+    }
+
+    private fun evaluateStrategicEmplacements(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f) {
+
+        val commRelays: MutableSet<SectorEntityToken> = HashSet()
+        val navBuoys: MutableSet<SectorEntityToken> = HashSet()
+        val sensorRelays: MutableSet<SectorEntityToken> = HashSet()
+
+        for (strategicObject: SectorEntityToken in playerLocation.getEntitiesWithTag(Tags.OBJECTIVE)) {
+            if (strategicObject.hasTag(Tags.COMM_RELAY)) commRelays += strategicObject
+            if (strategicObject.hasTag(Tags.SENSOR_ARRAY)) sensorRelays += strategicObject
+            if (strategicObject.hasTag(Tags.NAV_BUOY)) navBuoys += strategicObject
+        }
+
+        addCommRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, commRelays)
+        addNavBuoyScripts(engine, playerFleet, playerLocation, playerCoordinates, navBuoys)
+        addSensorRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, sensorRelays)
+    }
+
+    private fun addCommRelayScripts(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f,
+        commRelays: MutableSet<SectorEntityToken>
+    ) {
+
+        var effectStrength = 0f
+
+        for (commRelay in commRelays) {
+            val distance = MathUtils.getDistance(playerCoordinates, commRelay.location)
+            if (distance > COMMS_RELAY_MAX_DISTANCE) continue
+
+            val contribution =
+        }
+
     }
 
     private fun addPulsarScripts(

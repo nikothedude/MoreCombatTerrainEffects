@@ -110,6 +110,11 @@ object MCTE_settings {
     var PULSAR_EMP_DAMAGE_INCREMENT: Float = 20f
     var PULSAR_DAMAGE_INCREMENT: Float = 0.5f
 
+    // COMMS RELAY
+    var COMMS_RELAY_ENABLED = true
+    var COMMS_RELAY_MAX_DISTANCE = 5000f
+    var COMMS_RELAY_MIN_DISTANCE = 500f
+
     @JvmStatic
     fun getHyperstormFearThreshold(): Float {
         return (HYPERSTORM_ENERGY_DAMAGE + HYPERSTORM_EMP_DAMAGE * EMP_DAMAGE_FEAR_MULT)*0.4f
@@ -215,6 +220,8 @@ object MCTE_settings {
         PULSAR_EMP_CHANCE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcChanceIncrement")!!
         PULSAR_EMP_DAMAGE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcEMPDamageIncrement")!!
         PULSAR_DAMAGE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcEnergyDamageIncrement")!!
+
+        // COMMS RELAY
 
     }
 }
