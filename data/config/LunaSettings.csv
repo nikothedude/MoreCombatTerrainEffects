@@ -6,7 +6,7 @@ also have a chance for missiles to randomly break lock, affected by the missile'
 
 The effects are mitigated by electronic warfare resistance, e.g. ECCM package (Not the ECCM chance, which is for missiles, not ships).",,,
 niko_moreCombatTerrainEffects,MCTE_deepHyperspaceToggle,Deep Hyperspace,Boolean,true,Deep hyperspace will spawn nebula clouds in combat. Required to be true for hyperstorms to function.,,,
-niko_moreCombatTerrainEffects,MCTE_hyperstormsToggle,Hyperstorms,Boolean,true,"DOES NOT FUNCTION ON MACOS BECAUSE THE GAME WOULD CRASH. Requires deep hyperspace to be enabled.
+niko_moreCombatTerrainEffects,MCTE_hyperstormsToggle,Hyperstorms,Boolean,true,"Requires deep hyperspace to be enabled.
 
 Nebulae spawned by storming cells of deep hyperspace will periodically strike nearby ships/missiles with lightning, dealing crippling amounts of EMP damage and sending them flying. 
 Follows the same rules as campaign layer: Solar shielding reduces the damage, moving slowly reduces targetting chance, larger ships have a higher chance of being targetted.",,,
