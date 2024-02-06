@@ -14,8 +14,7 @@ import java.awt.Color
 
 object MCTE_debugUtils {
     var graphicsLibEnabled: Boolean = false
-    val systemName = System.getProperty("os.name")
-    val isWindows = systemName.startsWith("Windows")
+
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 
     init {
@@ -118,9 +117,5 @@ object MCTE_debugUtils {
             return true
         }
         return false
-    }
-
-    fun isMacOS(): Boolean {
-        return (systemName == "mac")
     }
 }

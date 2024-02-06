@@ -1,3 +1,8 @@
+1.3.1:
+Finally using the correct version num in changelog
+
+Now using reflection to call obfuscated functions which allows this to work on Mac and Linux
+
 1.2.5:
 
 Update to starsector 0.97

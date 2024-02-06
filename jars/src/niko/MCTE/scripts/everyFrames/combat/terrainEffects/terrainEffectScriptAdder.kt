@@ -15,6 +15,7 @@ import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellSt
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.Misc
+import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import com.fs.starfarer.combat.entities.terrain.`super`
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
@@ -65,10 +66,13 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.utils.MCTE_nebulaUtils
 import niko.MCTE.utils.MCTE_nebulaUtils.getCloudsInRadius
+import niko.MCTE.utils.MCTE_reflectionUtils.invoke
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector
 import org.lwjgl.util.vector.Vector2f
+import java.lang.invoke.MethodHandle
+import java.lang.invoke.MethodHandles
 
 // script to dodge plugin incompatability
 class terrainEffectScriptAdder: baseNikoCombatScript() {
@@ -85,7 +89,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val playerCoordinates = playerFleet.location ?: return
 
         evaluateTerrainAndAddScripts(engine, playerFleet, playerLocation, playerCoordinates)
-        evaluateStrategicEmplacements(engine, playerFleet, playerLocation, playerCoordinates)
+       // evaluateStrategicEmplacements(engine, playerFleet, playerLocation, playerCoordinates)
 
         engine.removePlugin(this)
     }
@@ -317,10 +321,6 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
     private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin>) {
         if (!DEEP_HYPERSPACE_EFFECT_ENABLED || engine.nebula == null || !engine.isInCampaign) return
-        if (!MCTE_debugUtils.isWindows) {
-            MCTE_debugUtils.log.info("Rejected hyperspace terrain due to potential non-windows OS crashes.")
-            return
-        }
         val nebula = engine.nebula
         var canAddScript = false
 
@@ -396,7 +396,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
     }
 
     private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> {
-        val nebulaManager = engine.nebula as? `super` ?: return HashMap() // required to use the obfuscated class due to spawnCloud not being exposed
+        val nebulaManager = engine.nebula
         val mapHeight = engine.mapHeight
         val mapWidth = engine.mapWidth
 
@@ -430,7 +430,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
                 val radiusInTiles: Int = (radius / cellSize).toInt()
 
-                nebulaManager.spawnCloud(Vector2f(x, y), radius) // this is why we need to use obfuscated classes
+                invoke("spawnCloud", nebulaManager, Vector2f(x, y), radius) // REFLECTION MAGIC
+
                 val nebula: Cloud = nebulaManager.getCloud(x, y) as Cloud
 
                 val nebulaCell: MutableSet<Cloud> = nebula.getCloudsInRadius(radiusInTiles, engine.nebula)

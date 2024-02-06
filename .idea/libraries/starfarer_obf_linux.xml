@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="starfarer_obf_linux">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../starsector modding/starfarer_obf_linux.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
