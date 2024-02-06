@@ -23,14 +23,14 @@ object MCTE_shipUtils {
 
     @JvmStatic
     fun CombatEntityAPI.isTangible(): Boolean {
-        if (this is ShipAPI) {
+        if (this is ShipAPI) { // cant find a way to overload extension methods
             if (isPhased) return false
         }
         return (collisionClass != CollisionClass.NONE)
     }
 
     @JvmStatic
-    fun CombatEntityAPI.isInsideNebulaAuxillary(): Boolean {
+    fun CombatEntityAPI.isInsideNebulaAuxillary(): Boolean { // a more accurate method of determing if a ship is in a nebula
         val nebula = Global.getCombatEngine()?.nebula ?: return false
         if (!isTangible()) return false
         val coreTile = getNebulaTile()

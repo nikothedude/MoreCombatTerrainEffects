@@ -1,5 +1,5 @@
 {
-	# RELEASE PRESET - More forgiving, disables some of the "annoying" things, like magfield range decrement.
+	# RELEASE PRESET - More forgiving, disables/tones down some of the "annoying" things, like magfield range decrement.
 	
 	#General toggles
 	#default:true

@@ -1,3 +1,18 @@
+1.2.5:
+
+Update to starsector 0.97
+
+Disabled nebula effects by default
+    Too annoying
+    Restore settings to default in lunasettings to see this change
+
+Added a new MCTE_settings.json preset: "Release"
+    More forgiving
+    Magnetic fields nerfed in it
+    Default
+
+    Old "standard" preset no longer the "standard"
+
 1.2.4:
 
 Migrated most lunalib settings to json

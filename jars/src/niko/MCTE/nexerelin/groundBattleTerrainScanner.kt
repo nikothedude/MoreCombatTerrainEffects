@@ -1,4 +1,4 @@
-package niko.MCTE.nexerelin
+/*package niko.MCTE.nexerelin
 
 import com.fs.starfarer.api.campaign.CampaignTerrainAPI
 import com.fs.starfarer.api.campaign.CampaignTerrainPlugin
@@ -76,4 +76,4 @@ class groundBattleTerrainScanner: BaseGroundBattlePlugin() {
         val newEffect = classesToPlugins[terrain.plugin.javaClass]!!.getDeclaredConstructor().newInstance(this)
     }
 
-}
+}*/

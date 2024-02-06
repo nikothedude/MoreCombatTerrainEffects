@@ -15,8 +15,8 @@ import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellSt
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.Misc
-import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import com.fs.starfarer.combat.entities.terrain.`super`
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
@@ -149,12 +149,12 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             if (strategicObject.hasTag(Tags.NAV_BUOY)) navBuoys += strategicObject
         }
 
-        addCommRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, commRelays)
-        addNavBuoyScripts(engine, playerFleet, playerLocation, playerCoordinates, navBuoys)
-        addSensorRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, sensorRelays)
+        //addCommRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, commRelays)
+        //addNavBuoyScripts(engine, playerFleet, playerLocation, playerCoordinates, navBuoys)
+        //addSensorRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, sensorRelays)
     }
 
-    private fun addCommRelayScripts(
+    /*private fun addCommRelayScripts(
         engine: CombatEngineAPI,
         playerFleet: CampaignFleetAPI,
         playerLocation: LocationAPI,
@@ -171,7 +171,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             val contribution =
         }
 
-    }
+    }*/
 
     private fun addPulsarScripts(
         engine: CombatEngineAPI,
@@ -396,7 +396,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
     }
 
     private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> {
-        val nebulaManager = (engine.nebula as? A ?: return HashMap())
+        val nebulaManager = engine.nebula as? `super` ?: return HashMap() // required to use the obfuscated class due to spawnCloud not being exposed
         val mapHeight = engine.mapHeight
         val mapWidth = engine.mapWidth
 
@@ -430,7 +430,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
                 val radiusInTiles: Int = (radius / cellSize).toInt()
 
-                nebulaManager.spawnCloud(Vector2f(x, y), radius)
+                nebulaManager.spawnCloud(Vector2f(x, y), radius) // this is why we need to use obfuscated classes
                 val nebula: Cloud = nebulaManager.getCloud(x, y) as Cloud
 
                 val nebulaCell: MutableSet<Cloud> = nebula.getCloudsInRadius(radiusInTiles, engine.nebula)

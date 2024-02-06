@@ -5,7 +5,7 @@ import com.fs.starfarer.api.combat.BoundsAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.combat.entities.terrain.Cloud
-import com.fs.starfarer.combat.entities.terrain.A
+import com.fs.starfarer.combat.entities.terrain.`super`
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.ext.plusAssign
 import org.lwjgl.util.vector.Vector2f
@@ -55,7 +55,7 @@ object MCTE_nebulaUtils {
     }
 
     fun getCellCentroid(nebulaHandler: CombatNebulaAPI, nebulaCell: MutableSet<Cloud>, ourCoordinates: Vector2f? = null): Vector2f? {
-        if (nebulaHandler is A) {
+        if (nebulaHandler is `super`) {
             var ourCoordinates = ourCoordinates
             if (ourCoordinates == null) {
                 ourCoordinates = nebulaCell.firstOrNull()?.location ?: return null
@@ -77,7 +77,7 @@ object MCTE_nebulaUtils {
         return null
     }
 
-    fun getTopCoord(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
+    fun getTopCoord(nebulaHandler: `super`, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
         var failureIndex = 0
 
         val cachedRayCastCoordinate = Vector2f(rayCastCoordinate)
@@ -100,7 +100,7 @@ object MCTE_nebulaUtils {
         return cachedRayCastCoordinate
     }
 
-    fun getBottomCoord(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
+    fun getBottomCoord(nebulaHandler: `super`, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
         var failureIndex = 0
 
         val cachedRayCastCoordinate = Vector2f(rayCastCoordinate)
@@ -123,7 +123,7 @@ object MCTE_nebulaUtils {
         return cachedRayCastCoordinate
     }
 
-    fun getLeftCoord(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
+    fun getLeftCoord(nebulaHandler: `super`, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
         var failureIndex = 0
 
         val cachedRayCastCoordinate = Vector2f(rayCastCoordinate)
@@ -146,7 +146,7 @@ object MCTE_nebulaUtils {
         return cachedRayCastCoordinate
     }
 
-    fun getRightCoord(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
+    fun getRightCoord(nebulaHandler: `super`, nebulaCell: MutableSet<Cloud>, rayCastCoordinate: Vector2f): Vector2f {
         var failureIndex = 0
 
         val cachedRayCastCoordinate = Vector2f(rayCastCoordinate)
@@ -169,7 +169,7 @@ object MCTE_nebulaUtils {
         return cachedRayCastCoordinate
     }
 
-    fun digToSeeIfCloudInCell(nebulaHandler: A, nebulaCell: MutableSet<Cloud>, cloud: Cloud?): Boolean {
+    fun digToSeeIfCloudInCell(nebulaHandler: `super`, nebulaCell: MutableSet<Cloud>, cloud: Cloud?): Boolean {
         if (cloud == null) return false
 
         var possibleCellInhabitant = cloud.flowDest
@@ -183,7 +183,7 @@ object MCTE_nebulaUtils {
     }
 
     fun getRadiusOfCell(cell: MutableSet<Cloud>, nebula: CombatNebulaAPI, centroid: Vector2f): Float {
-        if (nebula is A) {
+        if (nebula is `super`) {
             val topCoord = getTopCoord(nebula, cell, Vector2f(centroid))
             val bottomCoord = getBottomCoord(nebula, cell, Vector2f(centroid))
             val leftCoord = getLeftCoord(nebula, cell, Vector2f(centroid))
