@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="KnightsOfSelkie">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Knights of Ludd/jars/KnightsOfSelkie.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../Knights of Ludd/src" />
+      <root url="file://$PROJECT_DIR$/../Knights of Ludd/src" />
+      <root url="file://$PROJECT_DIR$/../Knights of Ludd" />
+      <root url="file://$PROJECT_DIR$/../Knights of Ludd/src" />
+    </SOURCES>
+  </library>
+</component>

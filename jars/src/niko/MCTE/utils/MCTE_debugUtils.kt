@@ -14,6 +14,7 @@ import java.awt.Color
 
 object MCTE_debugUtils {
     var graphicsLibEnabled: Boolean = false
+    var KOLenabled: Boolean = false
 
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 

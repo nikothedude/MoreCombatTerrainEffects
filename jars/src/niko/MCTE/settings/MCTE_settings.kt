@@ -6,11 +6,15 @@ import niko.MCTE.utils.MCTE_ids.masterConfig
 import niko.MCTE.utils.MCTE_ids.modId
 import org.json.JSONException
 import org.lazywizard.lazylib.ext.json.getFloat
+import org.lwjgl.util.vector.Vector2f
 import java.io.IOException
 import java.lang.NullPointerException
 import kotlin.jvm.Throws
 
 object MCTE_settings {
+
+    const val debrisFieldHulkificationLocationX = 9999f
+    const val debrisFieldHulkificationLocationY = 9999f
 
     var SHOW_SIDEBAR_INFO: Boolean = true
 
@@ -110,6 +114,9 @@ object MCTE_settings {
     var PULSAR_EMP_DAMAGE_INCREMENT: Float = 20f
     var PULSAR_DAMAGE_INCREMENT: Float = 0.5f
 
+    // DEBRIS FIELD
+    var MAX_SHIPS_ALLOWED = 500
+
     // COMMS RELAY
     var COMMS_RELAY_ENABLED = true
     var COMMS_RELAY_MAX_DISTANCE = 5000f
@@ -134,7 +141,7 @@ object MCTE_settings {
         DEEP_HYPERSPACE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_deepHyperspaceToggle")!!
         HYPERSTORM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_hyperstormsToggle")!!
         SLIPSTREAM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_slipstreamToggle")!!
-        //DEBRIS_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"enableDebrisFieldEffect")!!
+        DEBRIS_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_debrisFieldToggle")!!
         //DUST_CLOUD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"enableDustcloudEffect")!!
         EXTRA_NEBULA_EFFECTS_ENABLED = LunaSettings.getBoolean(modId,"MCTE_nebulaToggle")!!
         BLACK_HOLE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_blackholeToggle")!!
@@ -220,6 +227,8 @@ object MCTE_settings {
         PULSAR_EMP_CHANCE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcChanceIncrement")!!
         PULSAR_EMP_DAMAGE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcEMPDamageIncrement")!!
         PULSAR_DAMAGE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcEnergyDamageIncrement")!!
+
+        //MAX_SHIPS_ALLOWED = configJson.getInt("MCTE_debrisFieldMaxPieces")!!
 
         // COMMS RELAY
 

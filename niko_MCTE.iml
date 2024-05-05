@@ -24,5 +24,8 @@
     <orderEntry type="library" name="starfarer_obf_linux" level="project" />
     <orderEntry type="library" name="starfarer_obf_mac" level="project" />
     <orderEntry type="library" name="starsector-core" level="project" />
+    <orderEntry type="library" name="ExerelinCore" level="project" />
+    <orderEntry type="library" name="AITweaks" level="project" />
+    <orderEntry type="library" name="KnightsOfSelkie" level="project" />
   </component>
 </module>

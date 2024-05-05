@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="AITweaks">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../AITweaks/jars/AITweaks.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

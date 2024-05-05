@@ -8,30 +8,22 @@ import com.fs.starfarer.api.campaign.LocationAPI
 import com.fs.starfarer.api.campaign.SectorEntityToken
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
-import com.fs.starfarer.api.combat.CombatNebulaAPI.CloudAPI
 import com.fs.starfarer.api.impl.campaign.ids.Tags
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.Misc
-import com.fs.starfarer.combat.entities.terrain.A
 import com.fs.starfarer.combat.entities.terrain.Cloud
-import com.fs.starfarer.combat.entities.terrain.`super`
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
-import niko.MCTE.utils.MCTE_debugUtils
-import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
-import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.COMMS_RELAY_MAX_DISTANCE
 import niko.MCTE.settings.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
@@ -64,15 +56,15 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
+import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_nebulaUtils
+import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
 import niko.MCTE.utils.MCTE_nebulaUtils.getCloudsInRadius
+import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
 import niko.MCTE.utils.MCTE_reflectionUtils.invoke
-import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
-import org.lwjgl.util.vector.Vector
 import org.lwjgl.util.vector.Vector2f
-import java.lang.invoke.MethodHandle
-import java.lang.invoke.MethodHandles
+import org.selkie.kol.impl.terrain.AbyssPulsarBeam
 
 // script to dodge plugin incompatability
 class terrainEffectScriptAdder: baseNikoCombatScript() {
@@ -115,7 +107,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 if (terrainPlugin is PulsarBeamTerrainPlugin) pulsarPlugins += terrainPlugin
                 if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
                 if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
-                //if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
+              //  if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
                 if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
                 if (terrainPlugin is EventHorizonPlugin) blackHoleTerrainPlugins += terrainPlugin
                 if (terrainPlugin is StarCoronaTerrainPlugin) {
@@ -130,7 +122,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
         addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, slipstreamPlugins)
         addPulsarScripts(engine, playerFleet, playerLocation, playerCoordinates, pulsarPlugins)
-        //addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
+      //  addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
         addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, blackHoleTerrainPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
@@ -209,6 +201,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             energyDamage += (PULSAR_DAMAGE_INCREMENT * intensity)
 
             pluginToIntensity[plugin] = (intensity)
+            var angle = (VectorUtils.getAngle(plugin.entity.location, playerCoordinates))
             pluginToAngle[plugin] = (VectorUtils.getAngle(plugin.entity.location, playerCoordinates))
             canAddScript = true
         }
@@ -457,7 +450,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
      } */
 
-    private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
+    /*private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
         if (!DEBRIS_FIELD_EFFECT_ENABLED) return
 
         var canAddPlugin = false
@@ -497,14 +490,18 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         }
 
         if (canAddPlugin) {
+            val representations: MutableSet<debrisFieldParamsRepresentation> = HashSet()
+            for (plugin in debrisFieldPlugins) {
+                representations += debrisFieldParamsRepresentation(plugin)
+            }
             engine.addPlugin(
                 debrisFieldEffectScript(
                     debrisDensity.toDouble(),
-                    specialSalvage
+                    representations
             ))
         }
     }
-
+*/
     private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2>) {
         if (!SLIPSTREAM_EFFECT_ENABLED) return
 

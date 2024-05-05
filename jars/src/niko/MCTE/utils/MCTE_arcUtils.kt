@@ -158,7 +158,7 @@ object MCTE_arcUtils {
                               intensity: Float, size: Float,
                               specIntensity: Float, specSize: Float, specularMult: Float,
                               fadeOutMin: Float, fadeOutMax: Float,
-                              specFadeOutMin: Float, specFadeOutMax: Float) {
+                              specFadeOutMin: Float, specFadeOutMax: Float,) {
         if (!MCTE_debugUtils.graphicsLibEnabled) return
         val engine = Global.getCombatEngine()
         val viewPort = engine.viewport

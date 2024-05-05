@@ -23,15 +23,15 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         }
 
         MCTE_debugUtils.graphicsLibEnabled = Global.getSettings().modManager.isModEnabled("shaderLib")
+        MCTE_debugUtils.KOLenabled = Global.getSettings().modManager.isModEnabled("knights_of_ludd")
     }
 
     override fun onGameLoad(newGame: Boolean) {
         super.onGameLoad(newGame)
 
-        //Global.getSector().listenerManager.addListener(settingsChangedListener(), true)
         LunaSettings.addSettingsListener(settingsChangedListener())
 
-        //Global.getSector().listenerManager.addListener(combatEndListener(false), true)
+        //Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))
     }
 
     class settingsChangedListener : LunaSettingsListener {
