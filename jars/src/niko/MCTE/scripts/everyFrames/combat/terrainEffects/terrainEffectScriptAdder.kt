@@ -2,10 +2,7 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects
 
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
-import com.fs.starfarer.api.campaign.CampaignFleetAPI
-import com.fs.starfarer.api.campaign.CampaignTerrainAPI
-import com.fs.starfarer.api.campaign.LocationAPI
-import com.fs.starfarer.api.campaign.SectorEntityToken
+import com.fs.starfarer.api.campaign.*
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.impl.campaign.ids.Tags
@@ -13,18 +10,19 @@ import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
-import com.fs.starfarer.api.util.Misc
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import data.scripts.campaign.terrain.niko_MPC_mesonField
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.mesonField.mesonFieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
+import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
@@ -41,6 +39,12 @@ import niko.MCTE.settings.MCTE_settings.MAGSTORM_RANGE_MULT
 import niko.MCTE.settings.MCTE_settings.MAGSTORM_VISION_MULT
 import niko.MCTE.settings.MCTE_settings.MAG_FIELD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.MAX_HYPERCLOUDS_TO_ADD_PER_CELL
+import niko.MCTE.settings.MCTE_settings.MESON_FIELD_VISION_MULT
+import niko.MCTE.settings.MCTE_settings.MESON_FIELD_WEAPON_RANGE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.MESON_STORM_SYSTEM_RANGE_MULT
+import niko.MCTE.settings.MCTE_settings.MESON_STORM_VISION_MULT
+import niko.MCTE.settings.MCTE_settings.MESON_STORM_WEAPON_RANGE_INCREMENT
+import niko.MCTE.settings.MCTE_settings.MESON_STORM_WING_RANGE_INCREMENT
 import niko.MCTE.settings.MCTE_settings.MIN_HYPERCLOUDS_TO_ADD_PER_CELL
 import niko.MCTE.settings.MCTE_settings.PULSAR_DAMAGE_INCREMENT
 import niko.MCTE.settings.MCTE_settings.PULSAR_EFFECT_ENABLED
@@ -57,14 +61,15 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.utils.MCTE_debugUtils
+import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.MCTE_nebulaUtils
 import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
 import niko.MCTE.utils.MCTE_nebulaUtils.getCloudsInRadius
 import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
 import niko.MCTE.utils.MCTE_reflectionUtils.invoke
+import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
-import org.selkie.kol.impl.terrain.AbyssPulsarBeam
 
 // script to dodge plugin incompatability
 class terrainEffectScriptAdder: baseNikoCombatScript() {
@@ -76,14 +81,42 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         loadSettings()
 
         val engine = Global.getCombatEngine() ?: return
-        val playerFleet = Global.getSector()?.playerFleet ?: return
-        val playerLocation = playerFleet.containingLocation ?: return
-        val playerCoordinates = playerFleet.location ?: return
 
-        evaluateTerrainAndAddScripts(engine, playerFleet, playerLocation, playerCoordinates)
-       // evaluateStrategicEmplacements(engine, playerFleet, playerLocation, playerCoordinates)
+        if (engine.isMission && engine.missionId?.isNotEmpty() == true) {
+           // evaluateMissionParameters(engine, engine.missionId)
+        } else if (!terrainEffectsBlocked()){
+            val playerFleet = Global.getSector()?.playerFleet ?: return
+            val playerLocation = playerFleet.containingLocation ?: return
+            val playerCoordinates = playerFleet.location ?: return
+            evaluateTerrainAndAddScripts(engine, playerFleet, playerLocation, playerCoordinates)
+            evaluateStrategicEmplacements(engine, playerFleet, playerLocation, playerCoordinates)
+        }
 
         engine.removePlugin(this)
+    }
+
+    /// Should approximate if the current battleplugin disallowed terrain effects, and return the result
+    private fun terrainEffectsBlocked(): Boolean {
+        if (MCTE_settings.BLOCK_EFFECTS_ON_ENTITY_INTERACTION) {
+            val cachedEntity =
+                Global.getSector().memoryWithoutUpdate[MCTE_ids.cachedInteractionTargetId] as? SectorEntityToken
+            if (cachedEntity != null && cachedEntity.hasTag(Tags.PROTECTS_FROM_CORONA_IN_BATTLE)) return true
+        }
+
+        if (MCTE_settings.BLOCK_EFFECTS_ON_ENTITY_PROXIMITY) {
+            val playerFleet = Global.getSector().playerFleet
+            val containingLocation = playerFleet.containingLocation
+
+            for (entity in containingLocation.getEntitiesWithTag(Tags.PROTECTS_FROM_CORONA_IN_BATTLE)) {
+                val entityRadius = entity.radius
+                val playerRadius = playerFleet.radius
+
+                val dist = MathUtils.getDistance(entity, playerFleet)
+
+                if (dist <= (entityRadius + playerRadius + 10f)) return true
+            }
+        }
+        return false
     }
 
     private fun evaluateTerrainAndAddScripts(
@@ -101,6 +134,9 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val coronaPlugins: MutableSet<StarCoronaTerrainPlugin> = HashSet()
         val ionStormPlugins: MutableSet<StarCoronaAkaMainyuTerrainPlugin> = HashSet()
 
+        // MODDED TERRAIN
+        val mesonFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet() // cant type it correctly else itd probs crash
+
         for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
             val terrainPlugin = terrain.plugin
             if (terrainPlugin.containsEntity(playerFleet)) {
@@ -117,6 +153,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                         coronaPlugins += terrainPlugin
                     }
                 }
+                // MPC
+                if (MCTE_debugUtils.MPCenabled && terrainPlugin is niko_MPC_mesonField) mesonFieldPlugins += terrainPlugin
             }
         }
         addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
@@ -125,8 +163,55 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
       //  addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
         addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, blackHoleTerrainPlugins)
+        addMesonFieldTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, mesonFieldPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
         // dust clouds already have an effect
+    }
+
+    private fun addMesonFieldTerrainScripts(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f,
+        mesonFieldPlugins: MutableSet<CampaignTerrainPlugin>
+    ) {
+        if (!MCTE_debugUtils.MPCenabled || !MCTE_settings.MESON_FIELD_ENABLED) return
+
+        var weaponRangeIncrement = 1f
+        var wingRangeIncrement = 1f
+        var systemRangeMult = 1f
+        var visionMult = 1f
+        var isStorm = false
+
+        var canAddScript = false
+
+        val plugins: MutableSet<niko_MPC_mesonField> = mesonFieldPlugins as MutableSet<niko_MPC_mesonField>
+        for (plugin in plugins) {
+            val flareManager = plugin.flareManager ?: continue
+            if (flareManager.isInActiveFlareArc(playerFleet)) {
+                isStorm = true
+
+                weaponRangeIncrement += MESON_STORM_WEAPON_RANGE_INCREMENT
+                wingRangeIncrement += MESON_STORM_WING_RANGE_INCREMENT
+                systemRangeMult += MESON_STORM_SYSTEM_RANGE_MULT
+                visionMult += MESON_STORM_VISION_MULT
+            } else {
+                weaponRangeIncrement += MESON_FIELD_WEAPON_RANGE_INCREMENT
+                visionMult += MESON_FIELD_VISION_MULT
+            }
+            canAddScript = true
+        }
+
+        if (canAddScript) {
+            val mesonScript = mesonFieldEffectScript(
+                isStorm,
+                weaponRangeIncrement,
+                systemRangeMult,
+                wingRangeIncrement,
+                visionMult
+            )
+            mesonScript.start()
+        }
     }
 
     private fun evaluateStrategicEmplacements(
@@ -158,15 +243,19 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         commRelays: MutableSet<SectorEntityToken>
     ) {
 
+        val battle = playerFleet.battle ?: return
         var effectStrength = 0f
 
         for (commRelay in commRelays) {
             val distance = MathUtils.getDistance(playerCoordinates, commRelay.location)
             if (distance > COMMS_RELAY_MAX_DISTANCE) continue
 
-            val contribution =
+            val mult = (1 - (distance / COMMS_RELAY_MAX_DISTANCE))
+
+            //val contribution
         }
 
+        //val
     }*/
 
     private fun addPulsarScripts(
@@ -178,8 +267,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
     ) {
         if (!PULSAR_EFFECT_ENABLED) return
 
-        val pluginToIntensity: MutableMap<PulsarBeamTerrainPlugin, Float> = HashMap()
-        val pluginToAngle: MutableMap<PulsarBeamTerrainPlugin, Float> = HashMap()
+        val angleToIntensity: MutableMap<Float, Float> = HashMap()
         var canAddScript: Boolean = false
         var hardFluxGenPerFrame = 0f
         var bonusEMPDamageForWeapons = 0f
@@ -200,16 +288,13 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             EMPDamage += (PULSAR_EMP_DAMAGE_INCREMENT * intensity)
             energyDamage += (PULSAR_DAMAGE_INCREMENT * intensity)
 
-            pluginToIntensity[plugin] = (intensity)
             var angle = (VectorUtils.getAngle(plugin.entity.location, playerCoordinates))
-            pluginToAngle[plugin] = (VectorUtils.getAngle(plugin.entity.location, playerCoordinates))
+            angleToIntensity[angle] = intensity
             canAddScript = true
         }
         if (canAddScript) {
             val pulsarPlugin = pulsarEffectScript(
-                pulsarPlugins,
-                pluginToIntensity,
-                pluginToAngle,
+                angleToIntensity,
                 hardFluxGenPerFrame,
                 bonusEMPDamageForWeapons,
                 shieldDestabilziationMult,
@@ -232,25 +317,22 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         if (!BLACK_HOLE_EFFECT_ENABLED) return
 
         var timeMult = 1f
-        val pluginToIntensity: MutableMap<EventHorizonPlugin, Float> = HashMap()
-        val pluginToAngle: MutableMap<EventHorizonPlugin, Float> = HashMap()
+        val angleToIntensity: MutableMap<Float, Float> = HashMap()
         var canAddScript: Boolean = false
 
         for (plugin: EventHorizonPlugin in blackHoleTerrainPlugins) {
             if (playerLocation != plugin.entity.containingLocation) continue
             val intensity = plugin.getIntensityAtPoint(playerCoordinates)
             timeMult += getBlackholeTimeMultIncrement(engine, playerFleet, playerLocation, playerCoordinates, plugin, intensity)
-            pluginToIntensity[plugin] = intensity
-            pluginToAngle[plugin] = (VectorUtils.getAngle(playerCoordinates, plugin.entity.location))
+            angleToIntensity[(VectorUtils.getAngle(playerCoordinates, plugin.entity.location))] = intensity
             //gravityPointsToIntensity[getGravityPointOfBlackHole(engine, playerCoordinates, plugin)] = intensity
 
             canAddScript = true
         }
         if (canAddScript) {
             val blackHolePlugin = blackHoleEffectScript(
+                angleToIntensity,
                 timeMult,
-                pluginToIntensity,
-                pluginToAngle,
                 playerCoordinates
             )
             blackHolePlugin.start()
@@ -564,7 +646,6 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 rangeMod,
                 eccmChanceMod,
                 missileBreakLockBaseChance,
-                magneticFieldPlugins
             )
             magFieldPlugin.start()
         }

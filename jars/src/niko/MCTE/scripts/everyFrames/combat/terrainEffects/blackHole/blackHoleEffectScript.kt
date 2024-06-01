@@ -22,9 +22,8 @@ import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
 class blackHoleEffectScript(
+    val anglesToIntensity: MutableMap<Float, Float>,
     val timeMult: Float,
-    val pluginsToIntensity: MutableMap<EventHorizonPlugin, Float>,
-    val pluginsToAngle: MutableMap<EventHorizonPlugin, Float>,
     val playerCoordinates: Vector2f
     //val gravityPointsToIntensity: MutableMap<Vector2f, Float> = HashMap()
 ): baseTerrainEffectScript(), usesDeltaTime {
@@ -50,8 +49,8 @@ class blackHoleEffectScript(
         if (engine.isPaused) return
         if (!BLACKHOLE_GRAVITY_ENABLED) return
         if (!canAdvance(amount)) return
-        for (entry in pluginsToIntensity.entries) {
-            val plugin = entry.key
+        for (entry in anglesToIntensity.entries) {
+            val angle = entry.key
             val intensity = entry.value
 
             for (entity: CombatEntityAPI in engine.getAllObjects()) {
@@ -63,7 +62,6 @@ class blackHoleEffectScript(
                     }
                 }
                 val pushForce = getGravityForceForEntity(entity, intensity)
-                val angle = pluginsToAngle[plugin]!!
                 applyForceWithSuppliedMass(entity, mass, MathUtils.getPointOnCircumference(Vector2f(0f, 0f), 1f, angle), pushForce)
                 //entity.applyForce(angle, pushForce)
             }

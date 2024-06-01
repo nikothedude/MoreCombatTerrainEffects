@@ -279,3 +279,67 @@ class debrisFieldParamsRepresentation(var density: Float, var source: DebrisFiel
 
 
 }*/
+
+/*class debrisFieldParamsRepresentation(var density: Float, var source: DebrisFieldSource, val plugin: DebrisFieldTerrainPlugin?) {
+    //ship ids are the same across the master ship and its fragments
+    val shipIdToPieces: MutableMap<String, MutableSet<ShipAPI>> = HashMap()
+    val timesToSplitPicker = WeightedRandomPicker<Int>()
+    init {
+        addWeightsToPicker()
+    }
+
+    private fun addWeightsToPicker() {
+        when(source) {
+            DebrisFieldSource.PLAYER_SALVAGE, DebrisFieldSource.SALVAGE -> {
+                timesToSplitPicker.add(3, 20f)
+                timesToSplitPicker.add(2, 20f)
+                timesToSplitPicker.add(1, 20f)
+                timesToSplitPicker.add(0, 10f)
+            }
+            DebrisFieldSource.MIXED, DebrisFieldSource.GEN -> {
+                timesToSplitPicker.add(5, 5f)
+                timesToSplitPicker.add(2, 30f)
+                timesToSplitPicker.add(1, 10f)
+                timesToSplitPicker.add(0, 100000f)
+            }
+            DebrisFieldSource.BATTLE -> {
+                timesToSplitPicker.add(2, 10f)
+                timesToSplitPicker.add(1, 20f)
+                timesToSplitPicker.add(0, 200000f)
+            }
+        }
+    }
+
+    fun getVariantForHulk(): String? {
+        return when(source) {
+            DebrisFieldSource.BATTLE -> getVariantFromBattle()
+            else -> getGlobalDebrisFieldShipSourcePicker().pick()
+        }
+    }
+
+    fun getEffectiveDensity(): Double {
+        return density*5.0
+    }
+
+
+    private fun getVariantFromBattle(): String? {
+        if (plugin == null) return getGlobalDebrisFieldShipSourcePicker().pick()
+        val creationParams: debrisFieldCreationData = plugin.entity.memoryWithoutUpdate[MCTE_ids.MCTE_debris_info] as? debrisFieldCreationData ?: return getGlobalDebrisFieldShipSourcePicker().pick()
+        val variantDifference = creationParams.variantsPotentiallyLost
+        val variantPicked = variantDifference.randomOrNull()
+        if (variantPicked != null) {
+            variantDifference -= variantPicked
+            return variantPicked.originalVariant
+        }
+        return null
+
+        /*val pickedFaction = creationParams.factionsInvolved.randomOrNull() ?: return getGlobalDebrisFieldShipSourcePicker().pick()
+        val picker: WeightedRandomPicker<ShipRolePick> = WeightedRandomPicker(pickedFaction.pickShip())
+        return pickedFaction.pickShip()*/
+    }
+
+    constructor(plugin: DebrisFieldTerrainPlugin) : this(plugin.params.density, plugin.params.source, plugin)
+
+
+
+}*/

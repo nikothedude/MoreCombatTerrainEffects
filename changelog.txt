@@ -1,3 +1,17 @@
+1.4.0
+New effect: Meson Field (More Planetary Conditions)
+    The field moderately increases non-missile weapon range and vision range
+    The storm significantly increases all weapon range, vision range, system range, and wing engagement range
+
+Fixed terrain effects applying when fighting on a hypershunt (or a gravitational dynamo for you RAT fans)
+
+New lunasettings config
+    Block effects on terrain-blocker interaction
+    Block effects on terrain-blocker proximity
+
+Fully uncoupled terrain effects from the terrain plugins
+    Theoretically, a mission can now be ran with terrain effects
+
 1.3.2:
 
 Hotfix for nexerelin crash

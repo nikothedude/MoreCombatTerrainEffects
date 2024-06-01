@@ -23,7 +23,6 @@ class magneticFieldEffect(
     val rangeMod: Float,
     val eccmChanceMod: Float,
     var missileBreakLockBaseChance: Float,
-    val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin>
     ): baseTerrainEffectScript(), usesDeltaTime {
 
     override var deltaTime = 0f
@@ -142,7 +141,7 @@ class magneticFieldEffect(
             "niko_MCPE_magFieldInterference6",
             icon,
             "Magnetic $stormOrNot",
-            "${calculateScrambleChancePerSecond(ship)}% chance for missiles' guidance to be scrambled per 1 second(s)",
+            "${calculateScrambleChancePerSecond(ship) * 100}% chance for missiles' guidance to be scrambled per 1 second(s)",
             true)
         return true
     }

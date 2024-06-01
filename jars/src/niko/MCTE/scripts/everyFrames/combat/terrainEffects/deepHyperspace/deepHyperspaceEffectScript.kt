@@ -134,16 +134,6 @@ class deepHyperspaceEffectScript(
         }
     }
 
-    fun drawRect(bl: Vector2f, br: Vector2f, tr: Vector2f? = null, tl: Vector2f? = null) {
-        glBegin(GL_LINE_LOOP)
-
-        glVertex2f(bl.x, bl.y);
-        glVertex2f(br.x, bl.y);
-        glVertex2f(br.x, bl.y);
-        glVertex2f(bl.x, br.y);
-
-        glEnd();
-    }
     private fun handleWarnedShips(amount: Float) {
         val shipIterator = warnedShipsToCells.keys.iterator()
         while (shipIterator.hasNext()) {
@@ -412,7 +402,7 @@ class deepHyperspaceEffectScript(
 
         modifier *= MathUtils.clamp((speed - modifiedSpeedThreshold) * HYPERSTORM_SPEED_TARGETTING_COEFFICIENT, 0f, HYPERSTORM_SPEED_MAX_TARGETTING_MULT)
         if (modifier <= 0f) return modifier.coerceAtLeast(0f)
-        modifier += MathUtils.clamp(((modifiedMass)* HYPERSTORM_MASS_TARGETTING_COEFFICIENT), 0.0f, HYPERSTORM_MASS_MAX_TARGETTING_MULT)
+        modifier += MathUtils.clamp(((modifiedMass) * HYPERSTORM_MASS_TARGETTING_COEFFICIENT), 0.0f, HYPERSTORM_MASS_MAX_TARGETTING_MULT)
 
         modifier *= MathUtils.getRandomNumberInRange(0.8f, 1.2f)
 

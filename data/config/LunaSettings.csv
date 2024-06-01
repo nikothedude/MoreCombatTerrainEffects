@@ -1,21 +1,27 @@
-modID,fieldID,fieldName,fieldType,defaultValue,fieldTooltip,minValue,maxValue,tab
-niko_moreCombatTerrainEffects,MCTE_settingsReminder,irrelevant,Header,See MCTE_settings.json for more specific settings,,,,
-niko_moreCombatTerrainEffects,MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,
-niko_moreCombatTerrainEffects,MCTE_magneticFieldToggle,Magnetic Fields,Boolean,true,"Magnetic fields reduce the weapon/fighter range, vision, missile mauneverability/guidance, and ECCM chance of any fleet in it, and
+fieldID,fieldName,fieldType,defaultValue,fieldTooltip,minValue,maxValue,tab
+MCTE_settingsReminder,irrelevant,Header,See MCTE_settings.json for more specific settings,,,,
+MCTE_generalSettingsheader,awdawd,Header,General Settings,,,,
+MCTE_blockEffectsOnEntityInteraction,Block effects on terrain-blocker interaction,Boolean,false,Allows things like hypershunts and RAT's gravitational dynamo to block terrain effects on interaction.,,,
+MCTE_blockEffectsOnEntityProximity,Block effects on terrain-blocker proximity,Boolean,false,Causes the above terrain blockers to also block terrain if you fly over them. Works with or without the above setting.,,,
+MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,
+MCTE_magneticFieldToggle,Magnetic Fields,Boolean,true,"Magnetic fields reduce the weapon/fighter range, vision, missile mauneverability/guidance, and ECCM chance of any fleet in it, and
 also have a chance for missiles to randomly break lock, affected by the missile's ECM chance. Magnetic storms are a more intense version of magnetic fields.
 
 The effects are mitigated by electronic warfare resistance, e.g. ECCM package (Not the ECCM chance, which is for missiles, not ships).",,,
-niko_moreCombatTerrainEffects,MCTE_deepHyperspaceToggle,Deep Hyperspace,Boolean,true,Deep hyperspace will spawn nebula clouds in combat. Required to be true for hyperstorms to function.,,,
-niko_moreCombatTerrainEffects,MCTE_hyperstormsToggle,Hyperstorms,Boolean,true,"Requires deep hyperspace to be enabled.
+MCTE_deepHyperspaceToggle,Deep Hyperspace,Boolean,true,Deep hyperspace will spawn nebula clouds in combat. Required to be true for hyperstorms to function.,,,
+MCTE_hyperstormsToggle,Hyperstorms,Boolean,true,"Requires deep hyperspace to be enabled.
 
 Nebulae spawned by storming cells of deep hyperspace will periodically strike nearby ships/missiles with lightning, dealing crippling amounts of EMP damage and sending them flying. 
 Follows the same rules as campaign layer: Solar shielding reduces the damage, moving slowly reduces targetting chance, larger ships have a higher chance of being targetted.",,,
-niko_moreCombatTerrainEffects,MCTE_slipstreamToggle,Slipstreams,Boolean,true,"Slipstreams force safety overrides on all ships/fighters/missiles, with the caveat that venting is allowed (less efficient). If safety overrides (or similar) is already applied, doubles zero-flux boost.
+MCTE_slipstreamToggle,Slipstreams,Boolean,true,"Slipstreams force safety overrides on all ships/fighters/missiles, with the caveat that venting is allowed (less efficient). If safety overrides (or similar) is already applied, doubles zero-flux boost.
 Slowly generates hardflux on all ships as well.",,,
-niko_moreCombatTerrainEffects,MCTE_nebulaToggle,Nebulae,Boolean,false,"Ships within nebulae lose some top speed and some weapon range. Speed ispreserved with insulated engine assembly.
+MCTE_nebulaToggle,Nebulae,Boolean,false,"Ships within nebulae lose some top speed and some weapon range. Speed ispreserved with insulated engine assembly.
 This does not affect the campaign-layer nebulae, only the combat-layer ones, which can spawn anywhere. The nebula terrain only increases how many clouds spawn.
 ",,,
-niko_moreCombatTerrainEffects,MCTE_blackholeToggle,Black Holes,Boolean,true,"Black holes lose some of their CR penalty in exchange for increasing timeflow on all ships in combat, as well as gaining an extremely strong gravitational effect which drags all combat entities towards the black hole's campaign location. Effect scales with your proximity to the black hole in the campaign layer.
+MCTE_blackholeToggle,Black Holes,Boolean,true,"Black holes lose some of their CR penalty in exchange for increasing timeflow on all ships in combat, as well as gaining an extremely strong gravitational effect which drags all combat entities towards the black hole's campaign location. Effect scales with your proximity to the black hole in the campaign layer.
 Affected by solar shielding, but inversely: The timeflow decreases as effect resistance increases, but the gravity doesn't, so solar shielding is a strict nerf in this case.",,,
-niko_moreCombatTerrainEffects,MCTE_pulsarToggle,Pulsars,Boolean,true,"Pulsars lose some of their CR penalty in exchange for decreasing shield efficiency, increasing shield upkeep, decreasing shield EMP arc pierce resist, randomly EMPing all ships, applying a flat EMP damage increase to all projectiles, pushing all combat entities away from it's campaign location, and slowly building hardflux. Effect scales with your proximity to the pulsar in the campaign layer.
+MCTE_pulsarToggle,Pulsars,Boolean,true,"Pulsars lose some of their CR penalty in exchange for decreasing shield efficiency, increasing shield upkeep, decreasing shield EMP arc pierce resist, randomly EMPing all ships, applying a flat EMP damage increase to all projectiles, pushing all combat entities away from it's campaign location, and slowly building hardflux. Effect scales with your proximity to the pulsar in the campaign layer.
 All effects except for the projectile EMP damage increase and push effect are affected by solar shielding.",,,
+MCTE_moddedHeader,awdjdwai,Header,Inter-mod settings below,,,,
+MCTE_MPCheader,awdjdwai,Header,More Planetary Conditions settings,,,,
+MCTE_mesonToggle,Meson Fields,Boolean,true,"Meson fields increase vision and non-missile weapon range, with storms increasing this effect and also applying it to missiles, wings, and system range.",,,

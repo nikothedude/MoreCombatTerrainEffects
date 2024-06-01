@@ -1,5 +1,7 @@
 {
-	# RELEASE PRESET - More forgiving, disables/tones down some of the "annoying" things, like magfield range decrement.
+	# STANDARD PRESET - Less forgiving
+	# The nebula effect may be enabled in lunasettings
+	# To enable, change the file name to MCTE_settings
 	
 	#General toggles
 	#default:true
@@ -18,9 +20,9 @@
 	#each individual magnetic field you are in sequentially multiplies/adds these settings to 1, then the value of the last calculation, etc.
 	#ex. 3 magfields, all non-storm, with visionMult = 0.6: You get visionModifier = 1*0.6*(0.6*(0.6))
 	
-	"MCTE_magneticFieldVisionMult":1, #default: 1
+	"MCTE_magneticFieldVisionMult":0.7, #default: 0.7
 	"MCTE_magneticFieldMissileGuidanceAndManeuverabilityMult":0.8, #default: 0.8
-	"MCTE_magneticFieldWeaponAndFighterRangeMult":1, #default: 1
+	"MCTE_magneticFieldWeaponAndFighterRangeMult":0.7, #default: 0.7
 	"MCTE_magneticFieldECCMChanceMult":0.8, #modifies missile ECCM chance. this is the stuff provided by ECCM package, default: 0.8
 	"MCTE_magneticFieldMissileScrambleChance":0.006, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
 	# value as a percentage chance to determine if the missile should unlock and fly in random directions, default: 0.006
@@ -29,9 +31,9 @@
 	#MAGNETIC STORM SETTINGS
 	#same rules as the ones above, except these values are used for magnetic STORMS.
 	
-	"MCTE_magneticStormVisionMult":0.7, #default: 0.7
+	"MCTE_magneticStormVisionMult":0.35, #default: 0.35
 	"MCTE_magneticStormMissileGuidanceAndManeuverabilityMult":0.55, #default: 0.55
-	"MCTE_magneticStormWeaponAndFighterRangeMult":0.8, #default: 0.8
+	"MCTE_magneticStormWeaponAndFighterRangeMult":0.35, #default: 0.35
 	"MCTE_magneticStormECCMChanceMult":0.2, #default: 0.2
 	"MCTE_magneticStormMissileScrambleChance":0.02, #default: 0.2
 	"MCTE_magneticStormMissileUnscrambleChance":0.007, #default: 0.007
@@ -109,5 +111,24 @@
 	"MCTE_pulsarRandomArcChanceIncrement":0.05f, #the chance, every frame, for a ship to be EMPed. default: 0.05
 	"MCTE_pulsarRandomArcEMPDamageIncrement":85f, #the EMP damage a random EMP does. default: 85
 	"MCTE_pulsarRandomArcEnergyDamageIncrement":2f, # the energy damage a random EMP does. default: 2
+
+	#DEBRIS FIELD EFFECTS
+	#"MCTE_debrisFieldMaxPieces":1000,
+	
+	#MODDED SETTINGS
+	#MORE PLANETARY CONDITIONS
+	#MESON FIELD EFFECTS
+	# Meson fields, not storms, flatly increase non-missile weapon range by this amount
+	"MCTE_mesonFieldWeaponRangeIncrement":400f,
+	# Meson fields, not storms, multiply in-combat vision by this amount
+	"MCTE_mesonFieldVisionMult": 1.3f,
+	# Meson storms flatly increase all weapon range by this amount
+	"MCTE_mesonStormWeaponRangeIncrement": 1400f,
+	# Meson storms flatly increase wing engagement range by this amount
+	"MCTE_mesonStormWingRangeIncrement": 2000f,
+	# Meson storms multiply system range by this amount
+	"MCTE_mesonStormSystemRangeMult": 4f,
+	# Meson storms multiply in-combat vision by this amount
+	"MCTE_mesonStormVisionMult": 4f,
 	
 }

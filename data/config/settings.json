@@ -2,5 +2,6 @@
 	"plugins":{
 		"niko_MCTE_scriptAdder":"niko.MCTE.scripts.everyFrames.combat.terrainEffects.terrainEffectScriptAdder",
 		"niko_MCTE_nebulaEffect":"niko.MCTE.scripts.everyFrames.combat.terrainEffects.nebula.nebulaEffectScript",
+		"niko_MCTE_campaignPlugin":"niko.MCTE.niko_MCTE_campaignPlugin",
 	},
  }

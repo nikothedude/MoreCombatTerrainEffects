@@ -27,9 +27,7 @@ import org.lwjgl.util.vector.Vector2f
 import java.awt.Color
 
 class pulsarEffectScript(
-    val plugins: MutableSet<PulsarBeamTerrainPlugin>,
-    val pluginsToIntensity: MutableMap<PulsarBeamTerrainPlugin, Float>,
-    val pluginsToAngle: MutableMap<PulsarBeamTerrainPlugin, Float>,
+    val anglesToIntensity: MutableMap<Float, Float>,
     val hardFluxGenerationPerFrame: Float,
     val bonusEMPDamageForWeapons: Float,
     val shieldDestabilziationMult: Float,
@@ -52,7 +50,7 @@ class pulsarEffectScript(
     private val originalValues: MutableMap<ShipAPI, MutableMap<StatBonus, MutableMap<String, MCTE_miscUtils.originalTerrainValue>>> = HashMap()
 
     init {
-        for (intensity in pluginsToIntensity.values) {
+        for (intensity in anglesToIntensity.values) {
             overallIntensity += intensity
         }
     }
@@ -207,8 +205,8 @@ class pulsarEffectScript(
     private fun applyForce() {
         if (engine.isPaused) return
         if (!PULSAR_FORCE_ENABLED) return
-        for (entry in pluginsToIntensity.entries) {
-            val plugin = entry.key
+        for (entry in anglesToIntensity.entries) {
+            val angle = entry.key
             val intensity = entry.value
 
             for (entity: CombatEntityAPI in engine.getAllObjects()) {
@@ -221,7 +219,6 @@ class pulsarEffectScript(
                     }
                 }
                 val pushForce = getGravityForceForEntity(entity, intensity)
-                val angle = pluginsToAngle[plugin]!!
                 MCTE_miscUtils.applyForceWithSuppliedMass(
                     entity,
                     mass,

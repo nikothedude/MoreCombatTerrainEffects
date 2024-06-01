@@ -86,7 +86,7 @@ class hyperstormArcPreparation(
     }
 
     private fun getTelegraphVolume(): Float {
-        return ((getTelegraphThreshold()+1).pow(4.6)).toFloat() //arbitrary
+        return ((getTelegraphThreshold()+1).pow(4.6)).toFloat() //arbitrary pow arg
     }
 
     private fun getTelegraphThreshold(): Double {

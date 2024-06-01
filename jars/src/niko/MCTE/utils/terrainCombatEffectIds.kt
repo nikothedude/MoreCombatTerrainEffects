@@ -8,4 +8,5 @@ object terrainCombatEffectIds {
     const val magneticField = "MCTEmagneticFieldEffect"
     const val slipstreamEffect = "MCTEslipstreamEffect"
     const val hyperstormEffect = "MCTEhyperstormEffect"
+    const val mesonFieldEffect = "MCTEmesonFieldEffect"
 }

@@ -3,6 +3,7 @@ package niko.MCTE
 import com.fs.starfarer.api.BaseModPlugin
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.impl.campaign.terrain.StarCoronaAkaMainyuTerrainPlugin
+import data.scripts.campaign.plugins.niko_MPC_campaignPlugin
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
 import niko.MCTE.utils.MCTE_debugUtils
@@ -24,12 +25,14 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
 
         MCTE_debugUtils.graphicsLibEnabled = Global.getSettings().modManager.isModEnabled("shaderLib")
         MCTE_debugUtils.KOLenabled = Global.getSettings().modManager.isModEnabled("knights_of_ludd")
+        MCTE_debugUtils.MPCenabled = Global.getSettings().modManager.isModEnabled("niko_morePlanetaryConditions")
     }
 
     override fun onGameLoad(newGame: Boolean) {
         super.onGameLoad(newGame)
 
         LunaSettings.addSettingsListener(settingsChangedListener())
+        Global.getSector().registerPlugin(niko_MCTE_campaignPlugin())
 
         //Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))
     }
