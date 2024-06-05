@@ -189,7 +189,7 @@ object MCTE_settings {
         DEEP_HYPERSPACE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_deepHyperspaceToggle")!!
         HYPERSTORM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_hyperstormsToggle")!!
         SLIPSTREAM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_slipstreamToggle")!!
-        DEBRIS_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_debrisFieldToggle")!!
+        //DEBRIS_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_debrisFieldToggle")!!
         //DUST_CLOUD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"enableDustcloudEffect")!!
         EXTRA_NEBULA_EFFECTS_ENABLED = LunaSettings.getBoolean(modId,"MCTE_nebulaToggle")!!
         BLACK_HOLE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_blackholeToggle")!!

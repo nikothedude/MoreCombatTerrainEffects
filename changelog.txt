@@ -1,3 +1,6 @@
+1.4.1
+Hotfix for a settings crash (WHY DID THIS NEVER CRASH FOR ME WTF)
+
 1.4.0
 New effect: Meson Field (More Planetary Conditions)
     The field moderately increases non-missile weapon range and vision range
