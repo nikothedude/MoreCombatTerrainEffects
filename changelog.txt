@@ -9,8 +9,23 @@ New lunasettings config
     Block effects on terrain-blocker interaction
     Block effects on terrain-blocker proximity
 
+Fixed lunasettings not updating after being changed
+
 Fully uncoupled terrain effects from the terrain plugins
     Theoretically, a mission can now be ran with terrain effects
+
+Nex integration
+    Hyperstorms
+        Chance to strike a few industries with lightning
+        Does massive damage to all units and can disorganize
+        Holders of the industry receive less damage
+        Blocked by planetary shield
+    Pulsar
+        All units disorganized until the pulsar goes away
+        Does chip damage to all units slowly
+        Blocked by planetary shield
+
+LunaSettings separated into sections
 
 1.3.2:
 

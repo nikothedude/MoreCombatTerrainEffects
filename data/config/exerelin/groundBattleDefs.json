@@ -1,0 +1,7 @@
+{
+	# specify plugins not associated with an industry, condition, faction or such here
+	"plugins":{
+		"groundBattleHyperspaceEffect":"niko.MCTE.nexerelin.groundBattleHyperspaceEffect",
+		"groundBattlePulsarEffect":"niko.MCTE.nexerelin.groundBattlePulsarEffect",
+	},
+}

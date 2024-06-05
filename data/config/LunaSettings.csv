@@ -1,27 +1,42 @@
 fieldID,fieldName,fieldType,defaultValue,fieldTooltip,minValue,maxValue,tab
-MCTE_settingsReminder,irrelevant,Header,See MCTE_settings.json for more specific settings,,,,
-MCTE_generalSettingsheader,awdawd,Header,General Settings,,,,
-MCTE_blockEffectsOnEntityInteraction,Block effects on terrain-blocker interaction,Boolean,false,Allows things like hypershunts and RAT's gravitational dynamo to block terrain effects on interaction.,,,
-MCTE_blockEffectsOnEntityProximity,Block effects on terrain-blocker proximity,Boolean,false,Causes the above terrain blockers to also block terrain if you fly over them. Works with or without the above setting.,,,
-MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,
+MCTE_settingsReminder,irrelevant,Header,See MCTE_settings.json for more specific settings,,,,General
+MCTE_generalSettingsheader,awdawd,Header,General Settings,,,,General
+MCTE_blockEffectsOnEntityInteraction,Block effects on terrain-blocker interaction,Boolean,false,Allows things like hypershunts and RAT's gravitational dynamo to block terrain effects on interaction.,,,General
+MCTE_blockEffectsOnEntityProximity,Block effects on terrain-blocker proximity,Boolean,false,Causes the above terrain blockers to also block terrain if you fly over them. Works with or without the above setting.,,,General
+MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,Combat
 MCTE_magneticFieldToggle,Magnetic Fields,Boolean,true,"Magnetic fields reduce the weapon/fighter range, vision, missile mauneverability/guidance, and ECCM chance of any fleet in it, and
 also have a chance for missiles to randomly break lock, affected by the missile's ECM chance. Magnetic storms are a more intense version of magnetic fields.
 
-The effects are mitigated by electronic warfare resistance, e.g. ECCM package (Not the ECCM chance, which is for missiles, not ships).",,,
-MCTE_deepHyperspaceToggle,Deep Hyperspace,Boolean,true,Deep hyperspace will spawn nebula clouds in combat. Required to be true for hyperstorms to function.,,,
+The effects are mitigated by electronic warfare resistance, e.g. ECCM package (Not the ECCM chance, which is for missiles, not ships).",,,Combat
+MCTE_deepHyperspaceToggle,Deep Hyperspace,Boolean,true,Deep hyperspace will spawn nebula clouds in combat. Required to be true for hyperstorms to function.,,,Combat
 MCTE_hyperstormsToggle,Hyperstorms,Boolean,true,"Requires deep hyperspace to be enabled.
 
 Nebulae spawned by storming cells of deep hyperspace will periodically strike nearby ships/missiles with lightning, dealing crippling amounts of EMP damage and sending them flying. 
-Follows the same rules as campaign layer: Solar shielding reduces the damage, moving slowly reduces targetting chance, larger ships have a higher chance of being targetted.",,,
+Follows the same rules as campaign layer: Solar shielding reduces the damage, moving slowly reduces targetting chance, larger ships have a higher chance of being targetted.",,,Combat
 MCTE_slipstreamToggle,Slipstreams,Boolean,true,"Slipstreams force safety overrides on all ships/fighters/missiles, with the caveat that venting is allowed (less efficient). If safety overrides (or similar) is already applied, doubles zero-flux boost.
-Slowly generates hardflux on all ships as well.",,,
+Slowly generates hardflux on all ships as well.",,,Combat
 MCTE_nebulaToggle,Nebulae,Boolean,false,"Ships within nebulae lose some top speed and some weapon range. Speed ispreserved with insulated engine assembly.
 This does not affect the campaign-layer nebulae, only the combat-layer ones, which can spawn anywhere. The nebula terrain only increases how many clouds spawn.
-",,,
+",,,Combat
 MCTE_blackholeToggle,Black Holes,Boolean,true,"Black holes lose some of their CR penalty in exchange for increasing timeflow on all ships in combat, as well as gaining an extremely strong gravitational effect which drags all combat entities towards the black hole's campaign location. Effect scales with your proximity to the black hole in the campaign layer.
-Affected by solar shielding, but inversely: The timeflow decreases as effect resistance increases, but the gravity doesn't, so solar shielding is a strict nerf in this case.",,,
+Affected by solar shielding, but inversely: The timeflow decreases as effect resistance increases, but the gravity doesn't, so solar shielding is a strict nerf in this case.",,,Combat
 MCTE_pulsarToggle,Pulsars,Boolean,true,"Pulsars lose some of their CR penalty in exchange for decreasing shield efficiency, increasing shield upkeep, decreasing shield EMP arc pierce resist, randomly EMPing all ships, applying a flat EMP damage increase to all projectiles, pushing all combat entities away from it's campaign location, and slowly building hardflux. Effect scales with your proximity to the pulsar in the campaign layer.
-All effects except for the projectile EMP damage increase and push effect are affected by solar shielding.",,,
-MCTE_moddedHeader,awdjdwai,Header,Inter-mod settings below,,,,
-MCTE_MPCheader,awdjdwai,Header,More Planetary Conditions settings,,,,
-MCTE_mesonToggle,Meson Fields,Boolean,true,"Meson fields increase vision and non-missile weapon range, with storms increasing this effect and also applying it to missiles, wings, and system range.",,,
+All effects except for the projectile EMP damage increase and push effect are affected by solar shielding.",,,Combat
+MCTE_moddedHeader,awdjdwai,Header,Inter-mod settings below,,,,Combat
+MCTE_MPCheader,awdjdwai,Header,More Planetary Conditions settings,,,,Combat
+MCTE_mesonToggle,Meson Fields,Boolean,true,"Meson fields increase vision and non-missile weapon range, with storms increasing this effect and also applying it to missiles, wings, and system range.",,,Combat
+MCTE_groundBattleEffectHeader,Ground Battle Effects,Header,Ground Battle Effects,,,,Nexerelin
+MCTE_hyperstormNexHeader,Hyperstorms,Header,Hyperstorms,,,,Nexerelin
+MCTE_hyperstormNexToggle,Hyperstorm Toggle,Boolean,true,"Hyperstorms have a chance to strike a number of industries, dealing high damage to each unit individually and disorganizing them.",,,Nexerelin
+MCTE_hyperstormNexBaseDamage,Base damage,Double,40.0,Applied individually to all units.,0.0,500.0,Nexerelin
+MCTE_hyperstormNexChancePerRound,Lightning strike chance per round,Double,30.0,,0.0,100.0,Nexerelin
+MCTE_hyperstormNexChanceMinIndustries,Minimum industries targetted,Int,1,,1,20,Nexerelin
+MCTE_hyperstormNexChanceMaxIndustries,Maximum industries targetted,Int,2,,1,20,Nexerelin
+MCTE_hyperstormNexDisorganizeChance,Disorganize chance,Double,70.0,,0.0,100.0,Nexerelin
+MCTE_hyperstormNexDisorganizeTurns,Disorganize turns,Int,1,,0,50,Nexerelin
+MCTE_hyperstormNexHolderDamageMult,Holder damage mult,Double,0.5,Applies to troops currently holding the target industry.,0,5,Nexerelin
+MCTE_hyperstormNexHolderDisorganizeChanceMult,Holder disorganization chance mult,Double,0.7,Applies to troops currently holding the target industry.,0,5,Nexerelin
+MCTE_pulsarNexHeader,Pulsars,Header,Pulsars,,,,Nexerelin
+MCTE_pulsarNexToggle,Pulsar Toggle,Boolean,true,Pulsars force all troops to be disorganized (lower damage and cannot move) and deals slow chip damage to them.,,,Nexerelin
+MCTE_pulsarNexBaseDamage,Base damage,Double,1.0,Distributed across all troops equally.,0.0,100.0,Nexerelin
+MCTE_pulsarNexHoldingDamageMult,Holding damage mult,Double,0.7,Applies to troops currently holding the target industry.,0.0,100.0,Nexerelin

@@ -6,6 +6,7 @@ import com.fs.starfarer.api.impl.campaign.terrain.StarCoronaAkaMainyuTerrainPlug
 import data.scripts.campaign.plugins.niko_MPC_campaignPlugin
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
+import niko.MCTE.settings.MCTE_settings.loadAllSettings
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import org.apache.log4j.Level
@@ -17,7 +18,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         super.onApplicationLoad()
 
         try {
-            loadSettings()
+            loadAllSettings()
         } catch (ex: Exception) {
             MCTE_debugUtils.displayError("onApplicationLoad loadSettings exception caught, logging info", logType = Level.ERROR)
             MCTE_debugUtils.log.debug("info:", ex)
@@ -40,7 +41,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
     class settingsChangedListener : LunaSettingsListener {
         override fun settingsChanged(modID: String) {
             try {
-                loadSettings()
+                loadAllSettings()
             } catch (ex: Exception) {
                 MCTE_debugUtils.displayError("settingsChangedListener exception caught, logging info", logType = Level.ERROR)
                 MCTE_debugUtils.log.debug("info:", ex)

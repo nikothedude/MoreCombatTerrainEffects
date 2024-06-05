@@ -74,6 +74,9 @@ object MCTE_settings {
     var MIN_HYPERCLOUDS_TO_ADD_PER_CELL: Int = 8
 
     var MAX_HYPERCLOUDS_TO_ADD_PER_CELL: Int = 20
+
+    /*var DEEP_HYPERSPACE_NEX_MOVEMENT_COST: Float = 0.25f // percent of a units deployment cost
+    var DEEP_HYPERSPACE_NEX_MOVEMENT_COST_ATMOS_MULT: Float = 0.8f*/
     //HYPERSTORM SETTINGS
     var HYPERSTORM_ENERGY_DAMAGE = 2000f
     var HYPERSTORM_EMP_DAMAGE = 6500f
@@ -99,6 +102,21 @@ object MCTE_settings {
 
     var EMP_DAMAGE_FEAR_MULT: Float = 0.3f
 
+    var HYPERSTORM_NEX_ENABLED = true
+
+    var HYPERSTORM_NEX_CHANCE_PER_ROUND: Float = 30f
+    var HYPERSTORM_NEX_MIN_INDUSTRIES_TO_TARGET: Int = 1
+    var HYPERSTORM_NEX_MAX_INDUSTRIES_TO_TARGET: Int = 2
+
+    var HYPERSTORM_NEX_STRIKE_BASE_DAMAGE: Float = 40f
+
+    var HYPERSTORM_NEX_BASE_DISORGANIZE_CHANCE: Float = 70f
+
+    var HYPERSTORM_NEX_HOLDER_DISORGANIZE_CHANCE_MULT = 0.5f
+    var HYPERSTORM_NEX_HOLDER_DAMAGE_MULT = 0.7f
+
+    var HYPERSTORM_NEX_BASE_DISORGANIZE_TURNS = 1
+
     // BLACK HOLE SETTINGS
     var BLACKHOLE_TIMEMULT_MULT = 1.5f
     var BLACKHOLE_PPT_COMPENSATION = 1f
@@ -118,6 +136,11 @@ object MCTE_settings {
     var PULSAR_EMP_CHANCE_INCREMENT: Float = 0.01f
     var PULSAR_EMP_DAMAGE_INCREMENT: Float = 20f
     var PULSAR_DAMAGE_INCREMENT: Float = 0.5f
+
+    var PULSAR_NEX_ENABLED = true
+
+    var PULSAR_NEX_BASE_DAMAGE: Float = 1f
+    var PULSAR_NEX_HOLDING_DAMAGE_MULT: Float = 0.7f
 
     // DEBRIS FIELD
     var MAX_SHIPS_ALLOWED = 500
@@ -142,6 +165,11 @@ object MCTE_settings {
     @JvmStatic
     fun getHyperstormFearThreshold(): Float {
         return (HYPERSTORM_ENERGY_DAMAGE + HYPERSTORM_EMP_DAMAGE * EMP_DAMAGE_FEAR_MULT)*0.4f
+    }
+
+    fun loadAllSettings() {
+        loadSettings()
+        loadNexSettings()
     }
 
     @JvmStatic
@@ -265,6 +293,23 @@ object MCTE_settings {
         MESON_STORM_SYSTEM_RANGE_MULT = configJson.getFloat("MCTE_mesonStormSystemRangeMult") - 1
         MESON_STORM_VISION_MULT = configJson.getFloat("MCTE_mesonStormVisionMult") - 1
 
+    }
+
+    fun loadNexSettings() {
+        HYPERSTORM_NEX_ENABLED = LunaSettings.getBoolean(modId, "MCTE_hyperstormNexToggle")!!
+
+        HYPERSTORM_NEX_STRIKE_BASE_DAMAGE = LunaSettings.getFloat(modId, "MCTE_hyperstormNexBaseDamage")!!
+        HYPERSTORM_NEX_CHANCE_PER_ROUND = LunaSettings.getFloat(modId, "MCTE_hyperstormNexChancePerRound")!!
+        HYPERSTORM_NEX_MIN_INDUSTRIES_TO_TARGET = LunaSettings.getInt(modId, "MCTE_hyperstormNexChanceMinIndustries")!!
+        HYPERSTORM_NEX_MAX_INDUSTRIES_TO_TARGET = LunaSettings.getInt(modId, "MCTE_hyperstormNexChanceMaxIndustries")!!
+        HYPERSTORM_NEX_BASE_DISORGANIZE_CHANCE = LunaSettings.getFloat(modId, "MCTE_hyperstormNexDisorganizeChance")!!
+        HYPERSTORM_NEX_BASE_DISORGANIZE_TURNS = LunaSettings.getInt(modId, "MCTE_hyperstormNexDisorganizeTurns")!!
+        HYPERSTORM_NEX_HOLDER_DAMAGE_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormNexHolderDamageMult")!!
+        HYPERSTORM_NEX_HOLDER_DISORGANIZE_CHANCE_MULT = LunaSettings.getFloat(modId, "MCTE_hyperstormNexHolderDisorganizeChanceMult")!!
+
+        PULSAR_NEX_ENABLED = LunaSettings.getBoolean(modId, "MCTE_pulsarNexToggle")!!
+        PULSAR_NEX_BASE_DAMAGE = LunaSettings.getFloat(modId, "MCTE_pulsarNexBaseDamage")!!
+        PULSAR_NEX_HOLDING_DAMAGE_MULT = LunaSettings.getFloat(modId, "MCTE_pulsarNexHoldingDamageMult")!!
     }
 
     fun loadMissionConfig(missionId: String): JSONObject? {

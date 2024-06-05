@@ -3,14 +3,10 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.CombatEngineAPI
-import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.input.InputEventAPI
-import com.sun.org.apache.xpath.internal.operations.Bool
-import lunalib.lunaSettings.LunaSettingsListener
 import niko.MCTE.settings.MCTE_settings.SHOW_SIDEBAR_INFO
-import niko.MCTE.utils.terrainScriptsTracker
 
-abstract class baseTerrainEffectScript: baseNikoCombatScript() {
+abstract class baseTerrainEffectScript(): baseNikoCombatScript() {
 
     var initialized = false
 

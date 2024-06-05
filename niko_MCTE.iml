@@ -20,12 +20,11 @@
     <orderEntry type="library" name="Interstellar Imperium" level="project" />
     <orderEntry type="library" name="al_arkleg" level="project" />
     <orderEntry type="library" name="ungp" level="project" />
-    <orderEntry type="library" name="Nexerelin-master" level="project" />
     <orderEntry type="library" name="starfarer_obf_linux" level="project" />
     <orderEntry type="library" name="starfarer_obf_mac" level="project" />
     <orderEntry type="library" name="starsector-core" level="project" />
-    <orderEntry type="library" name="ExerelinCore" level="project" />
     <orderEntry type="library" name="AITweaks" level="project" />
     <orderEntry type="library" name="KnightsOfSelkie" level="project" />
+    <orderEntry type="library" name="ExerelinCore" level="project" />
   </component>
 </module>

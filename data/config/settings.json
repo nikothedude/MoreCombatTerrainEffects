@@ -1,4 +1,10 @@
  {
+	"graphics":{
+		"intel":{
+			"MCTE_hyperStorm":"graphics/icons/terrain/hyperspace_storm.png",
+		},
+	},
+	 
 	"plugins":{
 		"niko_MCTE_scriptAdder":"niko.MCTE.scripts.everyFrames.combat.terrainEffects.terrainEffectScriptAdder",
 		"niko_MCTE_nebulaEffect":"niko.MCTE.scripts.everyFrames.combat.terrainEffects.nebula.nebulaEffectScript",
