@@ -105,7 +105,7 @@ class magneticFieldEffect(
 
     private fun getECMMultForShip(ship: ShipAPI): Float {
         val mutableStats = ship.mutableStats
-        return mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
+        return 1 + (1 - mutableStats.dynamic.getMod(Stats.ELECTRONIC_WARFARE_PENALTY_MOD).computeEffective(1f))
     }
 
     override fun handleNotification(amount: Float): Boolean {
@@ -183,7 +183,7 @@ class magneticFieldEffect(
         val source: ShipAPI? = missile.source
         var electronicWarfareMult: Float = 1f
         if (source != null) {
-            electronicWarfareMult = source.mutableStats.dynamic.getStat(Stats.ELECTRONIC_WARFARE_PENALTY_MULT).modifiedValue
+            electronicWarfareMult = getECMMultForShip(source)
         }
         var missileBreakLockChance = missileBreakLockBaseChance
         missileBreakLockChance -= missile.eccmChance

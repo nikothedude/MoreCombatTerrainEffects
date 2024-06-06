@@ -1,3 +1,6 @@
+1.4.2
+Fixed a long-standing (apparantly) bug where ECCM didnt work in magfields (ugh)
+
 1.4.1
 Hotfix for a settings crash (WHY DID THIS NEVER CRASH FOR ME WTF)
 
