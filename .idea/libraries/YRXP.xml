@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="YRXP">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../YRXP/jars/yrxp.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../YRXP" />
+    </SOURCES>
+  </library>
+</component>
