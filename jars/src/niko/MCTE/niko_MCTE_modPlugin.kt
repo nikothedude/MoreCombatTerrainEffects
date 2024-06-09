@@ -9,6 +9,7 @@ import lunalib.lunaSettings.LunaSettingsListener
 import niko.MCTE.settings.MCTE_settings.loadAllSettings
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.settings.MCTE_settings.loadSettings
+import niko.MCTE.utils.MCTE_debugUtils.YRXPenabled
 import org.apache.log4j.Level
 import org.apache.log4j.lf5.LogLevel
 
@@ -27,6 +28,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         MCTE_debugUtils.graphicsLibEnabled = Global.getSettings().modManager.isModEnabled("shaderLib")
         MCTE_debugUtils.KOLenabled = Global.getSettings().modManager.isModEnabled("knights_of_ludd")
         MCTE_debugUtils.MPCenabled = Global.getSettings().modManager.isModEnabled("niko_morePlanetaryConditions")
+        YRXPenabled = Global.getSettings().modManager.isModEnabled("yrxp")
     }
 
     override fun onGameLoad(newGame: Boolean) {

@@ -7,12 +7,14 @@ import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.IntervalUtil
+import data.scripts.ai.missiles.yrxp_LRMissileAI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
 import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_UNSCRAMBLE_CHANCE
+import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lwjgl.util.vector.Vector2f
 
@@ -162,6 +164,7 @@ class magneticFieldEffect(
         for (missile: MissileAPI in engine.missiles) {
             val missileAI = missile.unwrappedMissileAI
             if (missileAI !is GuidedMissileAI) continue
+            if (MCTE_debugUtils.YRXPenabled && missileAI is yrxp_LRMissileAI) continue // prevents a crash
             if (missileAI.target == null || scrambledMissiles[missile] != null) continue
 
             if (shouldScrambleMissile(missile, missileAI)) scrambleMissile(missile)

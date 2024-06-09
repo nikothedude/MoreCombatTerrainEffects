@@ -1,3 +1,6 @@
+1.4.3
+Fixed a yuri expedition crash with magfields
+
 1.4.2
 Fixed a long-standing (apparantly) bug where ECCM didnt work in magfields (ugh)
 

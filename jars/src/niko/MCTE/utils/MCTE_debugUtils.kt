@@ -16,6 +16,7 @@ object MCTE_debugUtils {
     var graphicsLibEnabled: Boolean = false
     var KOLenabled: Boolean = false
     var MPCenabled = false
+    var YRXPenabled = false
 
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 
