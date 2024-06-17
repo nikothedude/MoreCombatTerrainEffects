@@ -5,6 +5,7 @@ import com.fs.starfarer.api.combat.MissileAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.combat.ShipEngineControllerAPI
 import com.fs.starfarer.api.util.IntervalUtil
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.settings.MCTE_settings
@@ -18,11 +19,12 @@ import java.awt.Color
 import java.util.*
 
 class SlipstreamEffectScript(
-    val peakPerformanceMult: Float,
-    val fluxDissipationMult: Float,
-    val hardFluxGenerationPerFrame: Float,
-    val overallSpeedMult: Float):
-    baseTerrainEffectScript(), usesDeltaTime {
+    var peakPerformanceMult: Float = 1f,
+    var fluxDissipationMult: Float = 1f,
+    var hardFluxGenerationPerFrame: Float = 0f,
+    var overallSpeedMult: Float = 1f
+): baseTerrainEffectScript(), usesDeltaTime {
+    override var effectPrototype: combatEffectTypes? = combatEffectTypes.SLIPSTREAM
 
     private val weaponRangeThresholdForSOThreshold: Float = 0f
     private val RANGE_THRESHOLD: Float = 450f

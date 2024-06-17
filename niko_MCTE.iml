@@ -19,7 +19,6 @@
     <orderEntry type="library" name="jar" level="project" />
     <orderEntry type="library" name="Interstellar Imperium" level="project" />
     <orderEntry type="library" name="al_arkleg" level="project" />
-    <orderEntry type="library" name="ungp" level="project" />
     <orderEntry type="library" name="starfarer_obf_linux" level="project" />
     <orderEntry type="library" name="starfarer_obf_mac" level="project" />
     <orderEntry type="library" name="starsector-core" level="project" />
@@ -27,5 +26,7 @@
     <orderEntry type="library" name="KnightsOfSelkie" level="project" />
     <orderEntry type="library" name="ExerelinCore" level="project" />
     <orderEntry type="library" name="YRXP" level="project" />
+    <orderEntry type="library" name="ungp" level="project" />
+    <orderEntry type="library" name="jars" level="project" />
   </component>
 </module>

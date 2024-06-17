@@ -79,7 +79,7 @@ object MCTE_debugUtils {
         val combatUI = engine.combatUI
         combatUI.addMessage(
             1,
-            "Please provide the mod author of MORE COMBAT TERRAIN EFFECTS with a copy of your logs. These messages can be disabled in the MCTE_settings.json file in the mod settings."
+            "Please provide the mod author of MORE COMBAT TERRAIN EFFECTS with a copy of your logs. These messages can be disabled in lunasettings."
         )
         if (highPriority) {
             Global.getSoundPlayer().playUISound("cr_playership_critical", 1f, 1f)

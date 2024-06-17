@@ -4,14 +4,13 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.*
 import com.fs.starfarer.api.combat.CombatEngineAPI
-import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.impl.campaign.ids.Tags
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
-import com.fs.starfarer.combat.entities.terrain.Cloud
 import data.scripts.campaign.terrain.niko_MPC_mesonField
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
@@ -25,7 +24,6 @@ import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.MAGFIELD_ECCM_MULT
 import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_MULT
@@ -38,14 +36,12 @@ import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE
 import niko.MCTE.settings.MCTE_settings.MAGSTORM_RANGE_MULT
 import niko.MCTE.settings.MCTE_settings.MAGSTORM_VISION_MULT
 import niko.MCTE.settings.MCTE_settings.MAG_FIELD_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.MAX_HYPERCLOUDS_TO_ADD_PER_CELL
 import niko.MCTE.settings.MCTE_settings.MESON_FIELD_VISION_MULT
 import niko.MCTE.settings.MCTE_settings.MESON_FIELD_WEAPON_RANGE_INCREMENT
 import niko.MCTE.settings.MCTE_settings.MESON_STORM_SYSTEM_RANGE_MULT
 import niko.MCTE.settings.MCTE_settings.MESON_STORM_VISION_MULT
 import niko.MCTE.settings.MCTE_settings.MESON_STORM_WEAPON_RANGE_INCREMENT
 import niko.MCTE.settings.MCTE_settings.MESON_STORM_WING_RANGE_INCREMENT
-import niko.MCTE.settings.MCTE_settings.MIN_HYPERCLOUDS_TO_ADD_PER_CELL
 import niko.MCTE.settings.MCTE_settings.PULSAR_DAMAGE_INCREMENT
 import niko.MCTE.settings.MCTE_settings.PULSAR_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.PULSAR_EMP_CHANCE_INCREMENT
@@ -62,11 +58,8 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_ids
-import niko.MCTE.utils.MCTE_nebulaUtils
-import niko.MCTE.utils.MCTE_nebulaUtils.getCellCentroid
-import niko.MCTE.utils.MCTE_nebulaUtils.getCloudsInRadius
-import niko.MCTE.utils.MCTE_nebulaUtils.getRadiusOfCell
-import niko.MCTE.utils.MCTE_reflectionUtils.invoke
+import niko.MCTE.utils.terrainEffectCreationLogic
+import niko.MCTE.utils.terrainScriptsTracker
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
@@ -78,6 +71,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         super.advance(amount, events)
         if (Global.getCurrentState() != GameState.COMBAT) return
 
+        terrainScriptsTracker.terrainScripts.clear()
         loadSettings()
 
         val engine = Global.getCombatEngine() ?: return
@@ -176,42 +170,21 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         mesonFieldPlugins: MutableSet<CampaignTerrainPlugin>
     ) {
         if (!MCTE_debugUtils.MPCenabled || !MCTE_settings.MESON_FIELD_ENABLED) return
+        if (mesonFieldPlugins.isEmpty()) return
 
-        var weaponRangeIncrement = 1f
-        var wingRangeIncrement = 1f
-        var systemRangeMult = 1f
-        var visionMult = 1f
-        var isStorm = false
-
-        var canAddScript = false
-
+        val entries = ArrayList<Boolean>()
         val plugins: MutableSet<niko_MPC_mesonField> = mesonFieldPlugins as MutableSet<niko_MPC_mesonField>
         for (plugin in plugins) {
             val flareManager = plugin.flareManager ?: continue
             if (flareManager.isInActiveFlareArc(playerFleet)) {
-                isStorm = true
-
-                weaponRangeIncrement += MESON_STORM_WEAPON_RANGE_INCREMENT
-                wingRangeIncrement += MESON_STORM_WING_RANGE_INCREMENT
-                systemRangeMult += MESON_STORM_SYSTEM_RANGE_MULT
-                visionMult += MESON_STORM_VISION_MULT
+                entries += true
             } else {
-                weaponRangeIncrement += MESON_FIELD_WEAPON_RANGE_INCREMENT
-                visionMult += MESON_FIELD_VISION_MULT
+                entries += false
             }
-            canAddScript = true
         }
 
-        if (canAddScript) {
-            val mesonScript = mesonFieldEffectScript(
-                isStorm,
-                weaponRangeIncrement,
-                systemRangeMult,
-                wingRangeIncrement,
-                visionMult
-            )
-            mesonScript.start()
-        }
+        val mesonFieldScript = combatEffectTypes.MESONFIELD.createInformedEffectInstance(entries, 1f)
+        mesonFieldScript.start()
     }
 
     private fun evaluateStrategicEmplacements(
@@ -269,41 +242,17 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
         val angleToIntensity: MutableMap<Float, Float> = HashMap()
         var canAddScript: Boolean = false
-        var hardFluxGenPerFrame = 0f
-        var bonusEMPDamageForWeapons = 0f
-        var shieldDestabilziationMult = 1f
-
-        var EMPChancePerFrame = 0f
-        var EMPDamage = 0f
-        var energyDamage = 0f
 
         for (plugin: PulsarBeamTerrainPlugin in pulsarPlugins) {
             val intensity = (plugin.getIntensityAtPoint(playerCoordinates))*PULSAR_INTENSITY_BASE_MULT
-
-            hardFluxGenPerFrame += (PULSAR_HARDFLUX_GEN_INCREMENT * intensity)
-            bonusEMPDamageForWeapons += (PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT * intensity)
-            shieldDestabilziationMult += (PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT * intensity)
-
-            EMPChancePerFrame += (PULSAR_EMP_CHANCE_INCREMENT * intensity)
-            EMPDamage += (PULSAR_EMP_DAMAGE_INCREMENT * intensity)
-            energyDamage += (PULSAR_DAMAGE_INCREMENT * intensity)
 
             var angle = (VectorUtils.getAngle(plugin.entity.location, playerCoordinates))
             angleToIntensity[angle] = intensity
             canAddScript = true
         }
         if (canAddScript) {
-            val pulsarPlugin = pulsarEffectScript(
-                angleToIntensity,
-                hardFluxGenPerFrame,
-                bonusEMPDamageForWeapons,
-                shieldDestabilziationMult,
-                EMPChancePerFrame,
-                EMPDamage,
-                energyDamage
-                //gravityPointsToIntensity
-            )
-            pulsarPlugin.start()
+            val script = combatEffectTypes.PULSAR.createInformedEffectInstance(angleToIntensity, 1f)
+            script.start()
         }
     }
 
@@ -315,6 +264,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin>
     ) {
         if (!BLACK_HOLE_EFFECT_ENABLED) return
+        if (blackHoleTerrainPlugins.isEmpty()) return
 
         var timeMult = 1f
         val angleToIntensity: MutableMap<Float, Float> = HashMap()
@@ -325,17 +275,12 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             val intensity = plugin.getIntensityAtPoint(playerCoordinates)
             timeMult += getBlackholeTimeMultIncrement(engine, playerFleet, playerLocation, playerCoordinates, plugin, intensity)
             angleToIntensity[(VectorUtils.getAngle(playerCoordinates, plugin.entity.location))] = intensity
-            //gravityPointsToIntensity[getGravityPointOfBlackHole(engine, playerCoordinates, plugin)] = intensity
 
             canAddScript = true
         }
         if (canAddScript) {
-            val blackHolePlugin = blackHoleEffectScript(
-                angleToIntensity,
-                timeMult,
-                playerCoordinates
-            )
-            blackHolePlugin.start()
+            val script = combatEffectTypes.BLACKHOLE.createInformedEffectInstance(angleToIntensity, timeMult)
+            script.start()
         }
     }
 
@@ -396,10 +341,9 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
     private fun addHyperspaceTerrainScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin>) {
         if (!DEEP_HYPERSPACE_EFFECT_ENABLED || engine.nebula == null || !engine.isInCampaign) return
-        val nebula = engine.nebula
-        var canAddScript = false
+        if (hyperspaceTerrainPlugins.isEmpty()) return
 
-        val pluginToStorming: HashMap<HyperspaceTerrainPlugin, Boolean> = HashMap()
+        val cells: MutableSet<cloudCell> = HashSet()
 
         for (plugin: HyperspaceTerrainPlugin in hyperspaceTerrainPlugins) {
             var isStorming = false
@@ -408,122 +352,11 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             if (cellAtPlayer.isStorming && HYPERSTORM_EFFECT_ENABLED) {
                 isStorming = true
             }
-            canAddScript = true
-            pluginToStorming[plugin] = isStorming
+            cells.addAll(combatEffectTypes.instantiateHyperstormCells(engine, 1f, isStorming))
         }
-        if (canAddScript) {
-            val deepHyperspaceNebulas: MutableMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> = instantiateDeephyperspaceNebulae(pluginToStorming)
-
-            val stormingNebulaeToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
-            val stormingNebulae: MutableSet<MutableSet<Cloud>> = HashSet()
-            for (mapOfCloudsToCentroid in deepHyperspaceNebulas.keys) if (deepHyperspaceNebulas[mapOfCloudsToCentroid] == true) {
-                stormingNebulae += mapOfCloudsToCentroid.keys
-                stormingNebulaeToCentroid += mapOfCloudsToCentroid
-            }
-
-            val cloudCells = HashSet<cloudCell>()
-            for (cell in stormingNebulae) {
-                val centroid = getCellCentroidRepeatadly(nebula, cell)
-                if (centroid == null) {
-                    MCTE_debugUtils.displayError("centroid null when making params")
-                    continue
-                }
-                val radius = getRadiusOfCell(cell, nebula, centroid)
-                val cloudCell = cloudCell(
-                    centroid,
-                    radius,
-                    cell
-                )
-                cloudCells += cloudCell
-            }
-            val hyperspacePlugin = deepHyperspaceEffectScript(cloudCells)
-            hyperspacePlugin.start()
-        }
-    }
-
-    private fun getCellCentroidRepeatadly(nebula: CombatNebulaAPI?, cell: MutableSet<Cloud>): Vector2f? {
-        if (nebula == null) {
-            MCTE_debugUtils.displayError("nebula null during centroid repeat")
-            return Vector2f(0f, 0f)
-        }
-        val amountOfTimes = HYPERSTORM_CENTROID_REFINEMENT_ITERATIONS
-        var centroid = getCellCentroid(nebula, cell)
-        var indexVal = 0
-        while (indexVal < amountOfTimes) {
-            indexVal++
-            centroid = getCellCentroid(nebula, cell, centroid)
-        }
-        return centroid
-    }
-
-    fun getRadiusOfHyperstorms(cellMap: MutableMap<MutableSet<Cloud>, Vector2f>, nebula: CombatNebulaAPI): MutableMap<MutableSet<Cloud>, Float> {
-        val cellsToRadius = HashMap<MutableSet<Cloud>, Float>()
-        for (cell in cellMap.keys) {
-            val centroid = cellMap[cell]
-            if (centroid == null) {
-                MCTE_debugUtils.displayError("centroid null during getRadiusOfHyperstorms in terraineffectadder")
-                continue
-            }
-            val radius = getRadiusOfCell(cell, nebula, centroid)
-            cellsToRadius[cell] = radius
-        }
-        return cellsToRadius
-    }
-
-    private fun instantiateDeephyperspaceNebulae(pluginToStorming: MutableMap<HyperspaceTerrainPlugin, Boolean>): HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> {
-        val nebulaManager = engine.nebula
-        val mapHeight = engine.mapHeight
-        val mapWidth = engine.mapWidth
-
-        val deepHyperspaceNebulae = HashMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean>()
-
-        for (plugin in pluginToStorming.keys) {
-            val isStorming = (pluginToStorming[plugin] == true)
-
-            val minNebulaeToAdd = MIN_HYPERCLOUDS_TO_ADD_PER_CELL
-            val maxNebulaeToAdd = MAX_HYPERCLOUDS_TO_ADD_PER_CELL
-            val nebulaeToAdd: Int = (minNebulaeToAdd..maxNebulaeToAdd).random()
-
-            var addedNebulae = 0f
-            while (addedNebulae < nebulaeToAdd) {
-                addedNebulae++
-                // copypasted from battlecreationplugin
-                val x = random.nextFloat() * mapWidth - mapWidth / 2
-                val y = random.nextFloat() * mapHeight - mapHeight / 2
-
-                val tile: IntArray? = MCTE_nebulaUtils.getNebulaTile(Vector2f(x, y))
-                if (tile == null) {
-                    MCTE_debugUtils.displayError("tile was null in iunstantiateing deep hyerpsace etc")
-                    continue
-                }
-
-                var radius = 100f + random.nextFloat() * 400f
-                radius += 100f + 500f * random.nextFloat()
-
-                val cellSize: Float = nebulaManager.tileSizeInPixels
-                if (cellSize == 0f) return HashMap() // why can this happen
-
-                val radiusInTiles: Int = (radius / cellSize).toInt()
-
-                invoke("spawnCloud", nebulaManager, Vector2f(x, y), radius) // REFLECTION MAGIC
-
-                val nebula: Cloud = nebulaManager.getCloud(x, y) as Cloud
-
-                val nebulaCell: MutableSet<Cloud> = nebula.getCloudsInRadius(radiusInTiles, engine.nebula)
-
-                val cellToCentroid: MutableMap<MutableSet<Cloud>, Vector2f> = HashMap()
-                nebulaCell += nebula
-                var possibleCellInhabitant = nebula.flowDest //TODO: tesssst
-                while (possibleCellInhabitant != null) {
-                    nebulaCell += possibleCellInhabitant
-                    possibleCellInhabitant = possibleCellInhabitant.flowDest
-                }
-                val cellCentroid = getCellCentroid(nebulaManager, nebulaCell) ?: return deepHyperspaceNebulae
-                cellToCentroid[nebulaCell] = cellCentroid
-                deepHyperspaceNebulae[cellToCentroid] = isStorming
-            }
-        }
-        return deepHyperspaceNebulae
+        if (cells.isEmpty()) return
+        val script = combatEffectTypes.HYPERSPACE.createInformedEffectInstance(cells)
+        script.start()
     }
 
     /* private fun instantiateDeephyperspaceNebulae(
@@ -586,68 +419,24 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 */
     private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2>) {
         if (!SLIPSTREAM_EFFECT_ENABLED) return
+        if (slipstreamPlugins.isEmpty()) return
 
-        var canAddPlugin = false
 
-        var peakPerformanceMult = 1f
-        var fluxDissipationMult = 1f
-        var overallSpeedMult = 1f
-        var hardFluxGenerationPerFrame = 0f
-
-        for (plugin: SlipstreamTerrainPlugin2 in slipstreamPlugins) {
-            peakPerformanceMult *= SLIPSTREAM_PPT_MULT
-            fluxDissipationMult *= SLIPSTREAM_FLUX_DISSIPATION_MULT
-            overallSpeedMult += SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
-
-            hardFluxGenerationPerFrame += SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
-            canAddPlugin = true
-        }
-        if (canAddPlugin) {
-            val slipstreamPlugin = SlipstreamEffectScript(
-                peakPerformanceMult,
-                fluxDissipationMult,
-                hardFluxGenerationPerFrame,
-                overallSpeedMult
-            )
-            slipstreamPlugin.start()
-        }
+        val plugin = combatEffectTypes.SLIPSTREAM.createInformedEffectInstance(1f)
+        plugin.start()
     }
 
     private fun addMagneticFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin>) {
         if (!MAG_FIELD_EFFECT_ENABLED) return
+        if (magneticFieldPlugins.isEmpty()) return
 
-        var isStorm = false
-        var visionMod = 1f
-        var missileMod = 1f
-        var rangeMod = 1f
-        var eccmChanceMod = 1f
-        var missileBreakLockBaseChance = 0f
-        var canAddPlugin = false
+        val entries = ArrayList<Boolean>()
 
-        for (plugin: MagneticFieldTerrainPlugin in magneticFieldPlugins) {
-            val flareManager = plugin.flareManager
-            val isInFlare = flareManager.isInActiveFlareArc(playerFleet)
-            if (isInFlare) isStorm = true
-
-            visionMod *= if (isInFlare) MAGSTORM_VISION_MULT else MAGFIELD_VISION_MULT
-            missileMod *= if (isInFlare) MAGSTORM_MISSILE_MULT else MAGFIELD_MISSILE_MULT
-            rangeMod *= if (isInFlare) MAGSTORM_RANGE_MULT else MAGFIELD_RANGE_MULT
-            eccmChanceMod *= if (isInFlare) MAGSTORM_ECCM_MULT else MAGFIELD_ECCM_MULT
-            missileBreakLockBaseChance += if (isInFlare) MAGSTORM_MISSILE_SCRAMBLE_CHANCE else MAGFIELD_MISSILE_SCRAMBLE_CHANCE
-            canAddPlugin = true
+        for (plugin in magneticFieldPlugins) {
+            entries += plugin.flareManager.isInActiveFlareArc(playerFleet)
         }
 
-        if (canAddPlugin) {
-            missileBreakLockBaseChance = missileBreakLockBaseChance.coerceAtMost(1f)
-            val magFieldPlugin = magneticFieldEffect(
-                isStorm,
-                visionMod,
-                missileMod,
-                rangeMod,
-                eccmChanceMod,
-                missileBreakLockBaseChance,
-            )
-            magFieldPlugin.start()
-        }
+        val plugin = combatEffectTypes.MAGFIELD.createInformedEffectInstance(entries, 1f)
+        plugin.start()
     }
 }

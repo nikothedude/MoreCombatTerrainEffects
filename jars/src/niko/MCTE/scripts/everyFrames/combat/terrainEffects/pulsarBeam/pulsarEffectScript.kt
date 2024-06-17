@@ -9,6 +9,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.impl.campaign.ids.Stats.CORONA_EFFECT_MULT
 import com.fs.starfarer.api.impl.campaign.terrain.PulsarBeamTerrainPlugin
 import com.fs.starfarer.api.util.IntervalUtil
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.settings.MCTE_settings
@@ -27,14 +28,17 @@ import org.lwjgl.util.vector.Vector2f
 import java.awt.Color
 
 class pulsarEffectScript(
-    val anglesToIntensity: MutableMap<Float, Float>,
-    val hardFluxGenerationPerFrame: Float,
-    val bonusEMPDamageForWeapons: Float,
-    val shieldDestabilziationMult: Float,
-    val EMPChancePerFrame: Float,
-    val EMPdamage: Float,
-    val energyDamage: Float,
+    val anglesToIntensity: MutableMap<Float, Float> = HashMap(),
+    var hardFluxGenerationPerFrame: Float = 0f,
+    var bonusEMPDamageForWeapons: Float = 0f,
+    var shieldDestabilziationMult: Float = 1f,
+    var EMPChancePerFrame: Float = 0f,
+    var EMPdamage: Float = 0f,
+    var energyDamage: Float = 0f,
 ): baseTerrainEffectScript(), usesDeltaTime, DamageDealtModifier {
+
+    override var effectPrototype: combatEffectTypes? = combatEffectTypes.PULSAR
+
     private val timesToDoThingPerSecond = 60f
     override var deltaTime: Float = 0f
     override val thresholdForAdvancement: Float = (1/timesToDoThingPerSecond)
@@ -50,6 +54,11 @@ class pulsarEffectScript(
     private val originalValues: MutableMap<ShipAPI, MutableMap<StatBonus, MutableMap<String, MCTE_miscUtils.originalTerrainValue>>> = HashMap()
 
     init {
+        refreshOverallIntensity()
+    }
+
+    fun refreshOverallIntensity() {
+        overallIntensity = 0f
         for (intensity in anglesToIntensity.values) {
             overallIntensity += intensity
         }

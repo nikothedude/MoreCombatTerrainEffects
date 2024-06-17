@@ -8,6 +8,7 @@ import com.fs.starfarer.api.fleet.FleetMemberType
 import com.fs.starfarer.api.impl.campaign.ids.Personalities
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.util.IntervalUtil
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EMP_DAMAGE
@@ -34,8 +35,10 @@ import java.awt.Color
 
 
 class deepHyperspaceEffectScript(
-    val stormingCells: MutableSet<cloudCell>,
+    val stormingCells: MutableSet<cloudCell> = HashSet(),
 ): baseTerrainEffectScript() {
+
+    override var effectPrototype: combatEffectTypes? = combatEffectTypes.HYPERSPACE
 
     val warnedShipsToCells: MutableMap<ShipAPI, MutableSet<cloudCell>> = HashMap()
     val targettedEntities: MutableMap<CombatEntityAPI, MutableSet<hyperstormArcPreparation>> = HashMap()

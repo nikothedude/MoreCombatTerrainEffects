@@ -37,7 +37,7 @@
 	"MCTE_magneticStormMissileUnscrambleChance":0.007, #default: 0.007
 	
 	#SLIPSTREAM SETTINGS
-	"MCTE_slipstreamPPTMult":0.45, #default: 0.45
+	"MCTE_slipstreamPPTMult":0.9, #default: 0.9 # made high to allow for longer battles (more fun)
 	"MCTE_slipstreamWeaponRangeReduction":true, #if true, ships will receive the usual weapon range reduction, usually. default: true
 	"MCTE_slipstreamFluxDissipationMult":3, #default: 3
 	"MCTE_slipstreamOverallSpeedMultIncrement":1, #default: 1

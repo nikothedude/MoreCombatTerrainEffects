@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="jars">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../starsector modding/UNGP-master/jars" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../starsector modding/UNGP-master/src" />
+      <root url="file://$PROJECT_DIR$/../../../starsector modding/UNGP-master/src" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../../../starsector modding/UNGP-master/jars" recursive="false" />
+  </library>
+</component>

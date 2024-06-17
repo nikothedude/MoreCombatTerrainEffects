@@ -7,6 +7,7 @@ import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import com.sun.org.apache.xpath.internal.operations.Bool
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
@@ -21,6 +22,8 @@ import niko.MCTE.utils.terrainCombatEffectIds
 import kotlin.collections.HashMap
 
 class nebulaEffectScript: baseTerrainEffectScript() {
+
+    override var effectPrototype: combatEffectTypes? = null
 
     var nebulaHandler: CombatNebulaAPI? = engine?.nebula
 

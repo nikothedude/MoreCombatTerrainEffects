@@ -1,3 +1,11 @@
+1.5.0
+Now has UNGP rules for applying terrain effects to all battles
+    The backend has been notably refactored to allow for this
+    Uses enums now, and a significantly different approach to instantiating effects
+
+By default, the slipstream PPT mult is now very forgiving
+    Its more fun this way
+
 1.4.3
 Fixed a yuri expedition crash with magfields
 

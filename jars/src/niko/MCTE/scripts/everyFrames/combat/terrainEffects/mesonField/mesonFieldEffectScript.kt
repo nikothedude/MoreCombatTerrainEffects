@@ -5,18 +5,20 @@ import com.fs.starfarer.api.combat.ShipAPI
 import com.fs.starfarer.api.ui.TooltipMakerAPI
 import com.fs.starfarer.api.util.IntervalUtil
 import com.fs.starfarer.api.util.Misc
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.utils.terrainCombatEffectIds.mesonFieldEffect
 
 class mesonFieldEffectScript(
-    val isStorm: Boolean,
-    val weaponRangeIncrement: Float,
-    val systemRangeMult: Float,
-    val fighterRangeIncrement: Float,
-    val visionMult: Float
+    var isStorm: Boolean = false,
+    var weaponRangeIncrement: Float = 0f,
+    var systemRangeMult: Float = 1f,
+    var fighterRangeIncrement: Float = 0f,
+    var visionMult: Float = 1f
 ): baseTerrainEffectScript() {
 
+    override var effectPrototype: combatEffectTypes? = combatEffectTypes.MESONFIELD
     companion object {
         fun modifyTerrainTooltip(tooltip: TooltipMakerAPI, nextpad: Float, isStorm: Boolean) {
             if (isStorm) {

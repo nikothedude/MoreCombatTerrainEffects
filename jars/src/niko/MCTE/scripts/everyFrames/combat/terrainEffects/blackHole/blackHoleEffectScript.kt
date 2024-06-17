@@ -5,6 +5,7 @@ import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.impl.campaign.terrain.EventHorizonPlugin
 import com.fs.starfarer.api.util.IntervalUtil
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.settings.MCTE_settings
@@ -22,10 +23,8 @@ import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
 class blackHoleEffectScript(
-    val anglesToIntensity: MutableMap<Float, Float>,
-    val timeMult: Float,
-    val playerCoordinates: Vector2f
-    //val gravityPointsToIntensity: MutableMap<Vector2f, Float> = HashMap()
+    val anglesToIntensity: MutableMap<Float, Float> = HashMap(),
+    var timeMult: Float = 1f,
 ): baseTerrainEffectScript(), usesDeltaTime {
     private val timesToApplyForcePerSecond = 60f
 
@@ -34,8 +33,9 @@ class blackHoleEffectScript(
 
     val timer: IntervalUtil = IntervalUtil(0.15f, 0.15f)
 
-
     private val originalValues: MutableMap<ShipAPI, MutableMap<StatBonus, MutableMap<String, MCTE_miscUtils.originalTerrainValue>>> = HashMap(HashMap(HashMap()))
+
+    override var effectPrototype: combatEffectTypes? = combatEffectTypes.BLACKHOLE
 
     override fun applyEffects(amount: Float) {
         timer.advance(amount)

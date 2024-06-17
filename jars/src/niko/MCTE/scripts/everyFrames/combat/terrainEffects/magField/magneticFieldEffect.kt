@@ -8,6 +8,7 @@ import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.IntervalUtil
 import data.scripts.ai.missiles.yrxp_LRMissileAI
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_ids
@@ -19,13 +20,15 @@ import niko.MCTE.utils.terrainCombatEffectIds
 import org.lwjgl.util.vector.Vector2f
 
 class magneticFieldEffect(
-    val isStorm: Boolean,
-    val visionMod: Float,
-    val missileMod: Float,
-    val rangeMod: Float,
-    val eccmChanceMod: Float,
-    var missileBreakLockBaseChance: Float,
+    var isStorm: Boolean = false,
+    var visionMod: Float = 1f,
+    var missileMod: Float = 1f,
+    var rangeMod: Float = 1f,
+    var eccmChanceMod: Float = 1f,
+    var missileBreakLockBaseChance: Float = 0f,
     ): baseTerrainEffectScript(), usesDeltaTime {
+
+    override var effectPrototype: combatEffectTypes? = combatEffectTypes.MAGFIELD
 
     override var deltaTime = 0f
 

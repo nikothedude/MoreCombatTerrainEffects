@@ -2,6 +2,7 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud
 
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.ShipAPI
+import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.terrainCombatEffectIds
 
@@ -10,7 +11,7 @@ class dustCloudEffectScript(
 ): baseTerrainEffectScript() {
 
     protected val affectedShips: MutableMap<ShipAPI, Boolean> = HashMap()
-
+    override var effectPrototype: combatEffectTypes? = null
     override fun applyEffects(amount: Float) {
         for (ship: ShipAPI in engine.ships) {
             if (affectedShips[ship] == null) {
