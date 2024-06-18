@@ -5,7 +5,6 @@ import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.settings.MCTE_settings
-import niko.MCTE.utils.terrainEffectCreationLogic
 import ungp.scripts.campaign.specialist.UNGP_SpecialistSettings
 
 class permaSlipstream: UNGPterrainEffect() {
@@ -33,6 +32,7 @@ class permaSlipstream: UNGPterrainEffect() {
     }
 
     override fun getDescriptionParams(index: Int, difficulty: UNGP_SpecialistSettings.Difficulty?): String {
+        updateDifficultyCache(difficulty)
         return when (index) {
             0 -> "slipstream"
             1 -> "safety overrides"

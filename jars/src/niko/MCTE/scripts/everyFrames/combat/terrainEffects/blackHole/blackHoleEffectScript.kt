@@ -69,11 +69,7 @@ class blackHoleEffectScript(
     }
 
     private fun getGravityForceForEntity(entity: CombatEntityAPI, baseIntensity: Float): Float {
-        var timeMult = 1f
         val engineMult: Float = engine.timeMult.modifiedValue
-        if (entity is ShipAPI) {
-            timeMult = entity.mutableStats.timeMult.modifiedValue
-        }
         val adjustedIntensity = baseIntensity * BLACKHOLE_BASE_GRAVITY
         val totalTimeMult = engineMult
         val mult = if (entity is DamagingProjectileAPI) 0.3f else 1f

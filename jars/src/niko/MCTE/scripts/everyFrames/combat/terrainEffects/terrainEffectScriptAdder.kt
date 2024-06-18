@@ -58,7 +58,6 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_ids
-import niko.MCTE.utils.terrainEffectCreationLogic
 import niko.MCTE.utils.terrainScriptsTracker
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils

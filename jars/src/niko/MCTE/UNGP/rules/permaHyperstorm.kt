@@ -16,7 +16,7 @@ class permaHyperstorm: UNGPterrainEffect() {
     override fun updateDifficultyCache(difficulty: UNGP_SpecialistSettings.Difficulty?) {
         if (difficulty == null) return
 
-        sizeMult = difficulty.getLinearValue(1f, 1f)
+        sizeMult = difficulty.getLinearValue(1f, 0.5f)
         super.updateDifficultyCache(difficulty)
     }
 
@@ -30,6 +30,7 @@ class permaHyperstorm: UNGPterrainEffect() {
     }
 
     override fun getDescriptionParams(index: Int, difficulty: UNGP_SpecialistSettings.Difficulty?): String {
+        updateDifficultyCache(difficulty)
         val minClouds = MCTE_settings.MIN_HYPERCLOUDS_TO_ADD_PER_CELL * sizeMult
         val maxClouds = MCTE_settings.MAX_HYPERCLOUDS_TO_ADD_PER_CELL * sizeMult
 

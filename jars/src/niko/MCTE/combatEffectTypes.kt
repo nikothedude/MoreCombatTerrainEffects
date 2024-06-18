@@ -12,6 +12,7 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.mesonField.mesonField
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.settings.MCTE_settings
+import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_nebulaUtils
 import niko.MCTE.utils.MCTE_nebulaUtils.getCloudsInRadius
@@ -34,10 +35,15 @@ enum class combatEffectTypes {
                 val isInFlare = entry
                 if (isInFlare) instance.isStorm = true
 
+                if (effectMult == 0f) {
+                    instance.eccmChanceMod = 0f
+                } else {
+                    instance.eccmChanceMod *= if (isInFlare) MCTE_settings.MAGSTORM_ECCM_MULT / effectMult else MCTE_settings.MAGFIELD_ECCM_MULT / effectMult
+                }
+
                 instance.visionMod *= if (isInFlare) MCTE_settings.MAGSTORM_VISION_MULT * effectMult else MCTE_settings.MAGFIELD_VISION_MULT * effectMult
                 instance.missileMod *= if (isInFlare) MCTE_settings.MAGSTORM_MISSILE_MULT * effectMult else MCTE_settings.MAGFIELD_MISSILE_MULT * effectMult
                 instance.rangeMod *= if (isInFlare) MCTE_settings.MAGSTORM_RANGE_MULT * effectMult else MCTE_settings.MAGFIELD_RANGE_MULT * effectMult
-                instance.eccmChanceMod *= if (isInFlare) MCTE_settings.MAGSTORM_ECCM_MULT * effectMult else MCTE_settings.MAGFIELD_ECCM_MULT * effectMult
                 instance.missileBreakLockBaseChance += if (isInFlare) MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE * effectMult else MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE * effectMult
             }
         }
@@ -79,8 +85,10 @@ enum class combatEffectTypes {
 
             for (entry in pushDirs) {
                 instance.anglesToIntensity[entry.key] = entry.value
+                instance.timeMult += (entry.value * BLACKHOLE_TIMEMULT_MULT)
             }
-            if (effectMult <= 0) {
+
+            if (effectMult == 0f) {
                 instance.timeMult = 0f
             } else {
                 instance.timeMult *= effectMult

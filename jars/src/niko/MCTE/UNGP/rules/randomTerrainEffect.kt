@@ -13,7 +13,6 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffe
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.utils.MCTE_debugUtils
-import niko.MCTE.utils.terrainEffectCreationLogic
 import niko.MCTE.utils.terrainScriptsTracker
 import org.lazywizard.lazylib.MathUtils
 import ungp.scripts.campaign.specialist.UNGP_SpecialistSettings
@@ -78,8 +77,8 @@ class randomTerrainEffect: UNGPterrainEffect() {
                 return combatEffectTypes.MESONFIELD.createInformedEffectInstance(stormList, effectMult)
             }
             combatEffectTypes.HYPERSPACE -> return combatEffectTypes.HYPERSPACE.createInformedEffectInstance(combatEffectTypes.instantiateHyperstormCells(engine, effectMult, true))
-            combatEffectTypes.PULSAR -> return combatEffectTypes.PULSAR.createInformedEffectInstance(hashMapOf(Pair(MathUtils.getRandomNumberInRange(0f, 360f), MCTE_settings.PULSAR_BASE_FORCE * 20f)), effectMult)
-            combatEffectTypes.BLACKHOLE -> return combatEffectTypes.BLACKHOLE.createInformedEffectInstance(hashMapOf(Pair(MathUtils.getRandomNumberInRange(0f, 360f), MCTE_settings.BLACKHOLE_BASE_GRAVITY * 20f)), effectMult)
+            combatEffectTypes.PULSAR -> return combatEffectTypes.PULSAR.createInformedEffectInstance(hashMapOf(Pair(MathUtils.getRandomNumberInRange(0f, 360f), 0.6f)), effectMult)
+            combatEffectTypes.BLACKHOLE -> return combatEffectTypes.BLACKHOLE.createInformedEffectInstance(hashMapOf(Pair(MathUtils.getRandomNumberInRange(0f, 360f), 0.4f)), effectMult)
         }
         MCTE_debugUtils.log.info("$usableEffect does not match any implemented random terrain effects, skipping random effect gen")
         return null
@@ -95,8 +94,9 @@ class randomTerrainEffect: UNGPterrainEffect() {
     }
 
     override fun getDescriptionParams(index: Int, difficulty: UNGP_SpecialistSettings.Difficulty?): String {
+        updateDifficultyCache(difficulty)
         when (index) {
-            0 -> return "$effectMult"
+            0 -> return "${effectMult}x"
             else -> return ""
         }
     }
