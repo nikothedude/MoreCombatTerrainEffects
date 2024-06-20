@@ -1,7 +1,7 @@
 fieldID,fieldName,fieldType,defaultValue,fieldTooltip,minValue,maxValue,tab
 MCTE_settingsReminder,irrelevant,Header,See MCTE_settings.json for more specific settings,,,,General
 MCTE_generalSettingsheader,awdawd,Header,General Settings,,,,General
-MCTE_blockEffectsOnEntityInteraction,Block effects on terrain-blocker interaction,Boolean,false,Allows things like hypershunts and RAT's gravitational dynamo to block terrain effects on interaction.,,,General
+MCTE_blockEffectsOnEntityInteraction,Block effects on terrain-blocker interaction,Boolean,true,Allows things like hypershunts and RAT's gravitational dynamo to block terrain effects on interaction.,,,General
 MCTE_blockEffectsOnEntityProximity,Block effects on terrain-blocker proximity,Boolean,false,Causes the above terrain blockers to also block terrain if you fly over them. Works with or without the above setting.,,,General
 MCTE_terrainEffectToggleDescription,Terrain Toggles,Header,Terrain Effect Toggles,if you see this niko is dumb,,,Combat
 MCTE_magneticFieldToggle,Magnetic Fields,Boolean,true,"Magnetic fields reduce the weapon/fighter range, vision, missile mauneverability/guidance, and ECCM chance of any fleet in it, and
