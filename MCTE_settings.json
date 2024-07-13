@@ -1,6 +1,6 @@
 {
-	# RELEASE PRESET - More forgiving, disables/tones down some of the "annoying" things, like magfield range decrement.
-	
+	# The nebula effect may be enabled in lunasettings
+
 	#General toggles
 	#default:true
 	"MCTE_showSidebarInfo":true, #Show the info relating to terrain effects in the info bar, on the left side of the screen, during combat. Useful to disable if you're being spammed.
@@ -18,9 +18,9 @@
 	#each individual magnetic field you are in sequentially multiplies/adds these settings to 1, then the value of the last calculation, etc.
 	#ex. 3 magfields, all non-storm, with visionMult = 0.6: You get visionModifier = 1*0.6*(0.6*(0.6))
 	
-	"MCTE_magneticFieldVisionMult":1, #default: 1
+	"MCTE_magneticFieldVisionMult":0.7, #default: 0.7
 	"MCTE_magneticFieldMissileGuidanceAndManeuverabilityMult":0.8, #default: 0.8
-	"MCTE_magneticFieldWeaponAndFighterRangeMult":1, #default: 1
+	"MCTE_magneticFieldWeaponAndFighterRangeMult":0.7, #default: 0.7
 	"MCTE_magneticFieldECCMChanceMult":0.8, #modifies missile ECCM chance. this is the stuff provided by ECCM package, default: 0.8
 	"MCTE_magneticFieldMissileScrambleChance":0.006, #every second or so, looks at all guided missiles, subtracts the ECCM chance from this value, and then uses the calculated
 	# value as a percentage chance to determine if the missile should unlock and fly in random directions, default: 0.006
@@ -29,15 +29,15 @@
 	#MAGNETIC STORM SETTINGS
 	#same rules as the ones above, except these values are used for magnetic STORMS.
 	
-	"MCTE_magneticStormVisionMult":0.7, #default: 0.7
+	"MCTE_magneticStormVisionMult":0.35, #default: 0.35
 	"MCTE_magneticStormMissileGuidanceAndManeuverabilityMult":0.55, #default: 0.55
-	"MCTE_magneticStormWeaponAndFighterRangeMult":0.8, #default: 0.8
+	"MCTE_magneticStormWeaponAndFighterRangeMult":0.35, #default: 0.35
 	"MCTE_magneticStormECCMChanceMult":0.2, #default: 0.2
 	"MCTE_magneticStormMissileScrambleChance":0.02, #default: 0.2
 	"MCTE_magneticStormMissileUnscrambleChance":0.007, #default: 0.007
 	
 	#SLIPSTREAM SETTINGS
-	"MCTE_slipstreamPPTMult":0.9, #default: 0.9 # made high to allow for longer battles (more fun)
+	"MCTE_slipstreamPPTMult":0.45, #default: 0.45
 	"MCTE_slipstreamWeaponRangeReduction":true, #if true, ships will receive the usual weapon range reduction, usually. default: true
 	"MCTE_slipstreamFluxDissipationMult":3, #default: 3
 	"MCTE_slipstreamOverallSpeedMultIncrement":1, #default: 1
@@ -109,7 +109,7 @@
 	"MCTE_pulsarRandomArcChanceIncrement":0.05f, #the chance, every frame, for a ship to be EMPed. default: 0.05
 	"MCTE_pulsarRandomArcEMPDamageIncrement":85f, #the EMP damage a random EMP does. default: 85
 	"MCTE_pulsarRandomArcEnergyDamageIncrement":2f, # the energy damage a random EMP does. default: 2
-	
+
 	#DEBRIS FIELD EFFECTS
 	#"MCTE_debrisFieldMaxPieces":1000,
 	
@@ -128,4 +128,5 @@
 	"MCTE_mesonStormSystemRangeMult": 4f,
 	# Meson storms multiply in-combat vision by this amount
 	"MCTE_mesonStormVisionMult": 4f,
+	
 }

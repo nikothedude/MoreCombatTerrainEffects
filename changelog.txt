@@ -1,5 +1,9 @@
-1.5.0
+1.5.1
 
+Meson fields now actually have extra effects in meson storms
+Removed the "release" preset, as I realzied it honestly kinda sucks and really makes magfields lame
+
+1.5.0
 Clarified that the error message toggle is in lunasettings
 
 Now has UNGP rules for applying terrain effects to all battles

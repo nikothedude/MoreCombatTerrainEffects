@@ -66,6 +66,7 @@ enum class combatEffectTypes {
                     instance.fighterRangeIncrement += MCTE_settings.MESON_STORM_WING_RANGE_INCREMENT * effectMult
                     instance.systemRangeMult *= MCTE_settings.MESON_STORM_SYSTEM_RANGE_MULT * effectMult
                     instance.visionMult += MCTE_settings.MESON_STORM_VISION_MULT * effectMult
+                    instance.isStorm = true
                 } else {
                     instance.weaponRangeIncrement += MCTE_settings.MESON_FIELD_WEAPON_RANGE_INCREMENT * effectMult
                     instance.visionMult += MCTE_settings.MESON_FIELD_VISION_MULT * effectMult
