@@ -4,6 +4,7 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.impl.campaign.ids.Stats
+import com.fs.starfarer.api.impl.campaign.ids.Tags
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.api.input.InputEventAPI
 import com.fs.starfarer.api.util.IntervalUtil
@@ -65,6 +66,7 @@ class magneticFieldEffect(
         timer.advance(amount)
         if (timer.intervalElapsed()) {
             for (ship: ShipAPI in engine.ships) {
+                if (ship.hullSpec.hullId == "dem_drone") continue
                 val mutableStats = ship.mutableStats
                 val modifiedRangeMult = getRangeMultForShip(ship)
                 mutableStats.ballisticWeaponRangeBonus.modifyMult(terrainCombatEffectIds.magneticField, modifiedRangeMult)
@@ -157,9 +159,9 @@ class magneticFieldEffect(
 
     override fun handleSounds(amount: Float) {
         if (isStorm) {
-            Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, 1f)
+            Global.getSoundPlayer().playUILoop("terrain_magstorm", 1f, 1.4f)
         } else {
-            Global.getSoundPlayer().playUILoop("terrain_magfield", 1f, 0.8f)
+            Global.getSoundPlayer().playUILoop("terrain_magfield", 1f, 1f)
         }
     }
 

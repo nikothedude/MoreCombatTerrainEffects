@@ -1,3 +1,7 @@
+1.5.2
+
+Fixed DEM lasers having reduced range in magfields and acting weirdly as a result
+
 1.5.1
 
 Meson fields now actually have extra effects in meson storms

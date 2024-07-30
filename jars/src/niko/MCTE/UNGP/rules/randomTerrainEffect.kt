@@ -22,6 +22,17 @@ class randomTerrainEffect: UNGPterrainEffect() {
 
     companion object {
         val chanceToStorm = hashMapOf(Pair(combatEffectTypes.MAGFIELD, 20f), Pair(combatEffectTypes.MESONFIELD, 20f))
+        val effectsWeCanUse = hashSetOf(
+            combatEffectTypes.MAGFIELD,
+            combatEffectTypes.HYPERSPACE,
+            combatEffectTypes.SLIPSTREAM,
+            combatEffectTypes.PULSAR,
+            combatEffectTypes.BLACKHOLE
+        )
+    }
+
+    init {
+        if (MCTE_debugUtils.MPCenabled) effectsWeCanUse += combatEffectTypes.MESONFIELD
     }
 
     override var classOfScript: Class<out baseTerrainEffectScript>? = null
@@ -42,24 +53,16 @@ class randomTerrainEffect: UNGPterrainEffect() {
     }
 
     private fun getEffectWeCanUse(): combatEffectTypes? {
-        val effectsWeCanUse = hashSetOf(
-            combatEffectTypes.MAGFIELD,
-            combatEffectTypes.HYPERSPACE,
-            combatEffectTypes.SLIPSTREAM,
-            combatEffectTypes.PULSAR,
-            combatEffectTypes.BLACKHOLE
-        )
-
-        if (MCTE_debugUtils.MPCenabled) effectsWeCanUse += combatEffectTypes.MESONFIELD
+        val localEffects = effectsWeCanUse.toMutableList()
         for (entry in terrainScriptsTracker.terrainScripts) {
             val list = entry.value
 
             if (list.isNotEmpty()) {
-                effectsWeCanUse -= list.random().effectPrototype ?: continue
+                localEffects -= list.random().effectPrototype ?: continue
                 continue
             }
         }
-        return effectsWeCanUse.randomOrNull()
+        return localEffects.randomOrNull()
     }
 
     override fun createNewScriptInstance(engine: CombatEngineAPI): baseTerrainEffectScript? {
