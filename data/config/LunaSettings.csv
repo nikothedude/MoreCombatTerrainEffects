@@ -25,6 +25,7 @@ All effects except for the projectile EMP damage increase and push effect are af
 MCTE_moddedHeader,awdjdwai,Header,Inter-mod settings below,,,,Combat
 MCTE_MPCheader,awdjdwai,Header,More Planetary Conditions settings,,,,Combat
 MCTE_mesonToggle,Meson Fields,Boolean,true,"Meson fields increase vision and non-missile weapon range, with storms increasing this effect and also applying it to missiles, wings, and system range.",,,Combat
+MCTE_UNGPEffectMult,UNGP Effects Mult,Double,1.0,Controls how strong UNGP effects are.,0.0,100.0,UNGP
 MCTE_groundBattleEffectHeader,Ground Battle Effects,Header,Ground Battle Effects,,,,Nexerelin
 MCTE_hyperstormNexHeader,Hyperstorms,Header,Hyperstorms,,,,Nexerelin
 MCTE_hyperstormNexToggle,Hyperstorm Toggle,Boolean,true,"Hyperstorms have a chance to strike a number of industries, dealing high damage to each unit individually and disorganizing them.",,,Nexerelin

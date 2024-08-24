@@ -67,6 +67,10 @@ class randomTerrainEffect: UNGPterrainEffect() {
 
     override fun createNewScriptInstance(engine: CombatEngineAPI): baseTerrainEffectScript? {
         val usableEffect = getEffectWeCanUse() ?: return null
+
+        val baseMult = MCTE_settings.UNGP_EFFECT_BASE_MULT
+        val effectMult = (effectMult * baseMult)
+
         when (usableEffect) {
             combatEffectTypes.SLIPSTREAM -> return combatEffectTypes.SLIPSTREAM.createInformedEffectInstance(effectMult)
             combatEffectTypes.MAGFIELD -> {

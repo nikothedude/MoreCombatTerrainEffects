@@ -22,11 +22,11 @@ class permaHyperstorm: UNGPterrainEffect() {
 
     override fun modifyScript(script: baseTerrainEffectScript) {
         if (script !is deepHyperspaceEffectScript) return
-        script.stormingCells.addAll(combatEffectTypes.instantiateHyperstormCells(Global.getCombatEngine(), sizeMult, true))
+        script.stormingCells.addAll(combatEffectTypes.instantiateHyperstormCells(Global.getCombatEngine(), sizeMult * MCTE_settings.UNGP_EFFECT_BASE_MULT, true))
     }
 
     override fun createNewScriptInstance(engine: CombatEngineAPI): baseTerrainEffectScript {
-        return combatEffectTypes.HYPERSPACE.createInformedEffectInstance(combatEffectTypes.instantiateHyperstormCells(engine, sizeMult, true))
+        return combatEffectTypes.HYPERSPACE.createInformedEffectInstance(combatEffectTypes.instantiateHyperstormCells(engine, sizeMult * MCTE_settings.UNGP_EFFECT_BASE_MULT, true))
     }
 
     override fun getDescriptionParams(index: Int, difficulty: UNGP_SpecialistSettings.Difficulty?): String {

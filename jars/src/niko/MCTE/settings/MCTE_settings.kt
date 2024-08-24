@@ -15,6 +15,8 @@ import kotlin.jvm.Throws
 
 object MCTE_settings {
 
+    var UNGP_EFFECT_BASE_MULT = 1f
+
     const val debrisFieldHulkificationLocationX = 9999f
     const val debrisFieldHulkificationLocationY = 9999f
 
@@ -292,6 +294,8 @@ object MCTE_settings {
         MESON_STORM_WING_RANGE_INCREMENT = configJson.getFloat("MCTE_mesonStormWingRangeIncrement")
         MESON_STORM_SYSTEM_RANGE_MULT = configJson.getFloat("MCTE_mesonStormSystemRangeMult") - 1
         MESON_STORM_VISION_MULT = configJson.getFloat("MCTE_mesonStormVisionMult") - 1
+
+        UNGP_EFFECT_BASE_MULT = LunaSettings.getFloat(modId, "MCTE_UNGPEffectMult")!!
 
     }
 

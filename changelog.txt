@@ -1,3 +1,6 @@
+1.6.0
+New lunasettings option for controlling how strong UNGP effects are
+
 1.5.2
 
 Fixed DEM lasers having reduced range in magfields and acting weirdly as a result

@@ -20,6 +20,9 @@ class permaSlipstream: UNGPterrainEffect() {
 
     override fun modifyScript(script: baseTerrainEffectScript) {
         if (script !is SlipstreamEffectScript) return
+
+        val effectMult = (effectMult * MCTE_settings.UNGP_EFFECT_BASE_MULT)
+
         script.peakPerformanceMult *= MCTE_settings.SLIPSTREAM_PPT_MULT / effectMult
         script.fluxDissipationMult += MCTE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT * effectMult
         script.overallSpeedMult += MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT * effectMult
@@ -28,7 +31,7 @@ class permaSlipstream: UNGPterrainEffect() {
     }
 
     override fun createNewScriptInstance(engine: CombatEngineAPI): baseTerrainEffectScript {
-        return combatEffectTypes.SLIPSTREAM.createInformedEffectInstance(effectMult)
+        return combatEffectTypes.SLIPSTREAM.createInformedEffectInstance(effectMult * MCTE_settings.UNGP_EFFECT_BASE_MULT)
     }
 
     override fun getDescriptionParams(index: Int, difficulty: UNGP_SpecialistSettings.Difficulty?): String {
