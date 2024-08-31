@@ -1,3 +1,6 @@
+1.7.0
+Station augments support
+
 1.6.0
 New lunasettings option for controlling how strong UNGP effects are
 

@@ -2,16 +2,17 @@ package niko.MCTE
 
 import com.fs.starfarer.api.BaseModPlugin
 import com.fs.starfarer.api.Global
-import com.fs.starfarer.api.impl.campaign.terrain.StarCoronaAkaMainyuTerrainPlugin
-import data.scripts.campaign.plugins.niko_MPC_campaignPlugin
+import com.fs.starfarer.api.campaign.econ.MarketAPI
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
 import niko.MCTE.settings.MCTE_settings.loadAllSettings
+import niko.MCTE.stationAugments.MCTE_stormDispersal
 import niko.MCTE.utils.MCTE_debugUtils
-import niko.MCTE.settings.MCTE_settings.loadSettings
+import niko.MCTE.utils.MCTE_debugUtils.SA_enabled
 import niko.MCTE.utils.MCTE_debugUtils.YRXPenabled
+import niko_SA.augments.core.stationAugmentData
+import niko_SA.augments.core.stationAugmentStore.allAugments
 import org.apache.log4j.Level
-import org.apache.log4j.lf5.LogLevel
 
 class niko_MCTE_modPlugin : BaseModPlugin() {
 
@@ -29,6 +30,18 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         MCTE_debugUtils.KOLenabled = Global.getSettings().modManager.isModEnabled("knights_of_ludd")
         MCTE_debugUtils.MPCenabled = Global.getSettings().modManager.isModEnabled("niko_morePlanetaryConditions")
         YRXPenabled = Global.getSettings().modManager.isModEnabled("yrxp")
+        MCTE_debugUtils.SA_enabled = Global.getSettings().modManager.isModEnabled("niko_stationAugments")
+
+        if (SA_enabled) {
+            addStationAugmentsToStore()
+        }
+    }
+
+    private fun addStationAugmentsToStore() {
+        allAugments["MCTE_stormDispersal"] = stationAugmentData(
+            { market: MarketAPI -> MCTE_stormDispersal(market, "MCTE_stormDispersal") },
+            false
+        )
     }
 
     override fun onGameLoad(newGame: Boolean) {
