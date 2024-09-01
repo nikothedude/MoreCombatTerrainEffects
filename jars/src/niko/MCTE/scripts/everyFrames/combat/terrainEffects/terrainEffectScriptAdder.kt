@@ -97,7 +97,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         }
 
         if (MCTE_settings.BLOCK_EFFECTS_ON_ENTITY_PROXIMITY) {
-            val playerFleet = Global.getSector().playerFleet
+            val playerFleet = Global.getSector().playerFleet ?: return false
             val containingLocation = playerFleet.containingLocation
 
             for (entity in containingLocation.getEntitiesWithTag(Tags.PROTECTS_FROM_CORONA_IN_BATTLE)) {
