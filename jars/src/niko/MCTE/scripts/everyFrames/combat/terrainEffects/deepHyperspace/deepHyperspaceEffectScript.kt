@@ -48,7 +48,7 @@ class deepHyperspaceEffectScript(
     val dummyShip: ShipAPI = createNewDummyShip()
 
     private fun createNewDummyShip(): ShipAPI {
-        val fleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "talon")
+        val fleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "talon_Interceptor")
         val fleetManager = engine.getFleetManager(100)
         val originalValue = fleetManager.isSuppressDeploymentMessages
         fleetManager.isSuppressDeploymentMessages = true

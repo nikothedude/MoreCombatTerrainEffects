@@ -7,12 +7,11 @@ import com.fs.starfarer.api.combat.ShipAPI
 import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
-import niko.MCTE.settings.MCTE_settings
 
-class MCTE_stormDispersal(market: MarketAPI, id: String) : MCTE_terrainAugment(market, id) {
+class MCTE_stormDispersal(market: MarketAPI?, id: String) : MCTE_terrainAugment(market, id) {
 
     override var classOfScript: Class<out baseTerrainEffectScript>? = deepHyperspaceEffectScript::class.java
-    override val augmentCost: Float = 15f
+    override val augmentCost: Float = 10f
 
     override val name: String = "Storm Dispersal System"
     override val spriteId: String = "graphics/icons/industry/mining.png"

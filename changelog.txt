@@ -1,5 +1,6 @@
 1.7.0
-Station augments support
+Station augments support - rare augments that create terrain effects can now be found if both mods are enabled (NOTE ITS CURRENTLY INDEV)
+Fixed a bug where the game would fail to spawn the talon that is blamed for hyperstorm lightning
 
 1.6.0
 New lunasettings option for controlling how strong UNGP effects are
