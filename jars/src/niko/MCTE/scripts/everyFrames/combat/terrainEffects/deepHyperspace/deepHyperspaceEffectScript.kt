@@ -47,6 +47,8 @@ class deepHyperspaceEffectScript(
 
     val dummyShip: ShipAPI = createNewDummyShip()
 
+    var terrainName = "Hyperspace Storm"
+
     private fun createNewDummyShip(): ShipAPI {
         val fleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "talon_Interceptor")
         val fleetManager = engine.getFleetManager(100)
@@ -328,13 +330,13 @@ class deepHyperspaceEffectScript(
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_hyperStorm2",
                 icon,
-                "Hyperspace Storm",
+                terrainName,
                 "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip).roundTo(2)} energy damage and ${getRawEMPDamageForEntity(playerShip).roundTo(2)} EMP damage",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_hyperStorm1",
                 icon,
-                "Hyperspace Storm",
+                terrainName,
                 "Storming hyperclouds periodically striking ships with lightning",
                 true)
         }

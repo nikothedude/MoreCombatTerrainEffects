@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.econ.MarketAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.ui.TooltipMakerAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.terrainScriptsTracker
 import niko_SA.augments.core.stationAttachment
@@ -31,4 +32,9 @@ abstract class MCTE_terrainAugment(market: MarketAPI?, id: String): stationAttac
     open fun getExistingScript(engine: CombatEngineAPI): baseTerrainEffectScript? {
         return terrainScriptsTracker.terrainScripts[classOfScript]?.randomOrNull()
     }
+
+    override fun getBlueprintValue(): Int {
+        return 30000
+    }
+
 }

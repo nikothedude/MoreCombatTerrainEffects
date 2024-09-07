@@ -3,6 +3,8 @@ package niko.MCTE.stationAugments
 import com.fs.starfarer.api.campaign.econ.MarketAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.ui.TooltipMakerAPI
+import com.fs.starfarer.api.util.Misc
 import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
@@ -29,5 +31,20 @@ class MCTE_slipstreamAugment(market: MarketAPI?, id: String) : MCTE_terrainAugme
     override fun createTerrainEffect(station: ShipAPI, engine: CombatEngineAPI) {
         val script = combatEffectTypes.SLIPSTREAM.createInformedEffectInstance(1f)
         script.start()
+    }
+
+    override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean) {
+        tooltip.addPara(
+            "Using a less far-fetched variant of the slipsurge theory, the station can destabilize reality just enough to cause " +
+            "a transient slipstream - too weak to impact the drive bubble, but enough to overcharge the systems of any nearby ships, including itself.",
+            5f
+        )
+
+        tooltip.addPara(
+            "Applies %s to all ships, fighters, and missiles in combat with the station.",
+            5f,
+            Misc.getHighlightColor(),
+            "safety overrides"
+        )
     }
 }
