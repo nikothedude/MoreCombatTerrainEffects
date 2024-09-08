@@ -16,9 +16,9 @@ class MCTE_blackHoleAugment(market: MarketAPI?, id: String) : MCTE_terrainAugmen
     }
 
     override var classOfScript: Class<out baseTerrainEffectScript>? = blackHoleEffectScript::class.java
-    override val augmentCost: Float = 15f
+    override val augmentCost: Float = 7f
     override val name: String = "Gravity bubble"
-    override val spriteId: String = "graphics/black_hole_augment_icon.png"
+    override val spriteId: String = "graphics/augments/black_hole_augment_icon.png"
 
     override fun applyInCombat(station: ShipAPI) {
         super.applyInCombat(station)
@@ -50,6 +50,8 @@ class MCTE_blackHoleAugment(market: MarketAPI?, id: String) : MCTE_terrainAugmen
     }
 
     override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean) {
+        super.getBasicDescription(tooltip, expanded)
+
         tooltip.addPara(
             "The static drive field of a station can be modified to amplify the mass of the station enough to create a event horizon. " +
                     "Naturally, all traffic near the station is prohibited when this modification is active - which thankfully " +

@@ -16,7 +16,7 @@ class MCTE_stormDispersal(market: MarketAPI?, id: String) : MCTE_terrainAugment(
     override val augmentCost: Float = 10f
 
     override val name: String = "Storm Dispersal System"
-    override val spriteId: String = "graphics/icons/terrain/hyperspace_storm.png"
+    override val spriteId: String = "graphics/augments/hyperspace_storm_augment_icon.png"
 
     override fun modifyScript(existingScript: baseTerrainEffectScript) {
         if (existingScript !is deepHyperspaceEffectScript) return
@@ -30,6 +30,8 @@ class MCTE_stormDispersal(market: MarketAPI?, id: String) : MCTE_terrainAugment(
     }
 
     override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean) {
+        super.getBasicDescription(tooltip, expanded)
+
         tooltip.addPara(
             "Prior to battle, the station can release clouds of ionized gas via modified cargo shuttles, altering the battlespace in a way similar to a hyperspace storm.",
             5f

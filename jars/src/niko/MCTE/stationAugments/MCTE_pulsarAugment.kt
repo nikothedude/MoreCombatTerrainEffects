@@ -11,9 +11,9 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffe
 
 class MCTE_pulsarAugment(market: MarketAPI?, id: String) : MCTE_terrainAugment(market, id) {
     override var classOfScript: Class<out baseTerrainEffectScript>? = pulsarEffectScript::class.java
-    override val augmentCost: Float = 15f
+    override val augmentCost: Float = 14f
     override val name: String = "Ionized Dispersal Unit"
-    override val spriteId: String = "graphics/pulsar_icon.png"
+    override val spriteId: String = "graphics/augments/pulsar_augment_icon.png"
 
     override fun modifyScript(existingScript: baseTerrainEffectScript) {
         /*if (existingScript !is SlipstreamEffectScript) return
@@ -39,6 +39,8 @@ class MCTE_pulsarAugment(market: MarketAPI?, id: String) : MCTE_terrainAugment(m
     }
 
     override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean) {
+        super.getBasicDescription(tooltip, expanded)
+
         tooltip.addPara(
             "The static drive field of a station can be modified to violently churn and warp, creating an incredibly hostile environment much like a %s.",
             5f,
