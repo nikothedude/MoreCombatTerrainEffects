@@ -1,3 +1,6 @@
+1.7.2
+Update to station augments 1.0.0
+
 1.7.1
 Tweaked some station augment stuff
 

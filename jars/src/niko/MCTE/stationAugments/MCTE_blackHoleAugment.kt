@@ -65,6 +65,6 @@ class MCTE_blackHoleAugment(market: MarketAPI?, id: String) : MCTE_terrainAugmen
             Misc.getHighlightColor(),
             "black hole", "significantly increases timeflow", "pulls ships into the station"
         )
-        tooltip.addPara("Also %s.", 5f, Misc.getHighlightColor(), "increases station mass by $MASS_INCREMENT")
+        tooltip.addPara("Also %s.", 5f, Misc.getHighlightColor(), "increases station mass by ${MASS_INCREMENT.toInt()}")
     }
 }
