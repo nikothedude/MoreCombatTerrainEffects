@@ -17,13 +17,18 @@
       <root url="jar://$PROJECT_DIR$/../../starsector-core/starfarer_obf.jar!/" />
       <root url="jar://$PROJECT_DIR$/../../starsector-core/xstream-1.4.10.jar!/" />
       <root url="file://$PROJECT_DIR$/../../starsector-core" />
+      <root url="file://$PROJECT_DIR$/../../starsector-core" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/../../starsector-core/starfarer.api.zip!/" />
       <root url="file://$PROJECT_DIR$/../../starsector-core" />
+      <root url="file://$PROJECT_DIR$/../../starsector-core" />
+      <root url="file://$PROJECT_DIR$/../../starsector-core" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/../../starsector-core" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../starsector-core" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../starsector-core" recursive="false" type="SOURCES" />
     <jarDirectory url="file://$PROJECT_DIR$/../../starsector-core" recursive="false" type="SOURCES" />
   </library>
 </component>

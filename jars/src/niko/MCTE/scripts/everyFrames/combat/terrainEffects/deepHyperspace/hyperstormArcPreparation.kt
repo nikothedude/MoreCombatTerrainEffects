@@ -6,7 +6,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.MissileAPI
 import com.fs.starfarer.api.input.InputEventAPI
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseNikoCombatScript
+import niko.MCTE.scripts.everyFrames.combat.baseNikoCombatScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.usesDeltaTime
 import niko.MCTE.utils.MCTE_arcUtils.arc
 import niko.MCTE.utils.MCTE_arcUtils.telegraphArc

@@ -8,7 +8,6 @@ import niko.MCTE.utils.MCTE_ids.modId
 import org.json.JSONException
 import org.json.JSONObject
 import org.lazywizard.lazylib.ext.json.getFloat
-import org.lwjgl.util.vector.Vector2f
 import java.io.IOException
 import java.lang.NullPointerException
 import kotlin.jvm.Throws
@@ -151,6 +150,7 @@ object MCTE_settings {
     var COMMS_RELAY_ENABLED = true
     var COMMS_RELAY_MAX_DISTANCE = 5000f
     var COMMS_RELAY_MIN_DISTANCE = 500f
+    var COMMS_BASE_CP_RATE = 1.5f
 
     // MPC CONFIG
     // MESON FIELD

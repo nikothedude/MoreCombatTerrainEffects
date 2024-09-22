@@ -2,7 +2,7 @@
     "id":"niko_moreCombatTerrainEffects", # For the convenience of troubleshooters, include your name and the mod name, not just an acronym.
 	"name":"More Combat Terrain Effects", # Displayed to the player
 	"author":"Niko",
-    "utility":"true",
+    "utility":"false",
 	"version":"1.7.2",
 	"description":"Adds combat effects to magnetic fields, slipstreams, nebulae, hyperstorms, pulsars, and black holes.",
     "gameVersion": "0.97a-RC11",

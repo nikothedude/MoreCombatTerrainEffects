@@ -129,7 +129,7 @@ class nebulaEffectScript: baseTerrainEffectScript() {
         if (nebulaHandler == null) return false
         val playerShip = engine.playerShip ?: return false
         if (playerShip.isInsideNebulaAuxillary()) {
-            val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+            val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_nebula")
             if (shouldDisableZeroFluxBoost(playerShip)) {
                 val zeroFluxString = if (playerShip.hasInsulatedEngines()) {
                     "Insulated engines preventing loss of zero-flux boost and mitigating speed loss"

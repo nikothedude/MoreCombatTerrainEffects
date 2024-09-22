@@ -14,4 +14,5 @@ object MCTE_ids {
     const val missionConfig = "MCTE_mission_config.json"
 
     const val NEX_TERRAIN_BATTLE_LOG = "terrain_battle_log"
+    const val OBJECTIVE_TERRAIN_MEMID = "\$MCTE_objectiveTerrain"
 }

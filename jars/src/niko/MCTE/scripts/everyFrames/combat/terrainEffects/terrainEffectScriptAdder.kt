@@ -3,7 +3,10 @@ package niko.MCTE.scripts.everyFrames.combat.terrainEffects
 import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.*
+import com.fs.starfarer.api.campaign.BattleAPI.BattleSide
 import com.fs.starfarer.api.combat.CombatEngineAPI
+import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory
+import com.fs.starfarer.api.impl.campaign.ids.FleetTypes
 import com.fs.starfarer.api.impl.campaign.ids.Tags
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
@@ -11,50 +14,23 @@ import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import data.scripts.campaign.terrain.niko_MPC_mesonField
 import niko.MCTE.combatEffectTypes
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
+import niko.MCTE.scripts.everyFrames.combat.baseNikoCombatScript
+import niko.MCTE.scripts.everyFrames.combat.objectiveEffects.CommsRelayEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.mesonField.mesonFieldEffectScript
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
-import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.COMMS_BASE_CP_RATE
+import niko.MCTE.settings.MCTE_settings.COMMS_RELAY_MAX_DISTANCE
+import niko.MCTE.settings.MCTE_settings.COMMS_RELAY_MIN_DISTANCE
 import niko.MCTE.settings.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.MAGFIELD_ECCM_MULT
-import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_MULT
-import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE
-import niko.MCTE.settings.MCTE_settings.MAGFIELD_RANGE_MULT
-import niko.MCTE.settings.MCTE_settings.MAGFIELD_VISION_MULT
-import niko.MCTE.settings.MCTE_settings.MAGSTORM_ECCM_MULT
-import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_MULT
-import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE
-import niko.MCTE.settings.MCTE_settings.MAGSTORM_RANGE_MULT
-import niko.MCTE.settings.MCTE_settings.MAGSTORM_VISION_MULT
 import niko.MCTE.settings.MCTE_settings.MAG_FIELD_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.MESON_FIELD_VISION_MULT
-import niko.MCTE.settings.MCTE_settings.MESON_FIELD_WEAPON_RANGE_INCREMENT
-import niko.MCTE.settings.MCTE_settings.MESON_STORM_SYSTEM_RANGE_MULT
-import niko.MCTE.settings.MCTE_settings.MESON_STORM_VISION_MULT
-import niko.MCTE.settings.MCTE_settings.MESON_STORM_WEAPON_RANGE_INCREMENT
-import niko.MCTE.settings.MCTE_settings.MESON_STORM_WING_RANGE_INCREMENT
-import niko.MCTE.settings.MCTE_settings.PULSAR_DAMAGE_INCREMENT
 import niko.MCTE.settings.MCTE_settings.PULSAR_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.PULSAR_EMP_CHANCE_INCREMENT
-import niko.MCTE.settings.MCTE_settings.PULSAR_EMP_DAMAGE_BONUS_FOR_WEAPONS_INCREMENT
-import niko.MCTE.settings.MCTE_settings.PULSAR_EMP_DAMAGE_INCREMENT
-import niko.MCTE.settings.MCTE_settings.PULSAR_HARDFLUX_GEN_INCREMENT
 import niko.MCTE.settings.MCTE_settings.PULSAR_INTENSITY_BASE_MULT
-import niko.MCTE.settings.MCTE_settings.PULSAR_SHIELD_DESTABILIZATION_MULT_INCREMENT
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_EFFECT_ENABLED
-import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT
-import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME
-import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_OVERALL_SPEED_MULT_INCREMENT
-import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_PPT_MULT
 import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_ids
@@ -202,33 +178,50 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             if (strategicObject.hasTag(Tags.NAV_BUOY)) navBuoys += strategicObject
         }
 
-        //addCommRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, commRelays)
+        addCommRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, commRelays)
         //addNavBuoyScripts(engine, playerFleet, playerLocation, playerCoordinates, navBuoys)
         //addSensorRelayScripts(engine, playerFleet, playerLocation, playerCoordinates, sensorRelays)
     }
 
-    /*private fun addCommRelayScripts(
+    private fun addCommRelayScripts(
         engine: CombatEngineAPI,
         playerFleet: CampaignFleetAPI,
         playerLocation: LocationAPI,
         playerCoordinates: Vector2f,
         commRelays: MutableSet<SectorEntityToken>
     ) {
-
         val battle = playerFleet.battle ?: return
-        var effectStrength = 0f
+        //val playerSide = battle.getSideFor(battle.playerCombined)
+        val sideToStrength = hashMapOf(Pair(BattleSide.ONE, 0f), Pair(BattleSide.TWO, 0f))
 
         for (commRelay in commRelays) {
+            val commRelayFaction = commRelay.faction
+            val dummyFleet = FleetFactory.createEmptyFleet(commRelayFaction.id, FleetTypes.PATROL_LARGE, null)
+            val commsSide = battle.pickSide(dummyFleet) ?: continue
+            if (commsSide == BattleAPI.BattleSide.NO_JOIN) continue
+
             val distance = MathUtils.getDistance(playerCoordinates, commRelay.location)
             if (distance > COMMS_RELAY_MAX_DISTANCE) continue
 
-            val mult = (1 - (distance / COMMS_RELAY_MAX_DISTANCE))
+            val adjustedMin = (COMMS_RELAY_MIN_DISTANCE).coerceAtLeast(commRelay.radius)
+            val adjustedDist = (distance - adjustedMin).coerceAtLeast(0f)
 
-            //val contribution
+            val mult = (1 - (1 / (COMMS_RELAY_MAX_DISTANCE / adjustedDist)))
+            val contribution = (COMMS_BASE_CP_RATE * mult)
+
+            sideToStrength[commsSide] = sideToStrength[commsSide]!! + contribution
+
+            dummyFleet.despawn()
         }
-
-        //val
-    }*/
+        for (entry in sideToStrength) {
+            val side = entry.key
+            val CPRate = entry.value
+            if (CPRate > 0f) {
+                val owner = if (battle.isPlayerSide(battle.getSide(side))) 0 else 1
+                CommsRelayEffectScript(owner, CPRate, battle).start()
+            }
+        }
+    }
 
     private fun addPulsarScripts(
         engine: CombatEngineAPI,
