@@ -15,7 +15,6 @@
     <orderEntry type="library" name="Console Commands" level="project" />
     <orderEntry type="library" name="LunaLib" level="project" />
     <orderEntry type="library" name="niko_morePlanetaryConditions" level="project" />
-    <orderEntry type="library" name="indevo" level="project" />
     <orderEntry type="library" name="jar" level="project" />
     <orderEntry type="library" name="Interstellar Imperium" level="project" />
     <orderEntry type="library" name="al_arkleg" level="project" />
@@ -30,5 +29,6 @@
     <orderEntry type="library" name="jars" level="project" />
     <orderEntry type="library" name="Station Augments" level="project" />
     <orderEntry type="library" name="Station-Augments" level="project" />
+    <orderEntry type="library" name="IndEvo" level="project" />
   </component>
 </module>

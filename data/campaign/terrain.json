@@ -1,0 +1,11 @@
+{
+	"MCTE_objectiveTerrain":{
+		"plugin":"niko.MCTE.terrain.ObjectiveTerrainPlugin",
+		#"musicSuppression":0.5,
+		# inside field
+		#"loopOne":"terrain_magfield",
+		# inside active aurora/magnetic storm
+		#"loopTwo":"terrain_magstorm",
+	},
+}
+

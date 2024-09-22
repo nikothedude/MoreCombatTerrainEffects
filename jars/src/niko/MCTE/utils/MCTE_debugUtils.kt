@@ -16,6 +16,7 @@ object MCTE_debugUtils {
     var graphicsLibEnabled: Boolean = false
     var KOLenabled: Boolean = false
     var MPCenabled = false
+    var indEvoEnabled = false
     var YRXPenabled = false
     var SA_enabled = false
 

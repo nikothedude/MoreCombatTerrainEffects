@@ -1,30 +1,26 @@
 package niko.MCTE.scripts.everyFrames.combat.objectiveEffects
 
-import com.fs.starfarer.api.EveryFrameScript
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.BattleAPI
-import com.fs.starfarer.api.campaign.BattleAPI.BattleSide
-import com.fs.starfarer.api.combat.DeployedFleetMemberAPI
 import com.fs.starfarer.api.combat.ShipAPI
-import com.fs.starfarer.api.fleet.FleetMemberAPI
 import com.fs.starfarer.api.impl.campaign.ids.Stats
 import niko.MCTE.scripts.everyFrames.combat.MCTEEffectScript
 
-class CommsRelayEffectScript(
+class NavBuoyEffectScript(
     val owner: Int,
-    val CPRate: Float,
+    val strength: Float,
     val battle: BattleAPI
 ): MCTEEffectScript() {
     var boostedShip: ShipAPI? = null
         set(value) {
-            field?.mutableStats?.dynamic?.getMod(Stats.COMMAND_POINT_RATE_FLAT)?.unmodify(modId)
-            value?.mutableStats?.dynamic?.getMod(Stats.COMMAND_POINT_RATE_FLAT)?.modifyFlat(modId, CPRate)
+            field?.mutableStats?.dynamic?.getMod(Stats.COORDINATED_MANEUVERS_FLAT)?.unmodify(modId)
+            value?.mutableStats?.dynamic?.getMod(Stats.COORDINATED_MANEUVERS_FLAT)?.modifyFlat(modId, strength)
 
             field = value
         }
 
     companion object {
-        const val modId = "MCTE_commsRelayEffect"
+        const val modId = "MCTE_navBuoyEffect"
     }
 
     override fun handleSounds(amount: Float) {
@@ -48,10 +44,10 @@ class CommsRelayEffectScript(
         }
 
         engine.maintainStatusForPlayerShip(
-            "MCTE_commsRelayScriptNotifOne",
+            "MCTE_navBuoyNotif",
             icon,
-            "External comms network",
-            "External comm relays routing data through flagship",
+            "External nav relay",
+            "External nav relays routing data through flagship",
             false
         )
 

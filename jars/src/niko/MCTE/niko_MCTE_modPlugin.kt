@@ -5,6 +5,7 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.econ.MarketAPI
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
+import niko.MCTE.listeners.objectiveTerrainAdder
 import niko.MCTE.settings.MCTE_settings.loadAllSettings
 import niko.MCTE.stationAugments.MCTE_blackHoleAugment
 import niko.MCTE.stationAugments.MCTE_pulsarAugment
@@ -32,6 +33,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         MCTE_debugUtils.graphicsLibEnabled = Global.getSettings().modManager.isModEnabled("shaderLib")
         MCTE_debugUtils.KOLenabled = Global.getSettings().modManager.isModEnabled("knights_of_ludd")
         MCTE_debugUtils.MPCenabled = Global.getSettings().modManager.isModEnabled("niko_morePlanetaryConditions")
+        MCTE_debugUtils.indEvoEnabled = Global.getSettings().modManager.isModEnabled("IndEvo")
         YRXPenabled = Global.getSettings().modManager.isModEnabled("yrxp")
         MCTE_debugUtils.SA_enabled = Global.getSettings().modManager.isModEnabled("niko_stationAugments")
 
@@ -72,6 +74,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
 
         LunaSettings.addSettingsListener(settingsChangedListener())
         Global.getSector().registerPlugin(niko_MCTE_campaignPlugin())
+        Global.getSector().addTransientListener(objectiveTerrainAdder())
 
         //Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))
     }
