@@ -1,3 +1,11 @@
+1.8.0
+Campaign objectives (Nav buoys, comm relays, sensor relays) now have in-combat effects
+    Increase coordinated maneuvers
+    Increase CP regen
+    Increase weapon range
+
+    Intensity increases based on campaign distance from these objectives
+
 1.7.2
 Update to station augments 1.0.0
 

@@ -13,10 +13,13 @@ import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellSt
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import data.scripts.campaign.terrain.niko_MPC_mesonField
-import exerelin.campaign.intel.groundbattle.plugins.IndEvoMinefieldPlugin
 import indevo.exploration.minefields.MineFieldTerrainPlugin
+import indevo.industries.artillery.entities.ArtilleryStationEntityPlugin
+import indevo.industries.artillery.scripts.ArtilleryStationScript
+import indevo.industries.artillery.scripts.CampaignAttackScript
 import niko.MCTE.ObjectiveEffect
 import niko.MCTE.combatEffectTypes
+import niko.MCTE.scripts.everyFrames.combat.ArtilleryStationEffect
 import niko.MCTE.scripts.everyFrames.combat.MCTEEffectScript
 import niko.MCTE.scripts.everyFrames.combat.baseNikoCombatScript
 import niko.MCTE.scripts.everyFrames.combat.objectiveEffects.CommsRelayEffectScript
@@ -38,6 +41,7 @@ import niko.MCTE.settings.MCTE_settings.loadSettings
 import niko.MCTE.terrain.ObjectiveTerrainPlugin
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_ids
+import niko.MCTE.utils.MCTE_reflectionUtils
 import niko.MCTE.utils.terrainScriptsTracker
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
@@ -57,12 +61,17 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
         if (engine.isMission && engine.missionId?.isNotEmpty() == true) {
            // evaluateMissionParameters(engine, engine.missionId)
-        } else if (!terrainEffectsBlocked()) {
+        } else {
             val playerFleet = Global.getSector()?.playerFleet ?: return
             val playerLocation = playerFleet.containingLocation ?: return
             val playerCoordinates = playerFleet.location ?: return
-            evaluateTerrainAndAddScripts(engine, playerFleet, playerLocation, playerCoordinates)
+            if (!terrainEffectsBlocked()) {
+                evaluateTerrainAndAddScripts(engine, playerFleet, playerLocation, playerCoordinates)
+            }
             evaluateStrategicEmplacements(engine, playerFleet, playerLocation, playerCoordinates)
+            if (MCTE_debugUtils.indEvoEnabled) {
+                //evaluateArtilleryStations(engine, playerFleet, playerLocation, playerCoordinates)
+            }
         }
 
         engine.removePlugin(this)
@@ -258,6 +267,59 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                     //CommsRelayEffectScript(owner, strength, battle).start()
                 }
             }
+        }
+    }
+
+    private fun evaluateArtilleryStations(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f
+    ) {
+        val battle = playerFleet.battle ?: return
+        val stationToHostileSide = HashMap<ArtilleryStationEntityPlugin, MutableSet<BattleSide>>()
+        val sideToHostileStation = hashMapOf(Pair(BattleSide.ONE, HashSet<ArtilleryStationEntityPlugin>()), Pair(BattleSide.TWO, HashSet()))
+        val stationToEntity = HashMap<ArtilleryStationEntityPlugin, CustomCampaignEntityAPI>()
+
+        for (artyStation in ArtilleryStationEntityPlugin.getArtilleriesInLoc(playerLocation)) {
+            val plugin = artyStation.customPlugin as ArtilleryStationEntityPlugin
+            stationToEntity[plugin] = artyStation as CustomCampaignEntityAPI
+            if (battle.sideOne.any { MCTE_reflectionUtils.invoke("isValid", plugin.orInitScript, it) == true }) { // this doesnt work :( it crashes :( it cant recognize the function :(
+                sideToHostileStation[BattleSide.ONE]!! += plugin
+
+                if (stationToHostileSide[plugin] == null) stationToHostileSide[plugin] = HashSet()
+                stationToHostileSide[plugin]!! += BattleSide.ONE
+            }
+            if (battle.sideTwo.any { MCTE_reflectionUtils.invoke("isValid", plugin.orInitScript, it) == true }) {
+                sideToHostileStation[BattleSide.TWO]!! += plugin
+
+                if (stationToHostileSide[plugin] == null) stationToHostileSide[plugin] = HashSet()
+                stationToHostileSide[plugin]!! += BattleSide.TWO
+            }
+        }
+
+        for (entry in stationToHostileSide) {
+            val station = entry.key
+            val sides = entry.value
+
+            var owner = 0
+
+            val hostileToSideOne = sides.contains(BattleSide.ONE)
+            val hostileToSideTwo = sides.contains(BattleSide.TWO)
+            val playerSide = battle.pickSide(playerFleet)
+
+            if (hostileToSideOne && hostileToSideTwo) {
+                owner = 100
+            } else {
+                if (playerSide == BattleSide.ONE && hostileToSideOne) owner = 1
+                if (playerSide == BattleSide.TWO && hostileToSideTwo) owner = 1
+            }
+
+            val location = battle.computeCenterOfMass()
+            val entity = stationToEntity[station]!!
+            val angle = VectorUtils.getAngle(entity.location, location)
+
+            ArtilleryStationEffect(owner, angle, station.type).start()
         }
     }
 
