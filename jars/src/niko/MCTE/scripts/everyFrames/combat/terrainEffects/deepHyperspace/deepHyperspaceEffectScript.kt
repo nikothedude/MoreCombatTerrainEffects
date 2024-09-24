@@ -60,6 +60,8 @@ class deepHyperspaceEffectScript(
         dummyShip.collisionClass = CollisionClass.NONE
         dummyShip.shipAI = null
         dummyShip.owner = 100
+        dummyShip.mutableStats.hullDamageTakenMult.modifyMult("MCTE_minefieldEffect", 0f)
+        dummyShip.alphaMult = 0f
         fleetManager.isSuppressDeploymentMessages = originalValue
         return dummyShip
     }
@@ -331,7 +333,7 @@ class deepHyperspaceEffectScript(
                 "niko_MCPE_hyperStorm2",
                 icon,
                 terrainName,
-                "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip).roundTo(2)} energy damage and ${getRawEMPDamageForEntity(playerShip).roundTo(2)} EMP damage",
+                "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip).toInt()} energy damage and ${getRawEMPDamageForEntity(playerShip).toInt()} EMP damage",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_hyperStorm1",

@@ -148,19 +148,19 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "niko_MCPE_nebulaEffect2",
                 icon,
                 "Nebula",
-                "Vision range reduced by ${(100-(getVisionMultForShip(playerShip))*100).roundTo(2)}%",
+                "Vision range reduced by ${(100-(getVisionMultForShip(playerShip))*100).toInt()}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect3",
                 icon,
                 "Nebula",
-                "Weapon range reduced by ${(100-(getRangeMultForShip(playerShip))*100).roundTo(2)}%",
+                "Weapon range reduced by ${(100-(getRangeMultForShip(playerShip))*100).toInt()}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect4",
                 icon,
                 "Nebula",
-                "Speed reduced by ${(-getSpeedDecrementForShip(playerShip)).roundTo(2)} Su",
+                "Speed reduced by ${(-getSpeedDecrementForShip(playerShip)).toInt()} Su",
                 true)
         }
         return true

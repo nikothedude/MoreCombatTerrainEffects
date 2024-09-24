@@ -148,6 +148,9 @@ object MCTE_settings {
 
     var MAKESHIFT_OBJECTIVE_EFFECT_MULT = 0.85f
 
+    // OBJECTIVES
+    var OBJECTIVES_ENABLED = true
+
     // COMMS RELAY
     var COMMS_RELAY_ENABLED = true
     var COMMS_RELAY_MAX_DISTANCE = 5000f
@@ -178,6 +181,15 @@ object MCTE_settings {
     var MESON_STORM_WING_RANGE_INCREMENT = 2000f // even bigger
     var MESON_STORM_SYSTEM_RANGE_MULT = 3f // :)
     var MESON_STORM_VISION_MULT = 3f // :)))
+
+    // INDEVO CONFIG
+    // MINEFIELD
+    var MINEFIELD_ENABLED = true
+    var MINEFIELD_MIN_SECS_BETWEEN_TICKS = 1.8f
+    var MINEFIELD_MAX_SECS_BETWEEN_TICKS = 2.6f
+
+    var MINEFIELD_MIN_MINES_PER_TICK = 2
+    var MINEFIELD_MAX_MINES_PER_TICK = 5
 
     @JvmStatic
     fun getHyperstormFearThreshold(): Float {
@@ -297,7 +309,13 @@ object MCTE_settings {
 
         //MAX_SHIPS_ALLOWED = configJson.getInt("MCTE_debrisFieldMaxPieces")!!
 
+        OBJECTIVES_ENABLED = LunaSettings.getBoolean(modId, "MCTE_objectivesToggle")!!
+
         // COMMS RELAY
+
+        // NAV RELAY
+
+        // SENSOR ARRAY
 
         // MPC CONFIG
         // MESON FIELD
@@ -310,6 +328,15 @@ object MCTE_settings {
         MESON_STORM_SYSTEM_RANGE_MULT = configJson.getFloat("MCTE_mesonStormSystemRangeMult") - 1
         MESON_STORM_VISION_MULT = configJson.getFloat("MCTE_mesonStormVisionMult") - 1
 
+        // INDEVO CONFIG
+        // MINEFIELD
+        MINEFIELD_ENABLED = LunaSettings.getBoolean(modId, "MCTE_minefieldToggle")!!
+        MINEFIELD_MIN_MINES_PER_TICK = LunaSettings.getInt(modId, "MCTE_minefieldMinMinesPerTick")!!
+        MINEFIELD_MAX_MINES_PER_TICK = LunaSettings.getInt(modId, "MCTE_minefieldMaxMinesPerTick")!!
+        MINEFIELD_MIN_SECS_BETWEEN_TICKS = LunaSettings.getFloat(modId, "MCTE_minefieldMinSecsBetweenTicks")!!
+        MINEFIELD_MAX_SECS_BETWEEN_TICKS = LunaSettings.getFloat(modId, "MCTE_minefieldMaxSecsBetweenTicks")!!
+
+        // UNGP CONFIG
         UNGP_EFFECT_BASE_MULT = LunaSettings.getFloat(modId, "MCTE_UNGPEffectMult")!!
 
     }

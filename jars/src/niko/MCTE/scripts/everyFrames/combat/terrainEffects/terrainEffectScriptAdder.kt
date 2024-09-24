@@ -7,16 +7,16 @@ import com.fs.starfarer.api.campaign.BattleAPI.BattleSide
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.impl.campaign.fleets.FleetFactory
 import com.fs.starfarer.api.impl.campaign.ids.FleetTypes
+import com.fs.starfarer.api.impl.campaign.ids.MemFlags
 import com.fs.starfarer.api.impl.campaign.ids.Tags
 import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import data.scripts.campaign.terrain.niko_MPC_mesonField
+import indevo.exploration.minefields.MineBeltTerrainPlugin
 import indevo.exploration.minefields.MineFieldTerrainPlugin
 import indevo.industries.artillery.entities.ArtilleryStationEntityPlugin
-import indevo.industries.artillery.scripts.ArtilleryStationScript
-import indevo.industries.artillery.scripts.CampaignAttackScript
 import niko.MCTE.ObjectiveEffect
 import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.ArtilleryStationEffect
@@ -139,7 +139,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 // MPC
                 if (MCTE_debugUtils.MPCenabled && terrainPlugin is niko_MPC_mesonField) mesonFieldPlugins += terrainPlugin
                 // INDEVO
-                if (MCTE_debugUtils.indEvoEnabled && terrainPlugin is MineFieldTerrainPlugin) mineFieldPlugins += terrainPlugin
+                if (MCTE_debugUtils.indEvoEnabled && terrainPlugin is MineBeltTerrainPlugin) mineFieldPlugins += terrainPlugin
             }
         }
         addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
@@ -149,8 +149,93 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
         addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, blackHoleTerrainPlugins)
         addMesonFieldTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, mesonFieldPlugins)
+        addMinefieldTerrainPlugins(engine, playerFleet, playerLocation, playerCoordinates, mineFieldPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
         // dust clouds already have an effect
+    }
+
+    private fun addMinefieldTerrainPlugins(
+        engine: CombatEngineAPI,
+        playerFleet: CampaignFleetAPI,
+        playerLocation: LocationAPI,
+        playerCoordinates: Vector2f,
+        mineFieldPlugins: MutableSet<CampaignTerrainPlugin>
+    ) {
+        if (!MCTE_debugUtils.indEvoEnabled || !MCTE_settings.MINEFIELD_ENABLED) return
+        if (mineFieldPlugins.isEmpty()) return
+
+        val castedPlugins = (mineFieldPlugins as MutableSet<MineBeltTerrainPlugin>)
+        val battle = playerFleet.battle ?: return
+
+        val minefieldToHostileSide = HashMap<MineBeltTerrainPlugin, MutableSet<BattleSide>>()
+
+        for (plugin in mineFieldPlugins) {
+            val market = plugin.primary
+            val factionId = market.factionId
+
+            if (battle.sideOne.any { plugin.canAttackFleet(it) }) { // this doesnt work :( it crashes :( it cant recognize the function :(
+                if (minefieldToHostileSide[plugin] == null) minefieldToHostileSide[plugin] = HashSet()
+                minefieldToHostileSide[plugin]!! += BattleSide.ONE
+            }
+            if (battle.sideTwo.any { plugin.canAttackFleet(it) }) {
+                if (minefieldToHostileSide[plugin] == null) minefieldToHostileSide[plugin] = HashSet()
+                minefieldToHostileSide[plugin]!! += BattleSide.TWO
+            }
+        }
+
+        val targetsToInstances = HashMap<Int, Int>()
+        targetsToInstances[0] = 0 // on player side
+        targetsToInstances[1] = 0 // on enemy side
+        //sidesToInstances[100] = 0 // targetting both sides
+
+        for (entry in minefieldToHostileSide) {
+            val minefield = entry.key
+            val sides = entry.value
+
+            val hostileToSideOne = sides.contains(BattleSide.ONE)
+            val hostileToSideTwo = sides.contains(BattleSide.TWO)
+            val playerSide = battle.pickSide(playerFleet)
+
+            if (hostileToSideOne && hostileToSideTwo) {
+                targetsToInstances[0] = targetsToInstances[0]!! + 1
+                targetsToInstances[1] = targetsToInstances[1]!! + 1 // attack both sides
+            } else {
+                if ((playerSide == BattleSide.ONE && hostileToSideOne) || (playerSide == BattleSide.TWO && hostileToSideTwo)) {
+                    targetsToInstances[0] = targetsToInstances[0]!! + 1 // attack enemy
+                } else {
+                    targetsToInstances[1] = targetsToInstances[1]!! + 1 // attack player
+                }
+            }
+
+            //sides.forEach { sidesToInstances[it] += 1}
+            //val location = battle.computeCenterOfMass()
+            //val entity = stationToEntity[station]!!
+            //val angle = VectorUtils.getAngle(entity.location, location)
+
+            //ArtilleryStationEffect(owner, angle, station.type).start()
+        }
+        if (targetsToInstances.any { it.value > 0 }) {
+            combatEffectTypes.MINEFIELD.createInformedEffectInstance(targetsToInstances).start()
+        }
+    }
+
+    // i dont like that this exists but whatever lol
+    private fun MineBeltTerrainPlugin.canAttackFleet(fleet: CampaignFleetAPI): Boolean {
+        var friend = false
+
+        val m = primary
+
+        if (m != null && !m.isPlanetConditionMarketOnly) {
+            friend = fleet.isPlayerFleet && m.isPlayerOwned || fleet.faction.id == m.factionId || fleet.faction.getRelationshipLevel(m.factionId).isAtWorst(RepLevel.INHOSPITABLE)
+            if (!m.isPlayerOwned && fleet.isPlayerFleet && !fleet.isTransponderOn) {
+                friend = false
+            }
+        }
+        if (fleet.memoryWithoutUpdate.contains(MemFlags.MEMORY_KEY_MISSION_IMPORTANT)) friend = true
+        if (friend) return false
+
+        for (area in disabledAreas) if (area.contains(fleet)) return false
+        return true
     }
 
     private fun addMesonFieldTerrainScripts(
@@ -183,6 +268,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         playerFleet: CampaignFleetAPI,
         playerLocation: LocationAPI,
         playerCoordinates: Vector2f) {
+
+        if (!MCTE_settings.OBJECTIVES_ENABLED) return
 
         val commRelays: MutableSet<ObjectiveTerrainPlugin> = HashSet()
         val navBuoys: MutableSet<ObjectiveTerrainPlugin> = HashSet()

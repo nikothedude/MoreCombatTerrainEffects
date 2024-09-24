@@ -224,7 +224,7 @@ class SlipstreamEffectScript(
                 "niko_MCPE_slipstream3",
                 icon,
                 "Slipstream",
-                "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(playerShip).roundTo(2)} per second",
+                "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(playerShip).toInt()} per second",
                 true)
         }
         engine.maintainStatusForPlayerShip(

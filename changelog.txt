@@ -4,7 +4,14 @@ Campaign objectives (Nav buoys, comm relays, sensor relays) now have in-combat e
     Increase CP regen
     Increase weapon range
 
-    Intensity increases based on campaign distance from these objectives
+    Intensity changes based on campaign distance from these objectives
+
+Indevo integration - minefields now spawn mines in-combat
+    Lower performance than star fortress mines
+    Can target both sides at once if neutral
+        Due to engine limitations, mines targetting enemies will always be allied, so you cant shoot them down
+
+Polished some numbers into ints and gave nebula a new icon
 
 1.7.2
 Update to station augments 1.0.0

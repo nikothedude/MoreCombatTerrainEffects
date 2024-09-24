@@ -14,6 +14,7 @@ class objectiveTerrainAdder: BaseCampaignEventListener(false) {
         to: JumpPointAPI.JumpDestination?
     ) {
         super.reportFleetJumped(fleet, from, to)
+        if (!MCTE_settings.OBJECTIVES_ENABLED) return
         if (fleet == null || !fleet.isPlayerFleet) return
 
         if (to == null) return

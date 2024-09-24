@@ -9,6 +9,7 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudC
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.mesonField.mesonFieldEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.minefield.minefieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.settings.MCTE_settings
@@ -72,6 +73,18 @@ enum class combatEffectTypes {
                     instance.visionMult += MCTE_settings.MESON_FIELD_VISION_MULT * effectMult
                 }
             }
+        }
+    },
+    MINEFIELD {
+        override fun createEffectInstance(): baseTerrainEffectScript {
+            return minefieldEffectScript()
+        }
+
+        override fun modifyEffectInstance(instance: baseTerrainEffectScript, vararg args: Any) {
+            if (instance !is minefieldEffectScript) return
+
+            val newSides = args[0] as? HashMap<Int, Int> ?: return
+            instance.targetSidesToInstance.forEach { instance.targetSidesToInstance[it.key] = instance.targetSidesToInstance[it.key]!! + newSides[it.key]!! }
         }
     },
     BLACKHOLE {

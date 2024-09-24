@@ -22,9 +22,16 @@ MCTE_blackholeToggle,Black Holes,Boolean,true,"Black holes lose some of their CR
 Affected by solar shielding, but inversely: The timeflow decreases as effect resistance increases, but the gravity doesn't, so solar shielding is a strict nerf in this case.",,,Combat
 MCTE_pulsarToggle,Pulsars,Boolean,true,"Pulsars lose some of their CR penalty in exchange for decreasing shield efficiency, increasing shield upkeep, decreasing shield EMP arc pierce resist, randomly EMPing all ships, applying a flat EMP damage increase to all projectiles, pushing all combat entities away from it's campaign location, and slowly building hardflux. Effect scales with your proximity to the pulsar in the campaign layer.
 All effects except for the projectile EMP damage increase and push effect are affected by solar shielding.",,,Combat
+MCTE_objectivesToggle,Objectives,Boolean,true,"Comm relays increase CP regeneration, nav buoys increase coordinated maneuvers, sensor relays increase weapon range.",,,Combat
 MCTE_moddedHeader,awdjdwai,Header,Inter-mod settings below,,,,Combat
 MCTE_MPCheader,awdjdwai,Header,More Planetary Conditions settings,,,,Combat
 MCTE_mesonToggle,Meson Fields,Boolean,true,"Meson fields increase vision and non-missile weapon range, with storms increasing this effect and also applying it to missiles, wings, and system range.",,,Combat
+MCTE_indEvoheader,awdjdwai,Header,Industrial Evolution settings,,,,Combat
+MCTE_minefieldToggle,Minefields,Boolean,true,Minefields spawn mines near hostile ships.,,,Combat
+MCTE_minefieldMinSecsBetweenTicks,Minimum seconds between ticks,Double,1.8,"Each ""tick"" is a chance for mines to spawn.",,,Combat
+MCTE_minefieldMaxSecsBetweenTicks,Maximum seconds between ticks,Double,2.6,,,,Combat
+MCTE_minefieldMinMinesPerTick,Minimum mines per tick,Int,2,Cannot exceed the amount of ships currently active.,,,Combat
+MCTE_minefieldMaxMinesPerTick,Maximum mines per tick,Int,5,,,,Combat
 MCTE_UNGPEffectMult,UNGP Effects Mult,Double,1.0,Controls how strong UNGP effects are.,0.0,100.0,UNGP
 MCTE_groundBattleEffectHeader,Ground Battle Effects,Header,Ground Battle Effects,,,,Nexerelin
 MCTE_hyperstormNexHeader,Hyperstorms,Header,Hyperstorms,,,,Nexerelin

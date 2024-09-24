@@ -392,7 +392,7 @@ class pulsarEffectScript(
             "niko_MCPE_pulsar2",
             icon,
             "Pulsar Beam",
-            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(ship).roundTo(2)} per second",
+            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(ship).toInt()} per second",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar5",
