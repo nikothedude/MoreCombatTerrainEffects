@@ -139,13 +139,13 @@ class minefieldEffectScript : baseTerrainEffectScript() {
         if (!super.handleNotification(amount)) return false
 
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
-        val playerShip = engine.playerShip.owner ?: return false
+        val playerShip = engine.playerShip ?: return false
 
         if (targetSidesToInstance[0]!! > 0) { // player targeted
             engine.maintainStatusForPlayerShip(
                 "niko_MCTE_minefield1",
                 icon,
-                "Minefield (MCTE FEATURE - NOT INDEVO)",
+                "Minefield",
                 "Stealth mines targeting allies",
                 true
             )
@@ -154,7 +154,7 @@ class minefieldEffectScript : baseTerrainEffectScript() {
             engine.maintainStatusForPlayerShip(
                 "niko_MCTE_minefield2",
                 icon,
-                "Minefield (MCTE FEATURE - NOT INDEVO)",
+                "Minefield",
                 "Stealth mines targeting enemies",
                 false
             )

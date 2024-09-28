@@ -12,6 +12,7 @@ Indevo integration - minefields now spawn mines in-combat
         Due to engine limitations, mines targetting enemies will always be allied, so you cant shoot them down
 
 Polished some numbers into ints and gave nebula a new icon
+Fixed missions endlessly loading settings
 
 1.7.2
 Update to station augments 1.0.0

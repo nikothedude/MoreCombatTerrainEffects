@@ -61,6 +61,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
         if (engine.isMission && engine.missionId?.isNotEmpty() == true) {
            // evaluateMissionParameters(engine, engine.missionId)
+            engine.removePlugin(this)
         } else {
             val playerFleet = Global.getSector()?.playerFleet ?: return
             val playerLocation = playerFleet.containingLocation ?: return
