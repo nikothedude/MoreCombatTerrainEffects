@@ -63,15 +63,15 @@
 	
 	#HYPERSTORM EFFECTS
 	"MCTE_hyperstormEnergyDamage":650.0, #energy damage the final purple bolt will do. default: 650
-	"MCTE_hyperstormEMPDamage":12000.0, #EMP damage the final purple bolts will do in total. default: 16000
+	"MCTE_hyperstormEMPDamage":12000.0, #EMP damage the final purple bolts will do in total. default: 12000
 	"MCTE_hyperstormMinTimeBetweenStrikes":2, #Minimum time, in ~seconds, between arc attempts. default: 2
 	"MCTE_hyperstormMaxTimeBetweenStrikes":5, #Maximum time, in ~seconds, between arc attempts. default: 5
 	"MCTE_hyperstormGracePeriod":3, #After all active arc attempts on a target finish, the target is given this amount of time in 
 	#~seconds before they can be targetted again. default: 3
-	"MCTE_hyperstormMinChargeTime":3.6, #Max time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.6
-	"MCTE_hyperstormMaxChargeTime":3.0, #Minimum time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 3.0
-	"MCTE_hyperstormMinArcRange":1200, #Lower bound of the range that can be picked for an arc attempt. Default: 1200
-	"MCTE_hyperstormMaxArcRange":1200, #Upper bound of the range that can be picked for an arc attempt. Default: 1200
+	"MCTE_hyperstormMinChargeTime":4.6, #Max time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 4.6
+	"MCTE_hyperstormMaxChargeTime":4.0, #Minimum time a ship will be zapped by the telegraphing arcs before they are struck by lightning. Default: 4.0
+	"MCTE_hyperstormMinArcRange":700, #Lower bound of the range that can be picked for an arc attempt. Default: 700
+	"MCTE_hyperstormMaxArcRange":700, #Upper bound of the range that can be picked for an arc attempt. Default: 700
 	"MCTE_hyperstormLightningForce":4500, #The amount of force in starsector units (yes i know) a arc will apply to a ship it hits. Default: 4500
 	"MCTE_hyperstormTimesToArc":5, #The amount of times a damaging ar will strike a ship. Higher = more dispersed damage. default: 5
 	"MCTE_hyperstormSpeedThreshold":50.0, #The speed at which a ship becomes targettable at, anything below and the lightning won't try to strike you, unless your mass is higher than the untargettability mass threshold. 

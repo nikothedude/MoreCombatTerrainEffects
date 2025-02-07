@@ -3,6 +3,7 @@ package niko.MCTE
 import com.fs.starfarer.api.BaseModPlugin
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.econ.MarketAPI
+import com.fs.starfarer.api.impl.campaign.ids.Factions
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
 import niko.MCTE.listeners.objectiveTerrainAdder
@@ -45,25 +46,25 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
     private fun addStationAugmentsToStore() {
         allAugments["MCTE_stormDispersal"] = stationAugmentData(
             { market: MarketAPI? -> MCTE_stormDispersal(market, "MCTE_stormDispersal") },
-            false,
-            mutableMapOf(Pair("SA_augmentRare", 10f)
-            )
+            hashSetOf(Factions.TRITACHYON),
+            mutableMapOf(Pair("SA_augmentRare", 10f)),
+            0.1f
         )
         allAugments["MCTE_slipstreamAugment"] = stationAugmentData(
             { market: MarketAPI? -> MCTE_slipstreamAugment(market, "MCTE_slipstreamAugment") },
-            false,
+            HashSet(),
             mutableMapOf(Pair("SA_augmentRare", 10f)
             )
         )
         allAugments["MCTE_blackholeAugment"] = stationAugmentData(
             { market: MarketAPI? -> MCTE_blackHoleAugment(market, "MCTE_blackholeAugment") },
-            false,
+            HashSet(),
             mutableMapOf(Pair("SA_augmentRare", 10f)
             )
         )
         allAugments["MCTE_pulsarAugment"] = stationAugmentData(
             { market: MarketAPI? -> MCTE_pulsarAugment(market, "MCTE_pulsarAugment") },
-            false,
+            HashSet(),
             mutableMapOf(Pair("SA_augmentRare", 10f)
             )
         )
