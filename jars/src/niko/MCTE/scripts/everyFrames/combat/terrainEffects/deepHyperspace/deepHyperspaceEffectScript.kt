@@ -26,6 +26,7 @@ import niko.MCTE.settings.MCTE_settings.SOLAR_SHIELDING_EFFECT_MULT
 import niko.MCTE.utils.MCTE_arcUtils.arc
 import niko.MCTE.utils.MCTE_arcUtils.cosmeticArc
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import niko.MCTE.utils.MCTE_shipUtils
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import org.lazywizard.lazylib.MathUtils
@@ -333,7 +334,7 @@ class deepHyperspaceEffectScript(
                 "niko_MCPE_hyperStorm2",
                 icon,
                 terrainName,
-                "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip).toInt()} energy damage and ${getRawEMPDamageForEntity(playerShip).toInt()} EMP damage",
+                "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip).trimHangingZero()} energy damage and ${getRawEMPDamageForEntity(playerShip).trimHangingZero()} EMP damage",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_hyperStorm1",

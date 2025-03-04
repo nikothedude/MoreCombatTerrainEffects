@@ -20,6 +20,7 @@ import niko.MCTE.settings.MCTE_settings.PULSAR_BASE_FORCE
 import niko.MCTE.settings.MCTE_settings.PULSAR_FORCE_ENABLED
 import niko.MCTE.settings.MCTE_settings.PULSAR_PPT_COMPENSATION
 import niko.MCTE.settings.MCTE_settings.SOLAR_SHIELDING_EFFECT_MULT
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
@@ -375,24 +376,24 @@ class pulsarEffectScript(
             "niko_MCPE_pulsar3",
             icon,
             "Pulsar Beam",
-            "${(getChargeForShip(ship)).roundTo(2)} EMP damage applied to all projectiles",
+            "${(getChargeForShip(ship)).roundTo(2).trimHangingZero()} EMP damage applied to all projectiles",
             true)
         var randomDamageData = ""
         if (empActualDamage > 0f) {
-            randomDamageData = "and ${empActualDamage.roundTo(2)} energy damage"
+            randomDamageData = "and ${empActualDamage.roundTo(2).trimHangingZero()} energy damage"
         }
-        val randomEMPData = "${empChance.roundTo(2)}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2)} EMP damage $randomDamageData"
+        val randomEMPData = "${empChance.roundTo(2).trimHangingZero()}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2)} EMP damage $randomDamageData"
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar4",
             icon,
             "Pulsar Beam",
-            "${empChance.roundTo(2)}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2)} EMP damage",
+            "${empChance.roundTo(2)}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2).trimHangingZero()} EMP damage",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar2",
             icon,
             "Pulsar Beam",
-            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(ship).toInt()} per second",
+            "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(ship).trimHangingZero()} per second",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar5",

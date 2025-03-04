@@ -2,6 +2,7 @@ package niko.MCTE
 
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
+import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.combat.entities.terrain.Cloud
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
@@ -31,6 +32,7 @@ enum class combatEffectTypes {
             if (instance !is magneticFieldEffect) return
             val entries: MutableList<Boolean> = args[0] as? ArrayList<Boolean> ?: return
             val effectMult = args[1] as? Float ?: return
+            val plugins = args[2] as? Collection<MagneticFieldTerrainPlugin>
 
             for (entry in entries) {
                 val isInFlare = entry
@@ -46,6 +48,10 @@ enum class combatEffectTypes {
                 instance.missileMod *= if (isInFlare) MCTE_settings.MAGSTORM_MISSILE_MULT * effectMult else MCTE_settings.MAGFIELD_MISSILE_MULT * effectMult
                 instance.rangeMod *= if (isInFlare) MCTE_settings.MAGSTORM_RANGE_MULT * effectMult else MCTE_settings.MAGFIELD_RANGE_MULT * effectMult
                 instance.missileBreakLockBaseChance += if (isInFlare) MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE * effectMult else MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE * effectMult
+
+                if (plugins != null) {
+                    instance.magneticFieldPlugins.addAll(plugins)
+                }
             }
         }
     },

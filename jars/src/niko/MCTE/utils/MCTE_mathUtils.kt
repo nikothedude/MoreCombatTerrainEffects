@@ -13,4 +13,9 @@ object MCTE_mathUtils {
     fun Float.roundTo(decimalPoints: Int): Float {
         return this.toDouble().roundTo(decimalPoints).toFloat()
     }
+
+    fun Float.trimHangingZero(): Number {
+        if (this % 1 == 0f) return this.toInt()
+        return this
+    }
 }

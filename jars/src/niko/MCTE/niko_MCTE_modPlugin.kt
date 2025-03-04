@@ -18,6 +18,8 @@ import niko.MCTE.utils.MCTE_debugUtils.YRXPenabled
 import niko_SA.augments.core.stationAugmentData
 import niko_SA.augments.core.stationAugmentStore.allAugments
 import org.apache.log4j.Level
+import niko.MCTE.listeners.objectiveTerrainAdder.Companion
+import niko.MCTE.listeners.objectiveTerrainAdder.Companion.createObjectiveTerrain
 
 class niko_MCTE_modPlugin : BaseModPlugin() {
 
@@ -76,6 +78,8 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         LunaSettings.addSettingsListener(settingsChangedListener())
         Global.getSector().registerPlugin(niko_MCTE_campaignPlugin())
         Global.getSector().addTransientListener(objectiveTerrainAdder())
+
+        Global.getSector().playerFleet?.containingLocation?.createObjectiveTerrain()
 
         //Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))
     }

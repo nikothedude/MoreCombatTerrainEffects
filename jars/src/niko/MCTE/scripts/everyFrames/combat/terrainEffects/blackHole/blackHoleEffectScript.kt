@@ -16,6 +16,7 @@ import niko.MCTE.settings.MCTE_settings.BLACKHOLE_BASE_GRAVITY
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_GRAVITY_ENABLED
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_PPT_COMPENSATION
 import niko.MCTE.settings.MCTE_settings.SOLAR_SHIELDING_EFFECT_MULT
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import niko.MCTE.utils.MCTE_miscUtils
 import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.terrainCombatEffectIds
@@ -116,7 +117,7 @@ class blackHoleEffectScript(
             "niko_MCPE_blackHole2",
             icon,
             "Event Horizon",
-            "Time dilation multiplied by ${getTimeMultForShip(engine.playerShip).roundTo(2)}x",
+            "Time dilation multiplied by ${getTimeMultForShip(engine.playerShip).roundTo(2).trimHangingZero()}x",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_blackHole1",

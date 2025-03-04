@@ -8,6 +8,7 @@ import com.fs.starfarer.api.util.Misc
 import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import niko.MCTE.utils.terrainCombatEffectIds.mesonFieldEffect
 
 class mesonFieldEffectScript(
@@ -95,26 +96,26 @@ class mesonFieldEffectScript(
             "niko_MCTE_mesonField1",
             icon,
             "Meson $stormOrNot",
-            "${((getVisionMultForShip(ship))*100).roundTo(2)}% vision",
+            "${((getVisionMultForShip(ship))*100).roundTo(2).trimHangingZero()}% vision",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCTE_mesonField2",
             icon,
             "Meson $stormOrNot",
-            "+${getRangeIncrementForShip(ship).toInt()} ${missileOrNot}weapon range",
+            "+${getRangeIncrementForShip(ship).trimHangingZero()} ${missileOrNot}weapon range",
             true)
         if (!isStorm) return true
         engine.maintainStatusForPlayerShip(
             "niko_MCTE_mesonField3",
             icon,
             "Meson $stormOrNot",
-            "+${getWingRangeIncrementForShip(ship).toInt()} fighter range",
+            "+${getWingRangeIncrementForShip(ship).trimHangingZero()} fighter range",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCTE_mesonField4",
             icon,
             "Meson $stormOrNot",
-            "${((getSystemRangeMultForShip(ship))*100).roundTo(2)}% system range",
+            "${((getSystemRangeMultForShip(ship))*100).roundTo(2).trimHangingZero()}% system range",
             true)
         return true
     }

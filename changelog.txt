@@ -1,3 +1,20 @@
+1.9.0
+
+Cleaned up some strings
+
+Buffed objective effects
+    Pristine objectives now have a +40% buff, instead of makeshift objectives getting a -15% malus
+        This buff also applies to range
+
+Objective effects are now color coded
+    Green - Will assist your fleet
+    Grey - Will not assist your fleet
+    Red - Possessed by an enemy faction
+
+Objective terrain is now properly removed when a objective is destroyed
+Objective terrain is now properly generated on new games
+Objective names in the objective terrain tooltip are now colored by their faction
+
 1.8.1
 
 Compatibility for station augments update

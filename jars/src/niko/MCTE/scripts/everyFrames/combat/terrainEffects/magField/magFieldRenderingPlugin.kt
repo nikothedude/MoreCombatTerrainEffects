@@ -22,7 +22,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 class magFieldRenderingPlugin(
-    val plugins: MutableSet<MagneticFieldTerrainPlugin>
+    val source: magneticFieldEffect
 ): BaseCombatLayeredRenderingPlugin() {
     val engine = Global.getCombatEngine()
     val playerFleet: CampaignFleetAPI? = Global.getSector().playerFleet
@@ -34,7 +34,7 @@ class magFieldRenderingPlugin(
     init {
         val maxHeight = engine.mapHeight
         val maxWidth = engine.mapWidth
-        for (plugin in plugins) {
+        for (plugin in source.magneticFieldPlugins) {
             var renderPoint: Vector2f = Vector2f(maxWidth, maxHeight)
             var angle = 5f
             if (playerFleet != null && playerFleet.location != null) {
@@ -86,7 +86,7 @@ class magFieldRenderingPlugin(
         val alphaMult = viewport?.alphaMult
         if (alphaMult == null || alphaMult <= 0) return
         val overallMult = 50
-        for (plugin in plugins) {
+        for (plugin in source.magneticFieldPlugins) {
 
             val bandWidthInTexture: Float = plugin.auroraBandWidthInTexture
             var bandIndex: Float
@@ -100,7 +100,7 @@ class magFieldRenderingPlugin(
             val pixelsPerSegment = 50f/overallMult
             val segments = ((circ / pixelsPerSegment).roundToInt().toFloat())
 
-            val pluginAngle = pluginToPlayerfleetAngle[plugin]!!
+            val pluginAngle = getPluginAngle(plugin)
             //val invertedAngle: Float = Misc.normalizeAngle(180f - pluginAngle)
 
             //val startRadius = 0.0
@@ -113,7 +113,7 @@ class magFieldRenderingPlugin(
             val anglePerSegment = (spanRad / segments)
 
             //val loc = Vector2f(0f, 0f)
-            val loc = pluginToRenderPoint[plugin]!!
+            val loc = getPluginRenderPoint(plugin)
             val x = loc.x
             val y = loc.y
 
@@ -234,11 +234,45 @@ class magFieldRenderingPlugin(
                     texProgress += texPerSegment * 1f
                     i++
                 }
-                GL11.glEnd()
                 GL11.glRotatef(180f, 0f, 0f, 1f)
+                GL11.glEnd()
             }
             GL11.glPopMatrix()
 //		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         }
+    }
+
+    private fun getPluginRenderPoint(plugin: MagneticFieldTerrainPlugin): Vector2f {
+        if (pluginToRenderPoint[plugin] != null) return pluginToRenderPoint[plugin]!!
+
+        regeneratePoints(plugin)
+        return pluginToRenderPoint[plugin]!!
+    }
+
+    fun getPluginAngle(plugin: MagneticFieldTerrainPlugin): Float {
+        if (pluginToPlayerfleetAngle[plugin] != null) return pluginToPlayerfleetAngle[plugin]!!
+
+        regeneratePoints(plugin)
+        return pluginToPlayerfleetAngle[plugin]!!
+    }
+
+    private fun regeneratePoints(plugin: MagneticFieldTerrainPlugin) {
+        val maxHeight = engine.mapHeight
+        val maxWidth = engine.mapWidth
+        var renderPoint: Vector2f = Vector2f(maxWidth, maxHeight)
+        var angle = 5f
+        if (playerFleet != null && playerFleet.location != null) {
+            angle = Misc.normalizeAngle(VectorUtils.getAngle(plugin.auroraCenterLoc, playerFleet.location))
+
+            val aTemp = angle % Math.PI /2
+            val radius = getRadiusOfMap()
+            val amplitude = radius/cos(aTemp)
+            val x = MathUtils.clamp((cos(angle) * amplitude).toFloat(), -maxWidth, maxWidth)
+            val y = MathUtils.clamp((sin(angle) * amplitude).toFloat(), -maxHeight, maxHeight)
+
+            renderPoint = Vector2f(x, y)
+        }
+        pluginToPlayerfleetAngle[plugin] = angle
+        pluginToRenderPoint[plugin] = renderPoint
     }
 }

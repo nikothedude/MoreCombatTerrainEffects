@@ -13,6 +13,7 @@ import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_DISABLE_VENTING
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_INCREASE_TURN_RATE
 import niko.MCTE.settings.MCTE_settings.SLIPSTREAM_REDUCE_WEAPON_RANGE
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds.slipstreamEffect
 import java.awt.Color
@@ -224,7 +225,7 @@ class SlipstreamEffectScript(
                 "niko_MCPE_slipstream3",
                 icon,
                 "Slipstream",
-                "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(playerShip).toInt()} per second",
+                "Generating hardflux at rate of ${calculateFluxGeneratedPerSecond(playerShip).trimHangingZero()} per second",
                 true)
         }
         engine.maintainStatusForPlayerShip(

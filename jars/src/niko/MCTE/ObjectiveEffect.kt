@@ -9,6 +9,7 @@ import com.fs.starfarer.api.ui.TooltipMakerAPI
 import com.fs.starfarer.api.util.Misc
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.utils.MCTE_mathUtils.roundTo
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import org.lazywizard.lazylib.MathUtils
 import kotlin.math.exp
 
@@ -84,7 +85,10 @@ enum class ObjectiveEffect {
         val distance = MathUtils.getDistance(fleetCoordinates, objective.location)
         val minDist = getMinDistance()
         val adjustedMin = minDist.coerceAtLeast(objective.radius)
-        val maxDist = getMaxDistance()
+        var maxDist = getMaxDistance()
+        if (!objective.hasTag(Tags.MAKESHIFT)) {
+            maxDist *= MCTE_settings.PRISTINE_OBJECTIVE_EFFECT_MULT
+        }
         val adjustedDist = (distance - adjustedMin).coerceAtLeast(0f)
         if (adjustedDist > maxDist) return 0f
 
@@ -129,17 +133,23 @@ enum class ObjectiveEffect {
 
     open fun addFirstTerrainTooltip(tooltip: TooltipMakerAPI, expanded: Boolean, fleet: CampaignFleetAPI, objective: CustomCampaignEntityAPI) {
         tooltip.addPara(
-            "Your fleet is in range of ${objective.name}, which offers %s to any allied fleets in combat.",
+            "Your fleet is in range of %s, which offers %s to any allied fleets in combat.",
             5f,
             Misc.getHighlightColor(),
-            getOfferingText()
+            objective.name, getOfferingText()
+        ).setHighlightColors(
+            objective.faction.baseUIColor,
+            Misc.getHighlightColor()
         )
-        if (objective.hasTag(Tags.MAKESHIFT)) {
+        if (!objective.hasTag(Tags.MAKESHIFT)) {
             tooltip.addPara(
-                "Compared to a domain-era instance of its kind, ${objective.name} will be %s less effective in-combat due to degraded performance.",
+                "Due to it's pristine nature, %s has %s more strength and range than makeshift variants of it's kind.",
                 5f,
-                Misc.getNegativeHighlightColor(),
-                "${((1 - (MCTE_settings.MAKESHIFT_OBJECTIVE_EFFECT_MULT))* 100f).roundTo(2)}%"
+                Misc.getPositiveHighlightColor(),
+                objective.name, "${((((MCTE_settings.PRISTINE_OBJECTIVE_EFFECT_MULT)) - 1) * 100f).roundTo(2).trimHangingZero()}%"
+            ).setHighlightColors(
+                objective.faction.baseUIColor,
+                Misc.getPositiveHighlightColor()
             )
         }
     }
@@ -152,7 +162,7 @@ enum class ObjectiveEffect {
             "%s of it's in-combat bonuses should you engage in combat.",
             5f,
             Misc.getHighlightColor(),
-            "${getPercentEffectiveness(fleet, objective) * 100f}%"
+            "${(getPercentEffectiveness(fleet, objective) * 100f).roundTo(1).trimHangingZero()}%"
         )
     }
 

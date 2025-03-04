@@ -17,6 +17,7 @@ import niko.MCTE.utils.MCTE_mathUtils.roundTo
 import niko.MCTE.settings.MCTE_settings.MAGFIELD_MISSILE_UNSCRAMBLE_CHANCE
 import niko.MCTE.settings.MCTE_settings.MAGSTORM_MISSILE_UNSCRAMBLE_CHANCE
 import niko.MCTE.utils.MCTE_debugUtils
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lwjgl.util.vector.Vector2f
 
@@ -27,6 +28,7 @@ class magneticFieldEffect(
     var rangeMod: Float = 1f,
     var eccmChanceMod: Float = 1f,
     var missileBreakLockBaseChance: Float = 0f,
+    var magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet()
     ): baseTerrainEffectScript(), usesDeltaTime {
 
     override var effectPrototype: combatEffectTypes? = combatEffectTypes.MAGFIELD
@@ -45,7 +47,7 @@ class magneticFieldEffect(
     override fun init(engine: CombatEngineAPI?) {
         super.init(engine)
 
-        //this.engine.addLayeredRenderingPlugin(magFieldRenderingPlugin(magneticFieldPlugins))
+        //this.engine.addLayeredRenderingPlugin(magFieldRenderingPlugin(this))
         // way beyond my skill level for now
     }
 
@@ -124,31 +126,31 @@ class magneticFieldEffect(
             "niko_MCPE_magFieldInterference1",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-(getVisionMultForShip(ship))*100).roundTo(2)}% less vision",
+            "${(100-(getVisionMultForShip(ship))*100).roundTo(2).trimHangingZero()}% less vision",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference2",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-(getMissileAuxillaryMultForShip(ship))*100).roundTo(2)}% less missile guidance/turn rate",
+            "${(100-(getMissileAuxillaryMultForShip(ship))*100).roundTo(2).trimHangingZero()}% less missile guidance/turn rate",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference4",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-(getRangeMultForShip(ship))*100).roundTo(2)}% less weapon range and fighter range",
+            "${(100-(getRangeMultForShip(ship))*100).roundTo(2).trimHangingZero()}% less weapon range and fighter range",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference5",
             icon,
             "Magnetic $stormOrNot",
-            "${(100-(getECCMChanceMultForShip(ship))*100).roundTo(2)}% less ECCM chance",
+            "${(100-(getECCMChanceMultForShip(ship))*100).roundTo(2).trimHangingZero()}% less ECCM chance",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference6",
             icon,
             "Magnetic $stormOrNot",
-            "${calculateScrambleChancePerSecond(ship) * 100}% chance for missiles' guidance to be scrambled per 1 second(s)",
+            "${(calculateScrambleChancePerSecond(ship) * 100).trimHangingZero()}% chance for missiles' guidance to be scrambled per 1 second(s)",
             true)
         return true
     }

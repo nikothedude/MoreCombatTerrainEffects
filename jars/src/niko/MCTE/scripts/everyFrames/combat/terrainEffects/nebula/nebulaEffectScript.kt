@@ -16,6 +16,7 @@ import niko.MCTE.settings.MCTE_settings.NEBULA_DISABLE_ZERO_FLUX_BOOST
 import niko.MCTE.settings.MCTE_settings.NEBULA_RANGE_MULT
 import niko.MCTE.settings.MCTE_settings.NEBULA_SPEED_DECREMENT
 import niko.MCTE.settings.MCTE_settings.NEBULA_VISION_MULT
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 import niko.MCTE.utils.MCTE_shipUtils.hasInsulatedEngines
 import niko.MCTE.utils.MCTE_shipUtils.isInsideNebulaAuxillary
 import niko.MCTE.utils.terrainCombatEffectIds
@@ -148,19 +149,19 @@ class nebulaEffectScript: baseTerrainEffectScript() {
                 "niko_MCPE_nebulaEffect2",
                 icon,
                 "Nebula",
-                "Vision range reduced by ${(100-(getVisionMultForShip(playerShip))*100).toInt()}%",
+                "Vision range reduced by ${(100-(getVisionMultForShip(playerShip))*100).trimHangingZero()}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect3",
                 icon,
                 "Nebula",
-                "Weapon range reduced by ${(100-(getRangeMultForShip(playerShip))*100).toInt()}%",
+                "Weapon range reduced by ${(100-(getRangeMultForShip(playerShip))*100).trimHangingZero()}%",
                 true)
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_nebulaEffect4",
                 icon,
                 "Nebula",
-                "Speed reduced by ${(-getSpeedDecrementForShip(playerShip)).toInt()} Su",
+                "Speed reduced by ${(-getSpeedDecrementForShip(playerShip)).trimHangingZero()} Su",
                 true)
         }
         return true

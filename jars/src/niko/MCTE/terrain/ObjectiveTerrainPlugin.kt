@@ -9,9 +9,12 @@ import com.fs.starfarer.api.impl.campaign.CampaignObjective
 import com.fs.starfarer.api.impl.campaign.ids.Factions
 import com.fs.starfarer.api.impl.campaign.terrain.BaseRingTerrain
 import com.fs.starfarer.api.ui.TooltipMakerAPI
+import com.fs.starfarer.api.util.IntervalUtil
 import com.fs.starfarer.api.util.Misc
 import niko.MCTE.ObjectiveEffect
+import niko.MCTE.utils.MCTE_ids
 import org.lwjgl.util.vector.Vector2f
+import java.awt.Color
 import java.util.*
 
 class ObjectiveTerrainPlugin: BaseRingTerrain() {
@@ -25,11 +28,29 @@ class ObjectiveTerrainPlugin: BaseRingTerrain() {
         var effect: ObjectiveEffect
     ): RingParams(bandWidthInEngine, middleRadius, relatedEntity, null)
 
+    var interval = IntervalUtil(1.1f, 1.2f) // days
+        get() {
+            if (field == null) field = IntervalUtil(1.1f, 1.2f)
+            return field
+        }
+
     override fun init(terrainId: String?, entity: SectorEntityToken?, param: Any) {
         super.init(terrainId, entity, param)
 
         ourParams = param as ObjectiveTerrainParams
         name = "error"
+    }
+
+    override fun advance(amount: Float) {
+        super.advance(amount)
+
+        interval.advance(Misc.getDays(amount))
+        if (interval.intervalElapsed()) {
+            if (!ourParams.relatedEntity.isAlive) {
+                entity?.containingLocation?.removeEntity(entity)
+                ourParams.relatedEntity.memoryWithoutUpdate[MCTE_ids.OBJECTIVE_TERRAIN_MEMID] = null
+            }
+        }
     }
 
     override fun getTerrainName(): String {
@@ -47,6 +68,20 @@ class ObjectiveTerrainPlugin: BaseRingTerrain() {
         return ourParams.effect.getTerrainName(playerFleet, objective as CustomCampaignEntityAPI)
     }
 
+    override fun getNameColor(): Color {
+        val playerFleet = Global.getSector().playerFleet
+        val objective = ourParams.relatedEntity as? CustomCampaignEntityAPI ?: return super.getNameColor()
+
+        if (ourParams.effect.wantToAssist(playerFleet, objective)) {
+            return Misc.getPositiveHighlightColor()
+        } else {
+            if (objective.faction.relToPlayer.isHostile) {
+                return Misc.getNegativeHighlightColor()
+            }
+            return Misc.getGrayColor()
+        }
+    }
+
     override fun hasTooltip(): Boolean {
         return true
     }
@@ -61,8 +96,8 @@ class ObjectiveTerrainPlugin: BaseRingTerrain() {
     override fun containsEntity(other: SectorEntityToken?): Boolean {
         if (other == null) return false
 
-        val objective = ourParams.relatedEntity
-        if (objective.faction.id == Factions.NEUTRAL) return false
+        //val objective = ourParams.relatedEntity
+        //if (objective.faction.id == Factions.NEUTRAL) return false
 
         return super.containsEntity(other)
     }

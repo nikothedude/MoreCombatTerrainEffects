@@ -339,8 +339,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
             val percentStrength = (effect.getPercentEffectiveness(playerFleet, objective))
             var strength = (effect.getBaseStrength() * percentStrength)
-            if (objective.hasTag(Tags.MAKESHIFT)) {
-                strength *= MCTE_settings.MAKESHIFT_OBJECTIVE_EFFECT_MULT
+            if (!objective.hasTag(Tags.MAKESHIFT)) {
+                strength *= MCTE_settings.PRISTINE_OBJECTIVE_EFFECT_MULT
             }
             sideToStrength[pickedSide] = strength
 
@@ -616,7 +616,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             entries += plugin.flareManager.isInActiveFlareArc(playerFleet)
         }
 
-        val plugin = combatEffectTypes.MAGFIELD.createInformedEffectInstance(entries, 1f)
+        val plugin = combatEffectTypes.MAGFIELD.createInformedEffectInstance(entries, 1f, magneticFieldPlugins)
         plugin.start()
     }
 }
