@@ -86,9 +86,11 @@ class randomTerrainEffect: UNGPterrainEffect() {
             combatEffectTypes.HYPERSPACE -> return combatEffectTypes.HYPERSPACE.createInformedEffectInstance(combatEffectTypes.instantiateHyperstormCells(engine, effectMult, true))
             combatEffectTypes.PULSAR -> return combatEffectTypes.PULSAR.createInformedEffectInstance(hashMapOf(Pair(MathUtils.getRandomNumberInRange(0f, 360f), 0.6f)), effectMult)
             combatEffectTypes.BLACKHOLE -> return combatEffectTypes.BLACKHOLE.createInformedEffectInstance(hashMapOf(Pair(MathUtils.getRandomNumberInRange(0f, 360f), 0.4f)), effectMult)
+            else -> {
+                MCTE_debugUtils.log.info("$usableEffect does not match any implemented random terrain effects, skipping random effect gen")
+                return null
+            }
         }
-        MCTE_debugUtils.log.info("$usableEffect does not match any implemented random terrain effects, skipping random effect gen")
-        return null
     }
 
     private fun shouldDoStorm(type: combatEffectTypes): Boolean {
