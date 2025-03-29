@@ -1,3 +1,12 @@
+1.11.0
+Codex support
+    New category in the codex: MCTE
+        Contains both terrain and objective information
+
+Hyperstorms now use directional EMP arcs
+
+Some basic autoresolve support
+
 1.10.0
 Update to Starsector 0.98
     Now compiled on Java 17 and Kotlin 2.1

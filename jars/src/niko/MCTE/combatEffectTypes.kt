@@ -1,9 +1,15 @@
 package niko.MCTE
 
+import com.fs.starfarer.api.Global
+import com.fs.starfarer.api.campaign.BattleAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
+import com.fs.starfarer.api.combat.WeaponAPI.AIHints
+import com.fs.starfarer.api.impl.campaign.BattleAutoresolverPluginImpl
+import com.fs.starfarer.api.impl.campaign.ids.Stats
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import indevo.exploration.minefields.MineBeltTerrainPlugin
 import niko.MCTE.codex.TerrainEntry
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
@@ -14,6 +20,7 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.mesonField.mesonField
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.minefield.minefieldEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.terrainEffectScriptAdder
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.utils.MCTE_debugUtils
@@ -57,6 +64,37 @@ enum class combatEffectTypes(
                 }
             }
         }
+
+        override fun modifyAutoresolve(
+            data: BattleAutoresolverPluginImpl.FleetAutoresolveData,
+            terrainAffecting: terrainEffectScriptAdder.TerrainScriptList,
+            battle: BattleAPI
+        ) {
+            super.modifyAutoresolve(data, terrainAffecting, battle)
+
+            for (magfield in terrainAffecting.magneticFieldPlugins) {
+                val isStorming = magfield.flareManager.isInActiveFlareArc(battle.computeCenterOfMass())
+                for (memberData in data.members) {
+                    val member = memberData.member
+                    val eccmMult = member.stats.dynamic.getMod(Stats.ELECTRONIC_WARFARE_PENALTY_MOD).computeEffective(1f)
+                    if (eccmMult <= 0f) continue
+
+                    /*var percentOpIsGuided = 0f
+                    var totalOp = 0f
+                    for (slot in member.variant.fittedWeaponSlots) {
+                        val weaponId = member.variant.getWeaponId(slot)
+                        val spec = Global.getSettings().getWeaponSpec(weaponId)
+                        totalOp += spec.getOrdnancePointCost(member.captain?.stats)
+
+                        if (spec.aiHints.contains(AIHints.GUIDED_POOR) || spec.aiHints.contains(AIHints.HEATSEEKER) || spec.aiHints.contains(AIHints.DO_NOT_AIM))
+                    }*/
+
+                    val divisor = if (isStorming) 2.1f else 1.2f
+
+                    memberData.strength /= (divisor * eccmMult).coerceAtLeast(1f)
+                }
+            }
+        }
     },
     MESONFIELD {
         override fun createEffectInstance(): mesonFieldEffectScript {
@@ -85,7 +123,6 @@ enum class combatEffectTypes(
         }
     },
     MINEFIELD {
-
         override fun createEffectInstance(): baseTerrainEffectScript {
             return minefieldEffectScript()
         }
@@ -95,6 +132,26 @@ enum class combatEffectTypes(
 
             val newSides = args[0] as? HashMap<Int, Int> ?: return
             instance.targetSidesToInstance.forEach { instance.targetSidesToInstance[it.key] = instance.targetSidesToInstance[it.key]!! + newSides[it.key]!! }
+        }
+
+        override fun modifyAutoresolve(
+            data: BattleAutoresolverPluginImpl.FleetAutoresolveData,
+            terrainAffecting: terrainEffectScriptAdder.TerrainScriptList,
+            battle: BattleAPI
+        ) {
+            super.modifyAutoresolve(data, terrainAffecting, battle)
+
+            if (!MCTE_debugUtils.indEvoEnabled) return
+            val minefieldPlugins = terrainAffecting.mineFieldPlugins as? MutableSet<MineBeltTerrainPlugin> ?: return
+            val pluginsToSide = terrainEffectScriptAdder.getMinefieldHostileSides(minefieldPlugins, battle)
+            val side = battle.pickSide(data.fleet)
+            val other = if (side == BattleAPI.BattleSide.ONE) BattleAPI.BattleSide.TWO else BattleAPI.BattleSide.ONE
+            if (side == BattleAPI.BattleSide.NO_JOIN) return
+
+            for (entry in pluginsToSide) {
+                if (entry.value.none { it == other } ) continue
+                data.fightingStrength += BASE_MINEFIELD_AUTORESOLVE_BONUS
+            }
         }
     },
     BLACKHOLE {
@@ -184,9 +241,14 @@ enum class combatEffectTypes(
         return
     }
 
+    open fun modifyAutoresolve(data: BattleAutoresolverPluginImpl.FleetAutoresolveData, terrainAffecting: terrainEffectScriptAdder.TerrainScriptList, battle: BattleAPI) {}
+
     open fun isAvailableInCodex(): Boolean = true
 
     companion object {
+
+        const val BASE_MINEFIELD_AUTORESOLVE_BONUS = 30f
+
         fun instantiateHyperstormCells(engine: CombatEngineAPI, sizeMult: Float, isStorming: Boolean, nebula: CombatNebulaAPI = engine.nebula): MutableSet<cloudCell> {
             val deepHyperspaceNebulas: MutableMap<MutableMap<MutableSet<Cloud>, Vector2f>, Boolean> = instantiateDeephyperspaceNebulae(engine, sizeMult, isStorming)
 

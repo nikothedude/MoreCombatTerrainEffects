@@ -15,7 +15,6 @@ import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
 import data.scripts.campaign.terrain.niko_MPC_mesonField
 import indevo.exploration.minefields.MineBeltTerrainPlugin
-import indevo.exploration.minefields.MineFieldTerrainPlugin
 import indevo.industries.artillery.entities.ArtilleryStationEntityPlugin
 import niko.MCTE.ObjectiveEffect
 import niko.MCTE.combatEffectTypes
@@ -42,6 +41,7 @@ import niko.MCTE.terrain.ObjectiveTerrainPlugin
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_ids
 import niko.MCTE.utils.MCTE_reflectionUtils
+import niko.MCTE.utils.niko_MCTE_battleUtils.getContainingLocation
 import niko.MCTE.utils.terrainScriptsTracker
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
@@ -49,6 +49,105 @@ import org.lwjgl.util.vector.Vector2f
 
 // script to dodge plugin incompatability
 class terrainEffectScriptAdder: baseNikoCombatScript() {
+
+
+    companion object {
+        fun getTerrainAffectingBattle(battle: BattleAPI, battleLoc: LocationAPI? = null): TerrainScriptList {
+
+            var battleLoc = battleLoc
+            if (battleLoc == null) {
+                battleLoc = battle.getContainingLocation() ?: return TerrainScriptList()
+            }
+            val terrainFocus = if (battle.isPlayerInvolved) Global.getSector().playerFleet.location else battle.computeCenterOfMass()
+
+            val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet()
+            val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2> = HashSet()
+            //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
+            val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
+            val blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin> = HashSet()
+            val pulsarPlugins: MutableSet<PulsarBeamTerrainPlugin> = HashSet()
+            val coronaPlugins: MutableSet<StarCoronaTerrainPlugin> = HashSet()
+            val ionStormPlugins: MutableSet<StarCoronaAkaMainyuTerrainPlugin> = HashSet()
+
+            // MODDED TERRAIN
+            val mesonFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet() // cant type it correctly else itd probs crash
+            val mineFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet()
+
+            for (terrain: CampaignTerrainAPI in battleLoc.terrainCopy) {
+                val terrainPlugin = terrain.plugin
+                if (terrainPlugin.containsEntity(battleLoc.createToken(terrainFocus))) {
+                    if (terrainPlugin is PulsarBeamTerrainPlugin) pulsarPlugins += terrainPlugin
+                    if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
+                    if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
+                    //  if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
+                    if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
+                    if (terrainPlugin is EventHorizonPlugin) blackHoleTerrainPlugins += terrainPlugin
+                    if (terrainPlugin is StarCoronaTerrainPlugin) {
+                        if (terrainPlugin is StarCoronaAkaMainyuTerrainPlugin) {
+                            ionStormPlugins += terrainPlugin
+                        } else {
+                            coronaPlugins += terrainPlugin
+                        }
+                    }
+                    // MPC
+                    if (MCTE_debugUtils.MPCenabled && terrainPlugin is niko_MPC_mesonField) mesonFieldPlugins += terrainPlugin
+                    // INDEVO
+                    if (MCTE_debugUtils.indEvoEnabled && terrainPlugin is MineBeltTerrainPlugin) mineFieldPlugins += terrainPlugin
+                }
+            }
+
+            return TerrainScriptList(
+                magneticFieldPlugins,
+                slipstreamPlugins,
+                hyperspaceTerrainPlugins,
+                blackHoleTerrainPlugins,
+                pulsarPlugins,
+                coronaPlugins,
+                ionStormPlugins,
+                mesonFieldPlugins,
+                mineFieldPlugins
+            )
+        }
+
+        fun getMinefieldHostileSides(mineFieldPlugins: MutableSet<MineBeltTerrainPlugin>, battle: BattleAPI): HashMap<MineBeltTerrainPlugin, MutableSet<BattleSide>> {
+            val minefieldToHostileSide = HashMap<MineBeltTerrainPlugin, MutableSet<BattleSide>>()
+
+            for (plugin in mineFieldPlugins) {
+                val market = plugin.primary
+                val factionId = market.factionId
+
+                if (battle.sideOne.any { plugin.canAttackFleet(it) }) { // this doesnt work :( it crashes :( it cant recognize the function :(
+                    if (minefieldToHostileSide[plugin] == null) minefieldToHostileSide[plugin] = HashSet()
+                    minefieldToHostileSide[plugin]!! += BattleSide.ONE
+                }
+                if (battle.sideTwo.any { plugin.canAttackFleet(it) }) {
+                    if (minefieldToHostileSide[plugin] == null) minefieldToHostileSide[plugin] = HashSet()
+                    minefieldToHostileSide[plugin]!! += BattleSide.TWO
+                }
+            }
+
+            return minefieldToHostileSide
+        }
+
+        // i dont like that this exists but whatever lol
+        private fun MineBeltTerrainPlugin.canAttackFleet(fleet: CampaignFleetAPI): Boolean {
+            var friend = false
+
+            val m = primary
+
+            if (m != null && !m.isPlanetConditionMarketOnly) {
+                friend = fleet.isPlayerFleet && m.isPlayerOwned || fleet.faction.id == m.factionId || fleet.faction.getRelationshipLevel(m.factionId).isAtWorst(RepLevel.INHOSPITABLE)
+                if (!m.isPlayerOwned && fleet.isPlayerFleet && !fleet.isTransponderOn) {
+                    friend = false
+                }
+            }
+            if (fleet.memoryWithoutUpdate.contains(MemFlags.MEMORY_KEY_MISSION_IMPORTANT)) friend = true
+            if (friend) return false
+
+            for (area in disabledAreas) if (area.contains(fleet)) return false
+            return true
+        }
+    }
 
     override fun advance(amount: Float, events: MutableList<InputEventAPI>?) {
         super.advance(amount, events)
@@ -106,51 +205,20 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         engine: CombatEngineAPI,
         playerFleet: CampaignFleetAPI,
         playerLocation: LocationAPI,
-        playerCoordinates: Vector2f) {
+        playerCoordinates: Vector2f
+    ) {
 
-        val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet()
-        val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2> = HashSet()
-        //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
-        val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
-        val blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin> = HashSet()
-        val pulsarPlugins: MutableSet<PulsarBeamTerrainPlugin> = HashSet()
-        val coronaPlugins: MutableSet<StarCoronaTerrainPlugin> = HashSet()
-        val ionStormPlugins: MutableSet<StarCoronaAkaMainyuTerrainPlugin> = HashSet()
+        val battle = playerFleet.battle ?: return
+        val scriptList = getTerrainAffectingBattle(battle)
 
-        // MODDED TERRAIN
-        val mesonFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet() // cant type it correctly else itd probs crash
-        val mineFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet()
-
-        for (terrain: CampaignTerrainAPI in playerLocation.terrainCopy) {
-            val terrainPlugin = terrain.plugin
-            if (terrainPlugin.containsEntity(playerFleet)) {
-                if (terrainPlugin is PulsarBeamTerrainPlugin) pulsarPlugins += terrainPlugin
-                if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
-                if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
-              //  if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
-                if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
-                if (terrainPlugin is EventHorizonPlugin) blackHoleTerrainPlugins += terrainPlugin
-                if (terrainPlugin is StarCoronaTerrainPlugin) {
-                    if (terrainPlugin is StarCoronaAkaMainyuTerrainPlugin) {
-                        ionStormPlugins += terrainPlugin
-                    } else {
-                        coronaPlugins += terrainPlugin
-                    }
-                }
-                // MPC
-                if (MCTE_debugUtils.MPCenabled && terrainPlugin is niko_MPC_mesonField) mesonFieldPlugins += terrainPlugin
-                // INDEVO
-                if (MCTE_debugUtils.indEvoEnabled && terrainPlugin is MineBeltTerrainPlugin) mineFieldPlugins += terrainPlugin
-            }
-        }
-        addMagneticFieldScripts(engine, playerFleet, playerLocation, magneticFieldPlugins)
-        addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, slipstreamPlugins)
-        addPulsarScripts(engine, playerFleet, playerLocation, playerCoordinates, pulsarPlugins)
+        addMagneticFieldScripts(engine, playerFleet, playerLocation, scriptList.magneticFieldPlugins)
+        addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.slipstreamPlugins)
+        addPulsarScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.pulsarPlugins)
       //  addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
-        addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, hyperspaceTerrainPlugins)
-        addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, blackHoleTerrainPlugins)
-        addMesonFieldTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, mesonFieldPlugins)
-        addMinefieldTerrainPlugins(engine, playerFleet, playerLocation, playerCoordinates, mineFieldPlugins)
+        addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.hyperspaceTerrainPlugins)
+        addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.blackHoleTerrainPlugins)
+        addMesonFieldTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.mesonFieldPlugins)
+        addMinefieldTerrainPlugins(engine, playerFleet, playerLocation, playerCoordinates, scriptList.mineFieldPlugins)
         //addRingSystemTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, ringTerrainPlugins)
         // dust clouds already have an effect
     }
@@ -168,21 +236,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val castedPlugins = (mineFieldPlugins as MutableSet<MineBeltTerrainPlugin>)
         val battle = playerFleet.battle ?: return
 
-        val minefieldToHostileSide = HashMap<MineBeltTerrainPlugin, MutableSet<BattleSide>>()
-
-        for (plugin in mineFieldPlugins) {
-            val market = plugin.primary
-            val factionId = market.factionId
-
-            if (battle.sideOne.any { plugin.canAttackFleet(it) }) { // this doesnt work :( it crashes :( it cant recognize the function :(
-                if (minefieldToHostileSide[plugin] == null) minefieldToHostileSide[plugin] = HashSet()
-                minefieldToHostileSide[plugin]!! += BattleSide.ONE
-            }
-            if (battle.sideTwo.any { plugin.canAttackFleet(it) }) {
-                if (minefieldToHostileSide[plugin] == null) minefieldToHostileSide[plugin] = HashSet()
-                minefieldToHostileSide[plugin]!! += BattleSide.TWO
-            }
-        }
+        val minefieldToHostileSide = getMinefieldHostileSides(castedPlugins, battle)
 
         val targetsToInstances = HashMap<Int, Int>()
         targetsToInstances[0] = 0 // on player side
@@ -218,25 +272,6 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         if (targetsToInstances.any { it.value > 0 }) {
             combatEffectTypes.MINEFIELD.createInformedEffectInstance(targetsToInstances).start()
         }
-    }
-
-    // i dont like that this exists but whatever lol
-    private fun MineBeltTerrainPlugin.canAttackFleet(fleet: CampaignFleetAPI): Boolean {
-        var friend = false
-
-        val m = primary
-
-        if (m != null && !m.isPlanetConditionMarketOnly) {
-            friend = fleet.isPlayerFleet && m.isPlayerOwned || fleet.faction.id == m.factionId || fleet.faction.getRelationshipLevel(m.factionId).isAtWorst(RepLevel.INHOSPITABLE)
-            if (!m.isPlayerOwned && fleet.isPlayerFleet && !fleet.isTransponderOn) {
-                friend = false
-            }
-        }
-        if (fleet.memoryWithoutUpdate.contains(MemFlags.MEMORY_KEY_MISSION_IMPORTANT)) friend = true
-        if (friend) return false
-
-        for (area in disabledAreas) if (area.contains(fleet)) return false
-        return true
     }
 
     private fun addMesonFieldTerrainScripts(
@@ -619,4 +654,17 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val plugin = combatEffectTypes.MAGFIELD.createInformedEffectInstance(entries, 1f, magneticFieldPlugins)
         plugin.start()
     }
+
+    class TerrainScriptList(
+        val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet(),
+        val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2> = HashSet(),
+        //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
+        val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet(),
+        val blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin> = HashSet(),
+        val pulsarPlugins: MutableSet<PulsarBeamTerrainPlugin> = HashSet(),
+        val coronaPlugins: MutableSet<StarCoronaTerrainPlugin> = HashSet(),
+        val ionStormPlugins: MutableSet<StarCoronaAkaMainyuTerrainPlugin> = HashSet(),
+        val mesonFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet(), // cant type it correctly else itd probs crash
+        val mineFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet()
+    )
 }

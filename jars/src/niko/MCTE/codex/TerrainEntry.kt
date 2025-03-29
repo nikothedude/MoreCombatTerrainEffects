@@ -215,7 +215,7 @@ enum class TerrainEntry(
         override fun getRelatedEntries(): MutableSet<CodexEntryPlugin> = hashSetOf(CodexDataV2.getEntry(CodexDataV2.getHullmodEntryId(HullMods.SOLAR_SHIELDING)), CodexDataV2.getEntry(NEBULA.name))
         override fun getTags(): MutableSet<String> = mutableSetOf(HAS_CAMPAIGN_EFFECTS, HAS_COMBAT_EFFECTS, HAS_GROUND_BATTLE_EFFECTS)
     },
-    PULSAR("Pulsar", "graphics/augments/pulsar_augment_icon.png") {
+    PULSAR("Pulsar Stream", "graphics/augments/pulsar_augment_icon.png") {
         override fun createDesc(info: TooltipMakerAPI) {
             info.addPara("A relativistic, magnetized jet combined with intense radiation. Commonly emitted by neutron stars.", 0f)
         }
