@@ -4,8 +4,6 @@ import com.fs.starfarer.api.GameState
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.rules.HasMemory
 import com.fs.starfarer.api.campaign.rules.MemoryAPI
-import com.sun.deploy.util.SystemUtils
-import com.sun.javafx.PlatformUtil
 import niko.MCTE.settings.MCTE_settings
 import org.apache.log4j.Level
 import org.apache.log4j.Logger

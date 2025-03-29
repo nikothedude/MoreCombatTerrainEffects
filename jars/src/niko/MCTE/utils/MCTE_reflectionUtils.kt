@@ -1,5 +1,6 @@
 package niko.MCTE.utils
 
+import niko_SA.SA_debugUtils
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -10,13 +11,13 @@ import java.net.URLClassLoader
 object MCTE_reflectionUtils { // yoinked from exotica which yoinked it from rat i love starsector dev
 
     private val fieldClass = Class.forName("java.lang.reflect.Field", false, Class::class.java.classLoader)
-    private val setFieldHandle = MethodHandles.lookup()
+    val setFieldHandle = MethodHandles.lookup()
         .findVirtual(fieldClass, "set", MethodType.methodType(Void.TYPE, Any::class.java, Any::class.java))
     private val getFieldHandle =
         MethodHandles.lookup().findVirtual(fieldClass, "get", MethodType.methodType(Any::class.java, Any::class.java))
     private val getFieldNameHandle =
         MethodHandles.lookup().findVirtual(fieldClass, "getName", MethodType.methodType(String::class.java))
-    private val setFieldAccessibleHandle = MethodHandles.lookup()
+    val setFieldAccessibleHandle: MethodHandle = MethodHandles.lookup()
         .findVirtual(fieldClass, "setAccessible", MethodType.methodType(Void.TYPE, Boolean::class.javaPrimitiveType))
     private val getFieldTypeHandle = MethodHandles.lookup()
         .findVirtual(fieldClass, "getType", MethodType.methodType(Class::class.java))
@@ -87,13 +88,13 @@ object MCTE_reflectionUtils { // yoinked from exotica which yoinked it from rat 
             .map { (fieldObj, fieldClass) -> ReflectedField(fieldObj) }
     }
 
-    fun set(fieldName: String, instanceToModify: Any, newValue: Any?) {
+    fun set(fieldName: String, instanceToModify: Any, newValue: Any?, clazz: Class<*> = instanceToModify::class.java) {
         var field: Any? = null
         try {
-            field = instanceToModify.javaClass.getField(fieldName)
+            field = clazz.getField(fieldName)
         } catch (e: Throwable) {
             try {
-                field = instanceToModify.javaClass.getDeclaredField(fieldName)
+                field = clazz.getDeclaredField(fieldName)
             } catch (e: Throwable) {
             }
         }
@@ -102,14 +103,32 @@ object MCTE_reflectionUtils { // yoinked from exotica which yoinked it from rat 
         setFieldHandle.invoke(field, instanceToModify, newValue)
     }
 
-    fun get(fieldName: String, instanceToGetFrom: Any): Any? {
+    inline fun <reified T: Any> setMultipleInstances(fieldName: String, instancesToModify: Collection<T>, newValue: Any?) {
         var field: Any? = null
         try {
-            field = instanceToGetFrom.javaClass.getField(fieldName)
+            field = T::class.java.getField(fieldName)
         } catch (e: Throwable) {
             try {
-                field = instanceToGetFrom.javaClass.getDeclaredField(fieldName)
+                field = T::class.java.getDeclaredField(fieldName)
             } catch (e: Throwable) {
+            }
+        }
+
+        setFieldAccessibleHandle.invoke(field, true)
+        for (entry in instancesToModify) {
+            setFieldHandle.invoke(field, entry, newValue)
+        }
+    }
+
+    fun get(fieldName: String, instanceToGetFrom: Any, classToGetFrom: Class<out Any> = instanceToGetFrom::class.java): Any? {
+        var field: Any? = null
+        try {
+            field = classToGetFrom.getField(fieldName)
+        } catch (e: Throwable) {
+            try {
+                field = classToGetFrom.getDeclaredField(fieldName)
+            } catch (e: Throwable) {
+                SA_debugUtils.log.error(e)
             }
         }
 
@@ -153,17 +172,18 @@ object MCTE_reflectionUtils { // yoinked from exotica which yoinked it from rat 
         return instance
     }
 
-    fun invoke(methodName: String, instance: Any, vararg arguments: Any?, declared: Boolean = false): Any? {
-        var method: Any? = null
+    fun invoke(methodName: String, instance: Any, vararg arguments: Any?, declared: Boolean = false) : Any? {
+        var method: Any? = "null"
 
         val clazz = instance.javaClass
         val args = arguments.map { it!!::class.javaPrimitiveType ?: it::class.java }
         val methodType = MethodType.methodType(Void.TYPE, args)
 
         if (!declared) {
-            method = clazz.getMethod(methodName, *methodType.parameterArray())
-        } else {
-            method = clazz.getDeclaredMethod(methodName, *methodType.parameterArray())
+            method = clazz.getMethod(methodName, *methodType.parameterArray()) as Any?
+        }
+        else  {
+            method = clazz.getDeclaredMethod(methodName, *methodType.parameterArray()) as Any?
         }
 
         return invokeMethodHandle.invoke(method, instance, arguments)
@@ -193,7 +213,7 @@ object MCTE_reflectionUtils { // yoinked from exotica which yoinked it from rat 
         val methodType = MethodType.methodType(Void.TYPE, args)
 
         try {
-            method = clazz.getMethod(methodName, *methodType.parameterArray())
+            method = clazz.getMethod(methodName, *methodType.parameterArray()) as Any?
         } catch (e: Throwable) {
             try {
                 method = clazz.getDeclaredMethod(methodName, *methodType.parameterArray())

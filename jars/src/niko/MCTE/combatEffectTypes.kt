@@ -4,6 +4,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatNebulaAPI
 import com.fs.starfarer.api.impl.campaign.terrain.MagneticFieldTerrainPlugin
 import com.fs.starfarer.combat.entities.terrain.Cloud
+import niko.MCTE.codex.TerrainEntry
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
@@ -22,7 +23,9 @@ import niko.MCTE.utils.MCTE_reflectionUtils
 import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
-enum class combatEffectTypes {
+enum class combatEffectTypes(
+    val codexEntry: TerrainEntry? = null
+) {
     MAGFIELD {
         override fun createEffectInstance(): magneticFieldEffect {
             return magneticFieldEffect()
@@ -82,6 +85,7 @@ enum class combatEffectTypes {
         }
     },
     MINEFIELD {
+
         override fun createEffectInstance(): baseTerrainEffectScript {
             return minefieldEffectScript()
         }
@@ -179,6 +183,8 @@ enum class combatEffectTypes {
     protected open fun modifyEffectInstance(instance: baseTerrainEffectScript, vararg args: Any) {
         return
     }
+
+    open fun isAvailableInCodex(): Boolean = true
 
     companion object {
         fun instantiateHyperstormCells(engine: CombatEngineAPI, sizeMult: Float, isStorming: Boolean, nebula: CombatNebulaAPI = engine.nebula): MutableSet<cloudCell> {

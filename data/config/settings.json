@@ -3,6 +3,9 @@
 		"intel":{
 			"MCTE_hyperStorm":"graphics/icons/terrain/hyperspace_storm.png",
 		},
+		"codex":{
+			"MCTE_terrain":"graphics/icons/terrain/ring_system.png",
+		},
 	},
 	 
 	"plugins":{

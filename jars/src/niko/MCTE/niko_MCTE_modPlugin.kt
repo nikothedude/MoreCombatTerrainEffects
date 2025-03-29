@@ -6,6 +6,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI
 import com.fs.starfarer.api.impl.campaign.ids.Factions
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
+import niko.MCTE.codex.CodexData
 import niko.MCTE.listeners.objectiveTerrainAdder
 import niko.MCTE.settings.MCTE_settings.loadAllSettings
 import niko.MCTE.stationAugments.MCTE_blackHoleAugment
@@ -18,7 +19,6 @@ import niko.MCTE.utils.MCTE_debugUtils.YRXPenabled
 import niko_SA.augments.core.stationAugmentData
 import niko_SA.augments.core.stationAugmentStore.allAugments
 import org.apache.log4j.Level
-import niko.MCTE.listeners.objectiveTerrainAdder.Companion
 import niko.MCTE.listeners.objectiveTerrainAdder.Companion.createObjectiveTerrain
 
 class niko_MCTE_modPlugin : BaseModPlugin() {
@@ -80,8 +80,17 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         Global.getSector().addTransientListener(objectiveTerrainAdder())
 
         Global.getSector().playerFleet?.containingLocation?.createObjectiveTerrain()
-
         //Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))
+    }
+
+    override fun onAboutToStartGeneratingCodex() {
+        super.onAboutToStartGeneratingCodex()
+        CodexData.addCodexInfo()
+    }
+
+    override fun onAboutToLinkCodexEntries() {
+        super.onAboutToLinkCodexEntries()
+        CodexData.linkCodexInfo()
     }
 
     class settingsChangedListener : LunaSettingsListener {
