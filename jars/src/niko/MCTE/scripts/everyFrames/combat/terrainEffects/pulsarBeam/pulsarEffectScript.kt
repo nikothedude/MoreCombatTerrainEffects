@@ -382,12 +382,11 @@ class pulsarEffectScript(
         if (empActualDamage > 0f) {
             randomDamageData = "and ${empActualDamage.roundTo(2).trimHangingZero()} energy damage"
         }
-        val randomEMPData = "${empChance.roundTo(2).trimHangingZero()}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2)} EMP damage $randomDamageData"
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar4",
             icon,
             "Pulsar Beam",
-            "${empChance.roundTo(2)}% per frame for ship plating to polarize and EMP self for ${empDamage.roundTo(2).trimHangingZero()} EMP damage",
+            "${empChance.roundTo(2) * 60}% per second for ship plating to polarize and EMP self for ${empDamage.roundTo(2).trimHangingZero()} EMP damage",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar2",

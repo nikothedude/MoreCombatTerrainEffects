@@ -8,7 +8,9 @@ import com.fs.starfarer.api.impl.codex.CodexEntryPlugin.ListMode
 import com.fs.starfarer.api.impl.codex.CodexEntryV2
 import com.fs.starfarer.api.ui.*
 import com.fs.starfarer.api.util.Misc
+import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_ids
+import niko_SA.scripts.effectApplierScript
 import kotlin.math.max
 
 object CodexData {
@@ -24,6 +26,7 @@ object CodexData {
             override fun configureTagDisplay(tags: TagDisplayAPI) {
                 var combat = 0
                 var campaign = 0
+                var groundbattle = 0
                 var total = 0
 
                 for (curr in getChildren()) {
@@ -37,6 +40,9 @@ object CodexData {
                     if (castedParam.getTags().contains(TerrainEntry.HAS_COMBAT_EFFECTS)) {
                         combat++
                     }
+                    if (MCTE_debugUtils.nexEnabled && castedParam.getTags().contains(TerrainEntry.HAS_GROUND_BATTLE_EFFECTS)) {
+                        groundbattle++
+                    }
                     total++
                 }
 
@@ -45,6 +51,7 @@ object CodexData {
                 tags.beginGroup(false, CodexDataV2.ALL_TYPES, 120f)
                 tags.addTag(TerrainEntry.HAS_CAMPAIGN_EFFECTS, campaign)
                 tags.addTag(TerrainEntry.HAS_COMBAT_EFFECTS, combat)
+                tags.addTag(TerrainEntry.HAS_GROUND_BATTLE_EFFECTS, groundbattle)
                 tags.setTotalOverrideForCurrentGroup(total)
                 tags.addGroup(opad)
 
@@ -56,6 +63,44 @@ object CodexData {
             }
         }
         CodexDataV2.ROOT.addChild(terrainCat)
+        /*Global.getSettings().loadTexture("graphics/icons/intel/news.png")
+        val terrainBase = object : CodexEntryV2("MCTE_terrainDisclaimer", "DISCLAIMER!", "graphics/icons/intel/news.png") {
+            override fun hasCustomDetailPanel(): Boolean = true
+
+            override fun createCustomDetail(
+                panel: CustomPanelAPI,
+                relatedEntries: UIPanelAPI?,
+                codex: CodexDialogAPI?
+            ) {
+                val opad = 10f
+                val width = panel.getPosition().getWidth()
+                val horzBoxPad = 30f
+                // the right width for a tooltip wrapped in a box to fit next to relatedEntries
+                val tw = width - 290f - opad - horzBoxPad + 10f
+
+                val text = panel.createUIElement(tw, 0f, false)
+                text.setParaSmallInsignia()
+
+                text.addPara("TEST", 0f)
+
+                panel.updateUIElementSizeAndMakeItProcessInput(text)
+                val box = panel.wrapTooltipWithBox(text)
+                panel.addComponent(box).inTL(0f, 0f)
+                if (relatedEntries != null) {
+                    panel.addComponent(relatedEntries).inTR(0f, 0f)
+                }
+
+                var height = box.getPosition().getHeight()
+                if (relatedEntries != null) {
+                    height = max(height.toDouble(), relatedEntries.getPosition().getHeight().toDouble()).toFloat()
+                }
+            }
+
+            override fun getSourceMod(): ModSpecAPI? {
+                return Global.getSettings().modManager.getModSpec(MCTE_ids.modId)
+            }
+        }
+        terrainCat.addChild(terrainBase)*/
 
         for (effect in TerrainEntry.values()) {
             if (!effect.isAvailableInCodex()) {
@@ -89,7 +134,7 @@ object CodexData {
                     val tw = width - 290f - opad - horzBoxPad + 10f
 
                     val text = panel.createUIElement(tw, 0f, false)
-                    text.setParaSmallInsignia()
+                    //text.setParaSmallInsignia()
                     effect.createDesc(text)
                     if (effect.getTags().contains(TerrainEntry.HAS_CAMPAIGN_EFFECTS)) {
                         text.addSectionHeading("Campaign", Alignment.MID, 5f)
@@ -99,9 +144,13 @@ object CodexData {
                         text.addSectionHeading("Combat", Alignment.MID, 5f)
                         effect.createCombatDesc(text)
                     }
-                    if (effect.hasAfterDesc()) {
-                        text.addSectionHeading("Miscellany", Alignment.MID, 5f)
-                        effect.createAfterDesc(text)
+                    if (MCTE_debugUtils.nexEnabled && effect.getTags().contains(TerrainEntry.HAS_GROUND_BATTLE_EFFECTS)) {
+                        text.addSectionHeading("Ground Battle", Alignment.MID, 5f)
+                        effect.createGroundBattleDesc(text)
+                    }
+                    if (effect.hasTacticalDesc()) {
+                        text.addSectionHeading("Tactical", Alignment.MID, 5f)
+                        effect.createTacticalDesc(text)
                     }
                     panel.updateUIElementSizeAndMakeItProcessInput(text)
                     val box = panel.wrapTooltipWithBox(text)
@@ -125,6 +174,7 @@ object CodexData {
                 curr.addRelatedEntry(entry)
             }
 
+            Global.getSettings().loadTexture(effect.iconName)
             terrainCat.addChild(curr)
         }
     }

@@ -39,6 +39,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         MCTE_debugUtils.indEvoEnabled = Global.getSettings().modManager.isModEnabled("IndEvo")
         YRXPenabled = Global.getSettings().modManager.isModEnabled("yrxp")
         MCTE_debugUtils.SA_enabled = Global.getSettings().modManager.isModEnabled("niko_stationAugments")
+        MCTE_debugUtils.nexEnabled = Global.getSettings().modManager.isModEnabled("nexerelin")
 
         if (SA_enabled) {
             addStationAugmentsToStore()
@@ -78,6 +79,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         LunaSettings.addSettingsListener(settingsChangedListener())
         Global.getSector().registerPlugin(niko_MCTE_campaignPlugin())
         Global.getSector().addTransientListener(objectiveTerrainAdder())
+        Global.getSector().addTransientListener(terrainEffectAutoresolvePlugin())
 
         Global.getSector().playerFleet?.containingLocation?.createObjectiveTerrain()
         //Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))

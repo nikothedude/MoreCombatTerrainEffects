@@ -4,7 +4,9 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.CombatEntityAPI
 import com.fs.starfarer.api.combat.DamageType
+import com.fs.starfarer.api.combat.EmpArcEntityAPI.EmpArcParams
 import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.util.Misc
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
@@ -33,9 +35,11 @@ object MCTE_arcUtils {
         }
         val modifier = getArcOverallDamageMod(target)
 
+        val params = getArcParams()
+
         while (timesLeft > 0) {
             timesLeft--
-            engine.spawnEmpArc(
+            val arc = engine.spawnEmpArc(
                 source,
                 coordinatesToSpawnArcFrom,
                 null,
@@ -47,8 +51,12 @@ object MCTE_arcUtils {
                 null,
                 MCTE_shipUtils.damageArcThickness,
                 MCTE_shipUtils.arcFringeColor,
-                MCTE_shipUtils.arcCoreColor
+                MCTE_shipUtils.arcCoreColor,
+                params
             ) // manually play sounds, since no sound normally plays when striking hulks
+
+            arc.coreWidthOverride = 30f
+            arc.setSingleFlickerMode(true)
         }
         Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.5f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
         Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 1f, target.location, Vector2f(0f, 0f))
@@ -78,7 +86,9 @@ object MCTE_arcUtils {
         val energyDamage = 3f
         val empDamage = 1f
         val modifier = getArcOverallDamageMod(target)
-        engine.spawnEmpArc(
+
+
+        val arc = engine.spawnEmpArc(
             source,
             coordinatesToSpawnArcFrom,
             null,
@@ -90,41 +100,88 @@ object MCTE_arcUtils {
             null,
             1f,
             MCTE_shipUtils.arcFringeColor,
-            MCTE_shipUtils.arcCoreColor
+            MCTE_shipUtils.arcCoreColor,
+            getTelegraphArcParams()
         )
+
+        arc.coreWidthOverride = 30f
+        arc.setSingleFlickerMode(true)
+
         Global.getSoundPlayer().playSound("MCTE_telegraphArcSound", 1f, volume, target.location, Vector2f(0f, 0f))
         doTelegraphArcLighting(target.location, coordinatesToSpawnArcFrom)
     }
 
     fun cosmeticTelegraphArc(coordinatesToSpawnArcFrom: Vector2f, target: Vector2f, volume: Float) {
         val engine: CombatEngineAPI = Global.getCombatEngine() ?: return
-        engine.spawnEmpArcVisual(
+
+        val arc = engine.spawnEmpArcVisual(
             coordinatesToSpawnArcFrom,
             null,
             target,
             null,
             1f,
             MCTE_shipUtils.arcFringeColor,
-            MCTE_shipUtils.arcCoreColor
+            MCTE_shipUtils.arcCoreColor,
+            getTelegraphArcParams()
         )
+
+        arc.coreWidthOverride = 30f
+        arc.setSingleFlickerMode(true)
+
         Global.getSoundPlayer().playSound("MCTE_telegraphArcSound", 1f, volume, target, Vector2f(0f, 0f))
         doTelegraphArcLighting(target, coordinatesToSpawnArcFrom)
     }
 
     fun cosmeticArc(coordinatesToSpawnArcFrom: Vector2f, target: Vector2f) {
         val engine: CombatEngineAPI = Global.getCombatEngine() ?: return
-        engine.spawnEmpArcVisual(
+
+        //params.nonBrrightSpotMinBrightness = 0.25f;
+        val dist: Float = Misc.getDistance(coordinatesToSpawnArcFrom, target)
+
+        val arc = engine.spawnEmpArcVisual(
             coordinatesToSpawnArcFrom,
             null,
             target,
             null,
             MCTE_shipUtils.damageArcThickness,
             MCTE_shipUtils.arcFringeColor,
-            MCTE_shipUtils.arcCoreColor
+            MCTE_shipUtils.arcCoreColor,
+            getArcParams()
         )
+
+        arc.coreWidthOverride = 30f
+
+        arc.setSingleFlickerMode(true)
+
         Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 2.3f, coordinatesToSpawnArcFrom, Vector2f(0f, 0f))
         Global.getSoundPlayer().playSound("MCTE_hyperStormArcSound", 1f, 0.09f, target, Vector2f(0f, 0f))
         doMainArcLighting(target, coordinatesToSpawnArcFrom)
+    }
+
+    fun getTelegraphArcParams(): EmpArcParams {
+        val params = EmpArcParams()
+        params.segmentLengthMult = 8f
+        params.zigZagReductionFactor = 0.15f
+
+        params.brightSpotFullFraction = 0.5f
+        params.brightSpotFadeFraction = 0.5f
+
+        params.flickerRateMult = 0.7f
+
+        return params
+    }
+
+    fun getArcParams(): EmpArcParams {
+        val params = EmpArcParams()
+        params.segmentLengthMult = 8f
+        params.zigZagReductionFactor = 0.15f
+
+        params.brightSpotFullFraction = 0.5f
+        params.brightSpotFadeFraction = 0.5f
+
+        params.flickerRateMult = 0.6f
+
+        return params
     }
 
     private fun doMainArcLighting(target: Vector2f, coordinatesToSpawnArcFrom: Vector2f) {
@@ -154,11 +211,13 @@ object MCTE_arcUtils {
             0.1f, 0.2f, 0.3f, 0.4f)
     }
 
-    private fun doArcLighting(targetLoc: Vector2f, coordinatesToSpawnArcFrom: Vector2f,
-                              intensity: Float, size: Float,
-                              specIntensity: Float, specSize: Float, specularMult: Float,
-                              fadeOutMin: Float, fadeOutMax: Float,
-                              specFadeOutMin: Float, specFadeOutMax: Float,) {
+    private fun doArcLighting(
+        targetLoc: Vector2f, coordinatesToSpawnArcFrom: Vector2f,
+        intensity: Float, size: Float,
+        specIntensity: Float, specSize: Float, specularMult: Float,
+        fadeOutMin: Float, fadeOutMax: Float,
+        specFadeOutMin: Float, specFadeOutMax: Float,
+    ) {
         if (!MCTE_debugUtils.graphicsLibEnabled) return
         val engine = Global.getCombatEngine()
         val viewPort = engine.viewport

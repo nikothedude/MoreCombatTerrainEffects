@@ -140,12 +140,12 @@ class magneticFieldEffect(
             "Magnetic $stormOrNot",
             "${(100-(getRangeMultForShip(ship))*100).roundTo(2).trimHangingZero()}% less weapon range and fighter range",
             true)
-        engine.maintainStatusForPlayerShip(
+        /*engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference5",
             icon,
             "Magnetic $stormOrNot",
             "${(100-(getECCMChanceMultForShip(ship))*100).roundTo(2).trimHangingZero()}% less ECCM chance",
-            true)
+            true)*/
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference6",
             icon,

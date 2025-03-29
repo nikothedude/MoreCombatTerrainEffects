@@ -17,6 +17,7 @@ object MCTE_debugUtils {
     var indEvoEnabled = false
     var YRXPenabled = false
     var SA_enabled = false
+    var nexEnabled = false
 
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 
