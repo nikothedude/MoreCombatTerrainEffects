@@ -10,13 +10,9 @@ import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 
-class MCTE_stormDispersal(market: MarketAPI?, id: String) : MCTE_terrainAugment(market, id) {
+class MCTE_stormDispersal: MCTE_terrainAugment() {
 
     override var classOfScript: Class<out baseTerrainEffectScript>? = deepHyperspaceEffectScript::class.java
-    override val augmentCost: Float = 10f
-
-    override val name: String = "Storm Dispersal System"
-    override val spriteId: String = "graphics/augments/hyperspace_storm_augment_icon.png"
 
     override fun modifyScript(existingScript: baseTerrainEffectScript) {
         if (existingScript !is deepHyperspaceEffectScript) return

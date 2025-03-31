@@ -10,11 +10,8 @@ import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScri
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.slipstream.SlipstreamEffectScript
 import niko.MCTE.settings.MCTE_settings
 
-class MCTE_slipstreamAugment(market: MarketAPI?, id: String) : MCTE_terrainAugment(market, id) {
+class MCTE_slipstreamAugment : MCTE_terrainAugment() {
     override var classOfScript: Class<out baseTerrainEffectScript>? = SlipstreamEffectScript::class.java
-    override val augmentCost: Float = 5f
-    override val name: String = "Slipstream Shunt"
-    override val spriteId: String = "graphics/icons/markets/hyperspace_topography.png"
 
     override fun modifyScript(existingScript: baseTerrainEffectScript) {
         if (existingScript !is SlipstreamEffectScript) return

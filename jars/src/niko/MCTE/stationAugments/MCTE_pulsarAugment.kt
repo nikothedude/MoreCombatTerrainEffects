@@ -9,11 +9,8 @@ import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.pulsarBeam.pulsarEffectScript
 
-class MCTE_pulsarAugment(market: MarketAPI?, id: String) : MCTE_terrainAugment(market, id) {
+class MCTE_pulsarAugment: MCTE_terrainAugment() {
     override var classOfScript: Class<out baseTerrainEffectScript>? = pulsarEffectScript::class.java
-    override val augmentCost: Float = 14f
-    override val name: String = "Ionized Dispersal Unit"
-    override val spriteId: String = "graphics/augments/pulsar_augment_icon.png"
 
     override fun modifyScript(existingScript: baseTerrainEffectScript) {
         /*if (existingScript !is SlipstreamEffectScript) return

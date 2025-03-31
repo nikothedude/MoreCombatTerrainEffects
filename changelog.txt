@@ -1,3 +1,8 @@
+1.12.0
+NOT SAVE COMPATIBLE (if you use station augments)
+
+Update for station augments
+
 1.11.0
 Codex support
     New category in the codex: MCTE

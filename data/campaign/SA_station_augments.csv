@@ -1,0 +1,11 @@
+id,name,knowledge_tags,usage_tags,codex_tags,manufac,plugin,drop_weight,sell_weight,combat_drop_chance,sprite_path,ap_cost
+#EXAMPLE,,"if name = faction, goes to that fac.
+otherwise, defers to their faction.json knownHullmods tags field","format: type number
+combatgood, combatbad, logistics
+
+used in determining autofit, higher numbers = more likely (inverse for combatbad)
+military markets are far more likely to favor combat modification, non-military markets care less and can get logistics",hide_in_codex,,from your data folder,"if 0, never drops from loot","if 0, is never sold in markets","if 0, is never dropped in combat",,can be float
+MCTE_stormDispersal,Storm Dispersal System,"tritachyon, rare_bp, merc",combatgood15,,Fabrique Orbitale,niko.MCTE.stationAugments.MCTE_stormDispersal,30,40,90,graphics/augments/hyperspace_storm_augment_icon.png,10
+MCTE_slipstreamAugment,Slipstream Shunt,"merc, rare_bp",combatgood12,,Fabrique Orbitale,niko.MCTE.stationAugments.MCTE_slipstreamAugment,30,40,90,graphics/icons/markets/hyperspace_topography.png,5
+MCTE_blackholeAugment,Gravity Bubble,"merc, rare_bp",combatgood10,,Fabrique Orbitale,niko.MCTE.stationAugments.MCTE_blackHoleAugment,30,40,90,graphics/augments/black_hole_augment_icon.png,7
+MCTE_pulsarAugment,Ionized Dispersal Unit,"merc, rare_bp",combatgood10,,Fabrique Orbitale,niko.MCTE.stationAugments.MCTE_pulsarAugment,30,40,90,graphics/augments/pulsar_augment_icon.png,14

@@ -655,7 +655,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         plugin.start()
     }
 
-    class TerrainScriptList(
+    data class TerrainScriptList(
         val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet(),
         val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2> = HashSet(),
         //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()

@@ -16,7 +16,6 @@ import niko.MCTE.stationAugments.MCTE_stormDispersal
 import niko.MCTE.utils.MCTE_debugUtils
 import niko.MCTE.utils.MCTE_debugUtils.SA_enabled
 import niko.MCTE.utils.MCTE_debugUtils.YRXPenabled
-import niko_SA.augments.core.stationAugmentData
 import niko_SA.augments.core.stationAugmentStore.allAugments
 import org.apache.log4j.Level
 import niko.MCTE.listeners.objectiveTerrainAdder.Companion.createObjectiveTerrain
@@ -42,12 +41,9 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         MCTE_debugUtils.SA_enabled = Global.getSettings().modManager.isModEnabled("niko_stationAugments")
         MCTE_debugUtils.nexEnabled = Global.getSettings().modManager.isModEnabled("nexerelin")
 
-        if (SA_enabled) {
-            addStationAugmentsToStore()
-        }
     }
 
-    private fun addStationAugmentsToStore() {
+    /*private fun addStationAugmentsToStore() {
         allAugments["MCTE_stormDispersal"] = stationAugmentData(
             { market: MarketAPI? -> MCTE_stormDispersal(market, "MCTE_stormDispersal") },
             hashSetOf(Factions.TRITACHYON),
@@ -72,7 +68,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
             mutableMapOf(Pair("SA_augmentRare", 10f)
             )
         )
-    }
+    }*/
 
     override fun onGameLoad(newGame: Boolean) {
         super.onGameLoad(newGame)

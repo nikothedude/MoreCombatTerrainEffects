@@ -9,16 +9,13 @@ import niko.MCTE.combatEffectTypes
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
 
-class MCTE_blackHoleAugment(market: MarketAPI?, id: String) : MCTE_terrainAugment(market, id) {
+class MCTE_blackHoleAugment : MCTE_terrainAugment() {
 
     companion object {
         const val MASS_INCREMENT = 2000f
     }
 
     override var classOfScript: Class<out baseTerrainEffectScript>? = blackHoleEffectScript::class.java
-    override val augmentCost: Float = 7f
-    override val name: String = "Gravity bubble"
-    override val spriteId: String = "graphics/augments/black_hole_augment_icon.png"
 
     override fun applyInCombat(station: ShipAPI) {
         super.applyInCombat(station)
