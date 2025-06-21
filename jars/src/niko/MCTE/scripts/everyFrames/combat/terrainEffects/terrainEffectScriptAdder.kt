@@ -158,7 +158,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
         val engine = Global.getCombatEngine() ?: return
 
-        if (engine.isMission && engine.missionId?.isNotEmpty() == true) {
+        if ((engine.isMission && engine.missionId?.isNotEmpty() == true) || engine.isSimulation) {
            // evaluateMissionParameters(engine, engine.missionId)
             engine.removePlugin(this)
         } else {

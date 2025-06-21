@@ -2,4 +2,6 @@ id,name,short,desc,cost,isBonus,spritePath,effectPlugin,extra1,extra2
 MCTE_permaHyperstorm,Galactic storm,Permanent in-combat hyperstorms,[More Combat Terrain Effects] All combats are afflicted by %s-%s %s which have a high chance to %s. Stacks with the normal terrain by spawning more clouds,0,FALSE,graphics/UNGP/perma_hyperstorm.png,niko.MCTE.UNGP.rules.permaHyperstorm,,
 MCTE_permaSlipstream,Slipstream shunt,Permanent in-combat slipstream,"[More Combat Terrain Effects] All combats take place in a %s, which forces %s on %s as well as generating %s hard flux per frame. Stacks with the normal terrain by intensifying its effects",0,FALSE,graphics/UNGP/perma_slipstream.png,niko.MCTE.UNGP.rules.permaSlipstream,,
 ,,,,,,,,,
-MCTE_randomEffect,Weather volatility,Random combat terrain effects,[More Combat Terrain Effects] All combats are afflicted by a random terrain effect with %s intensity. Does not create an effect already present,2,FALSE,graphics/UNGP/random_effect.png,niko.MCTE.UNGP.rules.randomTerrainEffect,,
+MCTE_randomEffect,Weather volatility,Random combat terrain effects,"[More Combat Terrain Effects] All combats are afflicted by a random terrain effect with %s intensity. Does not create an effect already present. Each effect will be announced in advance.
+
+Next effect: %s",2,FALSE,graphics/UNGP/random_effect.png,niko.MCTE.UNGP.rules.randomTerrainEffect,,

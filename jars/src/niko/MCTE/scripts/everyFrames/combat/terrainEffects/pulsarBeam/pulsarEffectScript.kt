@@ -386,7 +386,7 @@ class pulsarEffectScript(
             "niko_MCPE_pulsar4",
             icon,
             "Pulsar Beam",
-            "${empChance.roundTo(2) * 60}% per second for ship plating to polarize and EMP self for ${empDamage.roundTo(2).trimHangingZero()} EMP damage",
+            "${((empChance * 100f) * 60f).roundTo(2)}% per second for ship plating to polarize and EMP self for ${empDamage.roundTo(2).trimHangingZero()} EMP damage",
             true)
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_pulsar2",

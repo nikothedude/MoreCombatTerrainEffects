@@ -3,8 +3,10 @@ package niko.MCTE.UNGP.rules
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
+import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.utils.terrainScriptsTracker
 import ungp.api.rules.UNGP_BaseRuleEffect
+import ungp.api.rules.tags.UNGP_CampaignTag
 import ungp.api.rules.tags.UNGP_CombatInitTag
 import ungp.api.rules.tags.UNGP_CombatTag
 import ungp.scripts.campaign.specialist.UNGP_SpecialistSettings
@@ -33,6 +35,7 @@ abstract class UNGPterrainEffect: UNGP_BaseRuleEffect(), UNGP_CombatTag, UNGP_Co
 
     override fun advanceInCombat(engine: CombatEngineAPI?, amount: Float) {
         if (engine == null) return
+        if (engine.isSimulation) return
         if (applied) return
         if (ticksToWait-- > 0) return
 

@@ -31,9 +31,10 @@ import org.lazywizard.lazylib.MathUtils
 import org.lwjgl.util.vector.Vector2f
 
 enum class combatEffectTypes(
+    val frontEndName: String,
     val codexEntry: TerrainEntry? = null
 ) {
-    MAGFIELD {
+    MAGFIELD("Magnetic Field") {
         override fun createEffectInstance(): magneticFieldEffect {
             return magneticFieldEffect()
         }
@@ -50,13 +51,17 @@ enum class combatEffectTypes(
 
                 if (effectMult == 0f) {
                     instance.eccmChanceMod = 0f
+                    instance.visionMod = 0.1f
+                    instance.missileMod = 0.1f
+                    instance.rangeMod = 0.1f
+
                 } else {
                     instance.eccmChanceMod *= if (isInFlare) MCTE_settings.MAGSTORM_ECCM_MULT / effectMult else MCTE_settings.MAGFIELD_ECCM_MULT / effectMult
+                    instance.visionMod *= if (isInFlare) MCTE_settings.MAGSTORM_VISION_MULT * effectMult else MCTE_settings.MAGFIELD_VISION_MULT / effectMult
+                    instance.missileMod *= if (isInFlare) MCTE_settings.MAGSTORM_MISSILE_MULT * effectMult else MCTE_settings.MAGFIELD_MISSILE_MULT / effectMult
+                    instance.rangeMod *= if (isInFlare) MCTE_settings.MAGSTORM_RANGE_MULT * effectMult else MCTE_settings.MAGFIELD_RANGE_MULT / effectMult
                 }
 
-                instance.visionMod *= if (isInFlare) MCTE_settings.MAGSTORM_VISION_MULT * effectMult else MCTE_settings.MAGFIELD_VISION_MULT * effectMult
-                instance.missileMod *= if (isInFlare) MCTE_settings.MAGSTORM_MISSILE_MULT * effectMult else MCTE_settings.MAGFIELD_MISSILE_MULT * effectMult
-                instance.rangeMod *= if (isInFlare) MCTE_settings.MAGSTORM_RANGE_MULT * effectMult else MCTE_settings.MAGFIELD_RANGE_MULT * effectMult
                 instance.missileBreakLockBaseChance += if (isInFlare) MCTE_settings.MAGSTORM_MISSILE_SCRAMBLE_CHANCE * effectMult else MCTE_settings.MAGFIELD_MISSILE_SCRAMBLE_CHANCE * effectMult
 
                 if (plugins != null) {
@@ -95,8 +100,12 @@ enum class combatEffectTypes(
                 }
             }
         }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.MAG_FIELD_EFFECT_ENABLED
+        }
     },
-    MESONFIELD {
+    MESONFIELD("Meson Field") {
         override fun createEffectInstance(): mesonFieldEffectScript {
             return mesonFieldEffectScript()
         }
@@ -121,8 +130,12 @@ enum class combatEffectTypes(
                 }
             }
         }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.MESON_FIELD_ENABLED
+        }
     },
-    MINEFIELD {
+    MINEFIELD("Minefield") {
         override fun createEffectInstance(): baseTerrainEffectScript {
             return minefieldEffectScript()
         }
@@ -153,8 +166,12 @@ enum class combatEffectTypes(
                 data.fightingStrength += BASE_MINEFIELD_AUTORESOLVE_BONUS
             }
         }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.MINEFIELD_ENABLED
+        }
     },
-    BLACKHOLE {
+    BLACKHOLE("Event Horizon") {
         override fun createEffectInstance(): blackHoleEffectScript {
             return blackHoleEffectScript()
         }
@@ -175,8 +192,12 @@ enum class combatEffectTypes(
                 instance.timeMult *= effectMult
             }
         }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
+        }
     },
-    HYPERSPACE {
+    HYPERSPACE("Hyperspace") {
         override fun createEffectInstance(): deepHyperspaceEffectScript {
             return deepHyperspaceEffectScript()
         }
@@ -187,8 +208,12 @@ enum class combatEffectTypes(
 
             instance.stormingCells.addAll(cells)
         }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
+        }
     },
-    SLIPSTREAM {
+    SLIPSTREAM("Slipstream") {
         override fun createEffectInstance(): SlipstreamEffectScript {
             return SlipstreamEffectScript()
         }
@@ -203,8 +228,12 @@ enum class combatEffectTypes(
             instance.fluxDissipationMult += MCTE_settings.SLIPSTREAM_FLUX_DISSIPATION_MULT * effectMult
             instance.hardFluxGenerationPerFrame += MCTE_settings.SLIPSTREAM_HARDFLUX_GEN_PER_FRAME * effectMult
         }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.SLIPSTREAM_EFFECT_ENABLED
+        }
     },
-    PULSAR {
+    PULSAR("Pulsar") {
         override fun createEffectInstance(): pulsarEffectScript {
             return pulsarEffectScript()
         }
@@ -228,6 +257,10 @@ enum class combatEffectTypes(
             instance.EMPdamage += MCTE_settings.PULSAR_EMP_DAMAGE_INCREMENT * effectMult
             instance.energyDamage += MCTE_settings.PULSAR_DAMAGE_INCREMENT * effectMult
         }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.PULSAR_EFFECT_ENABLED
+        }
     };
 
     protected abstract fun createEffectInstance(): baseTerrainEffectScript
@@ -240,6 +273,8 @@ enum class combatEffectTypes(
     protected open fun modifyEffectInstance(instance: baseTerrainEffectScript, vararg args: Any) {
         return
     }
+
+    abstract fun isEnabled(): Boolean
 
     open fun modifyAutoresolve(data: BattleAutoresolverPluginImpl.FleetAutoresolveData, terrainAffecting: terrainEffectScriptAdder.TerrainScriptList, battle: BattleAPI) {}
 

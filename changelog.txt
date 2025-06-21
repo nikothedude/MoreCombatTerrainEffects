@@ -1,3 +1,20 @@
+1.12.1
+PROBABLY SAVE COMPATIBLE
+
+Fixed a crash with weather volatility
+Weather volatility pulsar + event horizon effectiveness halved
+
+Reworked random terrain
+    Now tells you the next effect that will be used
+    Effects now weighted
+    Minefields can now spawn
+
+    Now respects terrain effects being disabled in settings
+
+Now doesnt apply if youre in a sim
+
+Fixed magnetic fields having 0 effects
+
 1.12.0
 NOT SAVE COMPATIBLE (if you use station augments)
 
