@@ -340,6 +340,10 @@ object CodexData {
             val effect = child.param as? TerrainEntry ?: continue
 
             for (entry in effect.getRelatedEntries()) {
+                if (entry == null) {
+                    MCTE_debugUtils.log.error("null entry on ${child.id}")
+                    continue
+                }
                 child.addRelatedEntry(entry)
                 entry.addRelatedEntry(child)
             }
