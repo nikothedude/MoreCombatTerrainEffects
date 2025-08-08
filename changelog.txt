@@ -1,3 +1,19 @@
+1.13.0
+SAVE COMPATIBLE
+
+New terrain effect: Debris fields
+    1. Causes derelict ships to spawn and drift around
+    2. Spawns extra objectives based on the density of the field
+
+    Is NOT a part of weather volatility.
+
+Changed the UI icon for nearly every effect
+Shortened and condensed many terrain/objective effect tooltips
+
+Fixed the damn station augments
+Event horizon no longer increases time dilation based on solar shielding. Yippee
+Event horizon and pulsar augments now properly push and pull in all directions
+
 1.12.1
 PROBABLY SAVE COMPATIBLE
 

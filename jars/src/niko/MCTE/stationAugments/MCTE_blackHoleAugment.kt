@@ -3,6 +3,7 @@ package niko.MCTE.stationAugments
 import com.fs.starfarer.api.campaign.econ.MarketAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.ui.CustomPanelAPI
 import com.fs.starfarer.api.ui.TooltipMakerAPI
 import com.fs.starfarer.api.util.Misc
 import niko.MCTE.combatEffectTypes
@@ -36,18 +37,12 @@ class MCTE_blackHoleAugment : MCTE_terrainAugment() {
     }
 
     override fun createTerrainEffect(station: ShipAPI, engine: CombatEngineAPI) {
-        var movementAngle = 90f
-        val side = station.owner
-        if (side == 0) {
-            movementAngle = 270f
-        }
-
-        val script = combatEffectTypes.BLACKHOLE.createInformedEffectInstance(hashMapOf(Pair(movementAngle, 0.2f)), 1.1f)
+        val script = combatEffectTypes.BLACKHOLE.createInformedEffectInstance(hashMapOf(Pair(station, 0.2f)), 1.35f)
         script.start()
     }
 
-    override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean) {
-        super.getBasicDescription(tooltip, expanded)
+    override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean, panel: CustomPanelAPI?) {
+        super.getBasicDescription(tooltip, expanded, panel)
 
         tooltip.addPara(
             "The static drive field of a station can be modified to amplify the mass of the station enough to create a event horizon. " +

@@ -21,10 +21,11 @@ import niko.MCTE.utils.MCTE_miscUtils
 import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
+import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
 
 class blackHoleEffectScript(
-    val anglesToIntensity: MutableMap<Float, Float> = HashMap(),
+    val anglesToIntensity: MutableMap<Any, Float> = HashMap(),
     var timeMult: Float = 1f,
 ): baseTerrainEffectScript(), usesDeltaTime {
     private val timesToApplyForcePerSecond = 60f
@@ -51,10 +52,17 @@ class blackHoleEffectScript(
         if (!BLACKHOLE_GRAVITY_ENABLED) return
         if (!canAdvance(amount)) return
         for (entry in anglesToIntensity.entries) {
-            val angle = entry.key
+            val first = entry.key
             val intensity = entry.value
 
             for (entity: CombatEntityAPI in engine.getAllObjects()) {
+                var angle = 0f
+                if (first is Float) {
+                    angle = first
+                } else if (first is CombatEntityAPI) {
+                    if (entity == first) continue
+                    angle = VectorUtils.getAngle(entity.location, first.location)
+                }
                 if (!engine.isInPlay(entity)) continue
                 var mass = entity.mass
                 if (mass == 0f) {
@@ -107,24 +115,24 @@ class blackHoleEffectScript(
         val solarShieldingEffect = (baseEffect - currentEffect) * SOLAR_SHIELDING_EFFECT_MULT
         val adjustedEffect = (baseEffect - solarShieldingEffect)
 
-        return (timeMult*adjustedEffect).coerceAtLeast(1f)
+        return (timeMult/*\*adjustedEffect*/).coerceAtLeast(1f)
     }
 
     override fun handleNotification(amount: Float): Boolean {
         if (!super.handleNotification(amount)) return false
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+        val icon = "graphics/icons/black_hole_well.png"
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_blackHole2",
             icon,
             "Event Horizon",
             "Time dilation multiplied by ${getTimeMultForShip(engine.playerShip).roundTo(2).trimHangingZero()}x",
             true)
-        engine.maintainStatusForPlayerShip(
+        /*engine.maintainStatusForPlayerShip(
             "niko_MCPE_blackHole1",
             icon,
             "Event Horizon",
             "Relativity Disrupted due to strong gravity",
-            true)
+            true)*/
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_blackHole3",
             icon,

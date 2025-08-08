@@ -24,11 +24,11 @@
     <orderEntry type="library" name="KnightsOfSelkie" level="project" />
     <orderEntry type="library" name="ExerelinCore" level="project" />
     <orderEntry type="library" name="YRXP" level="project" />
-    <orderEntry type="library" name="ungp" level="project" />
     <orderEntry type="library" name="jars" level="project" />
     <orderEntry type="library" name="Station-Augments" level="project" />
     <orderEntry type="library" name="IndEvo" level="project" />
     <orderEntry type="library" name="rat" level="project" />
-    <orderEntry type="library" name="jars1" level="project" />
+    <orderEntry type="library" name="luna" level="project" />
+    <orderEntry type="library" name="sotf" level="project" />
   </component>
 </module>

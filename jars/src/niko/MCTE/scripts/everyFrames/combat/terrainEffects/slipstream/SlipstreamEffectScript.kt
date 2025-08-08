@@ -219,7 +219,7 @@ class SlipstreamEffectScript(
     override fun handleNotification(amount: Float): Boolean {
         if (!super.handleNotification(amount)) return false
         val playerShip = engine.playerShip ?: return false
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+        val icon = getDefaultNotifIcon()
         if (!isShipIntangibleAndDoWeCare(playerShip)) {
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_slipstream3",
@@ -233,21 +233,24 @@ class SlipstreamEffectScript(
             icon,
             "Slipstream",
             "Safety overrides applied to all tangible ships, fighters, and missiles",
-            true)
+            true
+        )
         if (!isShipIntangibleAndDoWeCare(playerShip)) {
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_slipstream4",
                 icon,
                 "Slipstream",
                 "Venting effectiveness reduced",
-                true)
+                true
+            )
 
-            engine.maintainStatusForPlayerShip(
+            /*engine.maintainStatusForPlayerShip(
                 "niko_MCPE_slipstream1",
                 icon,
                 "Slipstream",
                 "Systems overcharge",
-                true)
+                true
+            )*/
         }
         return true
     }

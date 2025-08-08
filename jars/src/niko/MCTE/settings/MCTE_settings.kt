@@ -31,7 +31,7 @@ object MCTE_settings {
     var DEEP_HYPERSPACE_EFFECT_ENABLED: Boolean = true
     var HYPERSTORM_EFFECT_ENABLED: Boolean = true
     var SLIPSTREAM_EFFECT_ENABLED: Boolean = true
-    var DEBRIS_FIELD_EFFECT_ENABLED: Boolean = false
+    var DEBRIS_FIELD_EFFECT_ENABLED: Boolean = true
     var DUST_CLOUD_EFFECT_ENABLED: Boolean = false
     var EXTRA_NEBULA_EFFECTS_ENABLED: Boolean = true
     var BLACK_HOLE_EFFECT_ENABLED: Boolean = true
@@ -145,6 +145,8 @@ object MCTE_settings {
 
     // DEBRIS FIELD
     var MAX_SHIPS_ALLOWED = 500
+    var DEBRIS_FIELD_MAX_OBJECTIVE_SPAWNS = 6
+    var DEBRIS_FIELD_OBJECTIVES_PER_DENSITY = 2
 
     var PRISTINE_OBJECTIVE_EFFECT_MULT = 1.4f
     //var MAKESHIFT_OBJECTIVE_EFFECT_MULT = 0.85f
@@ -219,7 +221,7 @@ object MCTE_settings {
         DEEP_HYPERSPACE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_deepHyperspaceToggle")!!
         HYPERSTORM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_hyperstormsToggle")!!
         SLIPSTREAM_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_slipstreamToggle")!!
-        //DEBRIS_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_debrisFieldToggle")!!
+        DEBRIS_FIELD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_debrisFieldToggle")!!
         //DUST_CLOUD_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"enableDustcloudEffect")!!
         EXTRA_NEBULA_EFFECTS_ENABLED = LunaSettings.getBoolean(modId,"MCTE_nebulaToggle")!!
         BLACK_HOLE_EFFECT_ENABLED = LunaSettings.getBoolean(modId,"MCTE_blackholeToggle")!!
@@ -307,8 +309,8 @@ object MCTE_settings {
         PULSAR_DAMAGE_INCREMENT = configJson.getFloat("MCTE_pulsarRandomArcEnergyDamageIncrement")
 
         //MAX_SHIPS_ALLOWED = configJson.getInt("MCTE_debrisFieldMaxPieces")!!
-
-        //MAX_SHIPS_ALLOWED = configJson.getInt("MCTE_debrisFieldMaxPieces")!!
+        DEBRIS_FIELD_MAX_OBJECTIVE_SPAWNS = configJson.getInt("MCTE_debrisFieldMaxObjSpawns")
+        DEBRIS_FIELD_OBJECTIVES_PER_DENSITY = configJson.getInt("MCTE_debrisFieldObjsPerDensity")
 
         OBJECTIVES_ENABLED = LunaSettings.getBoolean(modId, "MCTE_objectivesToggle")!!
 

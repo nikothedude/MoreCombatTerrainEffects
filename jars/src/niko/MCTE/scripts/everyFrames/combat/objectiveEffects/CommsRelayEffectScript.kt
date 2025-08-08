@@ -42,19 +42,17 @@ class CommsRelayEffectScript(
         val playerShip = engine.playerShip ?: return false
         if (!shouldAffectShip(playerShip)) return false
 
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_neutral")
         if (boostedShip != playerShip) {
             boostedShip = playerShip
         }
 
         engine.maintainStatusForPlayerShip(
-            "MCTE_commsRelayScriptNotifOne",
-            icon,
+            "MCTE_commsRelayNotif",
+            "graphics/icons/relay.png",
             "External comms network",
-            "External comm relays routing data through flagship",
+            "Bonus CP generation",
             false
         )
-
         return true
     }
 

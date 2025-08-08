@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sotf">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Secrets of the Frontier 0.15.0b/jars/secretsofthefrontier.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../Secrets of the Frontier 0.15.0b/jars/src" />
+      <root url="file://$PROJECT_DIR$/../Secrets of the Frontier 0.15.0b/jars/src" />
+    </SOURCES>
+  </library>
+</component>

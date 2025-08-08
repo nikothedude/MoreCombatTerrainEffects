@@ -138,7 +138,7 @@ class minefieldEffectScript : baseTerrainEffectScript() {
     override fun handleNotification(amount: Float): Boolean {
         if (!super.handleNotification(amount)) return false
 
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+        val icon = "graphics/icons/hullsys/canister_flak.png"
         val playerShip = engine.playerShip ?: return false
 
         if (targetSidesToInstance[0]!! > 0) { // player targeted

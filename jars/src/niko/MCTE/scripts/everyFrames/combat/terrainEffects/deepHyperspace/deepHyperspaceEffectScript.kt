@@ -328,11 +328,11 @@ class deepHyperspaceEffectScript(
     override fun handleNotification(amount: Float): Boolean {
         if (!super.handleNotification(amount)) return false
         if (isStorming()) {
-            val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+            val icon = getDefaultNotifIcon()
             val playerShip = engine.playerShip
             engine.maintainStatusForPlayerShip(
                 "niko_MCPE_hyperStorm2",
-                icon,
+                "graphics/icons/hullsys/emp_emitter.png",
                 terrainName,
                 "Lightning strikes on this ship do ${getRawActualDamageForEntity(playerShip).trimHangingZero()} energy damage and ${getRawEMPDamageForEntity(playerShip).trimHangingZero()} EMP damage",
                 true)

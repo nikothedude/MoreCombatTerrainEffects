@@ -18,6 +18,7 @@ object MCTE_debugUtils {
     var YRXPenabled = false
     var SA_enabled = false
     var nexEnabled = false
+    var sotfEnabled = false
 
     val log: Logger = Global.getLogger(MCTE_debugUtils::class.java)
 

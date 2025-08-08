@@ -13,6 +13,8 @@ import indevo.exploration.minefields.MineBeltTerrainPlugin
 import niko.MCTE.codex.TerrainEntry
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.baseTerrainEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.blackHole.blackHoleEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldParamsRepresentation
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.deepHyperspaceEffectScript
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.magField.magneticFieldEffect
@@ -178,7 +180,7 @@ enum class combatEffectTypes(
 
         override fun modifyEffectInstance(instance: baseTerrainEffectScript, vararg args: Any) {
             if (instance !is blackHoleEffectScript) return
-            val pushDirs: MutableMap<Float, Float> = args[0] as? HashMap<Float, Float> ?: return
+            val pushDirs: MutableMap<Any, Float> = args[0] as? HashMap<Any, Float> ?: return
             val effectMult = args[1] as? Float ?: return
 
             for (entry in pushDirs) {
@@ -261,6 +263,25 @@ enum class combatEffectTypes(
         override fun isEnabled(): Boolean {
             return MCTE_settings.PULSAR_EFFECT_ENABLED
         }
+    },
+    DEBRISFIELD("Debris Field") {
+        override fun createEffectInstance(): debrisFieldEffectScript {
+            return debrisFieldEffectScript()
+        }
+
+        override fun isEnabled(): Boolean {
+            return MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
+        }
+
+        override fun modifyEffectInstance(instance: baseTerrainEffectScript, vararg args: Any) {
+            if (instance !is debrisFieldEffectScript) return
+
+            val density = args[0] as Float
+            val params = args[1] as HashSet<debrisFieldParamsRepresentation>
+            instance.density += density
+            instance.pluginParams.addAll(params)
+        }
+
     };
 
     protected abstract fun createEffectInstance(): baseTerrainEffectScript
@@ -277,8 +298,6 @@ enum class combatEffectTypes(
     abstract fun isEnabled(): Boolean
 
     open fun modifyAutoresolve(data: BattleAutoresolverPluginImpl.FleetAutoresolveData, terrainAffecting: terrainEffectScriptAdder.TerrainScriptList, battle: BattleAPI) {}
-
-    open fun isAvailableInCodex(): Boolean = true
 
     companion object {
 

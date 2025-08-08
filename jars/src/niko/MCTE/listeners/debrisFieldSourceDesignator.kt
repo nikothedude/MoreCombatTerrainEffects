@@ -1,4 +1,4 @@
-/*package niko.MCTE.listeners
+package niko.MCTE.listeners
 
 import com.fs.starfarer.api.EveryFrameScript
 import com.fs.starfarer.api.Global
@@ -125,4 +125,4 @@ class delayedDebrisFieldChecker(
 
 data class debrisFieldCreationData(
     val variantsPotentiallyLost: MutableList<ShipVariantAPI>
-)*/
+)

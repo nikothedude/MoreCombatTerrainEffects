@@ -38,16 +38,15 @@ class NavBuoyEffectScript(
         val playerShip = engine.playerShip ?: return false
         if (!shouldAffectShip(playerShip)) return false
 
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_neutral")
         if (boostedShip != playerShip) {
             boostedShip = playerShip
         }
 
         engine.maintainStatusForPlayerShip(
             "MCTE_navBuoyNotif",
-            icon,
+            "graphics/icons/nav_buoy.png",
             "External nav relay",
-            "External nav relays routing data through flagship",
+            "Bonus nav rating",
             false
         )
 

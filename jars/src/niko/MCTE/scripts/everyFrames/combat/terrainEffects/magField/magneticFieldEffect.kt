@@ -120,7 +120,7 @@ class magneticFieldEffect(
     override fun handleNotification(amount: Float): Boolean {
         if (!super.handleNotification(amount)) return false
         val ship = engine.playerShip ?: return false
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+        val icon = getDefaultNotifIcon()
         val stormOrNot = if (isStorm) "storm" else "field"
         engine.maintainStatusForPlayerShip(
             "niko_MCPE_magFieldInterference1",
@@ -150,7 +150,7 @@ class magneticFieldEffect(
             "niko_MCPE_magFieldInterference6",
             icon,
             "Magnetic $stormOrNot",
-            "${(calculateScrambleChancePerSecond(ship) * 100).trimHangingZero()}% chance for missiles' guidance to be scrambled per 1 second(s)",
+            "Scrambled missile guidance",
             true)
         return true
     }

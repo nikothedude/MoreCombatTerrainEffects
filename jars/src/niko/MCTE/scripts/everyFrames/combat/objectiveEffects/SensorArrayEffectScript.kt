@@ -4,7 +4,8 @@ import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.BattleAPI
 import com.fs.starfarer.api.combat.ShipAPI
 import niko.MCTE.scripts.everyFrames.combat.MCTEEffectScript
-import niko.MCTE.utils.MCTE_stringUtils
+import niko.MCTE.utils.MCTE_mathUtils.roundTo
+import niko.MCTE.utils.MCTE_mathUtils.trimHangingZero
 
 class SensorArrayEffectScript(
     val owner: Int,
@@ -37,9 +38,9 @@ class SensorArrayEffectScript(
         val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_neutral")
         engine.maintainStatusForPlayerShip(
             "MCTE_sensorArrayNotif",
-            icon,
+            "graphics/icons/sensor_array.png",
             "External target computing",
-            "Non-missile weapon range increased by +$strength",
+            "Non-missile weapon range increased by +${strength.roundTo(1).trimHangingZero()}",
             false
         )
 

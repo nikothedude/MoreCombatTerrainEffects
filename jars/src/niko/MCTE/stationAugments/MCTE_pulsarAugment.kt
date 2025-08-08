@@ -3,6 +3,7 @@ package niko.MCTE.stationAugments
 import com.fs.starfarer.api.campaign.econ.MarketAPI
 import com.fs.starfarer.api.combat.CombatEngineAPI
 import com.fs.starfarer.api.combat.ShipAPI
+import com.fs.starfarer.api.ui.CustomPanelAPI
 import com.fs.starfarer.api.ui.TooltipMakerAPI
 import com.fs.starfarer.api.util.Misc
 import niko.MCTE.combatEffectTypes
@@ -25,18 +26,12 @@ class MCTE_pulsarAugment: MCTE_terrainAugment() {
     }
 
     override fun createTerrainEffect(station: ShipAPI, engine: CombatEngineAPI) {
-        var movementAngle = 270f
-        val side = station.owner
-        if (side == 0) {
-            movementAngle = 90f
-        }
-
-        val script = combatEffectTypes.PULSAR.createInformedEffectInstance(hashMapOf(Pair(movementAngle, 0.6f)), 1f)
+        val script = combatEffectTypes.PULSAR.createInformedEffectInstance(hashMapOf(Pair(station, 0.6f)), 1f)
         script.start()
     }
 
-    override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean) {
-        super.getBasicDescription(tooltip, expanded)
+    override fun getBasicDescription(tooltip: TooltipMakerAPI, expanded: Boolean, panel: CustomPanelAPI?) {
+        super.getBasicDescription(tooltip, expanded, panel)
 
         tooltip.addPara(
             "The static drive field of a station can be modified to violently churn and warp, creating an incredibly hostile environment much like a %s.",

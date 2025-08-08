@@ -112,6 +112,10 @@
 
 	#DEBRIS FIELD EFFECTS
 	#"MCTE_debrisFieldMaxPieces":1000,
+	# The max number of bonus objectives a debris field can spawn.
+	"MCTE_debrisFieldMaxObjSpawns":6,
+	# The higher the number, the more objectives spawn in debris fields.
+	"MCTE_debrisFieldObjsPerDensity":2,
 	
 	#MODDED SETTINGS
 	#MORE PLANETARY CONDITIONS

@@ -7,6 +7,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Factions
 import lunalib.lunaSettings.LunaSettings
 import lunalib.lunaSettings.LunaSettingsListener
 import niko.MCTE.codex.CodexData
+import niko.MCTE.listeners.debrisFieldSourceDesignator
 import niko.MCTE.listeners.objectiveTerrainAdder
 import niko.MCTE.settings.MCTE_settings.loadAllSettings
 import niko.MCTE.stationAugments.MCTE_blackHoleAugment
@@ -40,6 +41,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         YRXPenabled = Global.getSettings().modManager.isModEnabled("yrxp")
         MCTE_debugUtils.SA_enabled = Global.getSettings().modManager.isModEnabled("niko_stationAugments")
         MCTE_debugUtils.nexEnabled = Global.getSettings().modManager.isModEnabled("nexerelin")
+        MCTE_debugUtils.sotfEnabled = Global.getSettings().modManager.isModEnabled("secretsofthefrontier")
 
     }
 
@@ -79,7 +81,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         Global.getSector().listenerManager.addListener(terrainEffectAutoresolvePlugin(), true)
 
         Global.getSector().playerFleet?.containingLocation?.createObjectiveTerrain()
-        //Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))
+        Global.getSector().addTransientListener(debrisFieldSourceDesignator(false))
     }
 
     override fun onAboutToStartGeneratingCodex() {
@@ -92,7 +94,7 @@ class niko_MCTE_modPlugin : BaseModPlugin() {
         CodexData.linkCodexInfo()
     }
 
-    class settingsChangedListener : LunaSettingsListener {
+    class settingsChangedListener: LunaSettingsListener {
         override fun settingsChanged(modID: String) {
             try {
                 loadAllSettings()

@@ -13,6 +13,7 @@ import com.fs.starfarer.api.impl.campaign.terrain.*
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin.CellStateTracker
 import com.fs.starfarer.api.impl.campaign.velfield.SlipstreamTerrainPlugin2
 import com.fs.starfarer.api.input.InputEventAPI
+import com.fs.starfarer.api.util.Misc
 import data.scripts.campaign.terrain.niko_MPC_mesonField
 import indevo.exploration.minefields.MineBeltTerrainPlugin
 import indevo.industries.artillery.entities.ArtilleryStationEntityPlugin
@@ -24,11 +25,14 @@ import niko.MCTE.scripts.everyFrames.combat.baseNikoCombatScript
 import niko.MCTE.scripts.everyFrames.combat.objectiveEffects.CommsRelayEffectScript
 import niko.MCTE.scripts.everyFrames.combat.objectiveEffects.NavBuoyEffectScript
 import niko.MCTE.scripts.everyFrames.combat.objectiveEffects.SensorArrayEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldEffectScript
+import niko.MCTE.scripts.everyFrames.combat.terrainEffects.debrisField.debrisFieldParamsRepresentation
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.deepHyperspace.cloudCell
 import niko.MCTE.scripts.everyFrames.combat.terrainEffects.dustCloud.dustCloudEffectScript
 import niko.MCTE.settings.MCTE_settings
 import niko.MCTE.settings.MCTE_settings.BLACKHOLE_TIMEMULT_MULT
 import niko.MCTE.settings.MCTE_settings.BLACK_HOLE_EFFECT_ENABLED
+import niko.MCTE.settings.MCTE_settings.DEBRIS_FIELD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DEEP_HYPERSPACE_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.DUST_CLOUD_EFFECT_ENABLED
 import niko.MCTE.settings.MCTE_settings.HYPERSTORM_EFFECT_ENABLED
@@ -62,7 +66,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
             val magneticFieldPlugins: MutableSet<MagneticFieldTerrainPlugin> = HashSet()
             val slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2> = HashSet()
-            //val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
+            val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
             val hyperspaceTerrainPlugins: MutableSet<HyperspaceTerrainPlugin> = HashSet()
             val blackHoleTerrainPlugins: MutableSet<EventHorizonPlugin> = HashSet()
             val pulsarPlugins: MutableSet<PulsarBeamTerrainPlugin> = HashSet()
@@ -79,7 +83,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                     if (terrainPlugin is PulsarBeamTerrainPlugin) pulsarPlugins += terrainPlugin
                     if (terrainPlugin is MagneticFieldTerrainPlugin) magneticFieldPlugins += terrainPlugin
                     if (terrainPlugin is SlipstreamTerrainPlugin2) slipstreamPlugins += terrainPlugin
-                    //  if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
+                    if (terrainPlugin is DebrisFieldTerrainPlugin) debrisFieldPlugins += terrainPlugin
                     if (terrainPlugin is HyperspaceTerrainPlugin) hyperspaceTerrainPlugins += terrainPlugin
                     if (terrainPlugin is EventHorizonPlugin) blackHoleTerrainPlugins += terrainPlugin
                     if (terrainPlugin is StarCoronaTerrainPlugin) {
@@ -105,7 +109,8 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
                 coronaPlugins,
                 ionStormPlugins,
                 mesonFieldPlugins,
-                mineFieldPlugins
+                mineFieldPlugins,
+                debrisFieldPlugins,
             )
         }
 
@@ -214,7 +219,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         addMagneticFieldScripts(engine, playerFleet, playerLocation, scriptList.magneticFieldPlugins)
         addSlipstreamScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.slipstreamPlugins)
         addPulsarScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.pulsarPlugins)
-      //  addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, debrisFieldPlugins)
+        addDebrisFieldScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.debrisFieldPlugins)
         addHyperspaceTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.hyperspaceTerrainPlugins)
         addBlackHoleTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.blackHoleTerrainPlugins)
         addMesonFieldTerrainScripts(engine, playerFleet, playerLocation, playerCoordinates, scriptList.mesonFieldPlugins)
@@ -580,7 +585,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
 
      } */
 
-    /*private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
+    private fun addDebrisFieldScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin>) {
         if (!DEBRIS_FIELD_EFFECT_ENABLED) return
 
         var canAddPlugin = false
@@ -624,14 +629,13 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
             for (plugin in debrisFieldPlugins) {
                 representations += debrisFieldParamsRepresentation(plugin)
             }
-            engine.addPlugin(
-                debrisFieldEffectScript(
-                    debrisDensity.toDouble(),
-                    representations
-            ))
+            combatEffectTypes.DEBRISFIELD.createInformedEffectInstance(
+                debrisDensity,
+                representations
+            ).start()
         }
     }
-*/
+
     private fun addSlipstreamScripts(engine: CombatEngineAPI, playerFleet: CampaignFleetAPI, playerLocation: LocationAPI, playerCoordinates: Vector2f, slipstreamPlugins: MutableSet<SlipstreamTerrainPlugin2>) {
         if (!SLIPSTREAM_EFFECT_ENABLED) return
         if (slipstreamPlugins.isEmpty()) return
@@ -665,6 +669,7 @@ class terrainEffectScriptAdder: baseNikoCombatScript() {
         val coronaPlugins: MutableSet<StarCoronaTerrainPlugin> = HashSet(),
         val ionStormPlugins: MutableSet<StarCoronaAkaMainyuTerrainPlugin> = HashSet(),
         val mesonFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet(), // cant type it correctly else itd probs crash
-        val mineFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet()
+        val mineFieldPlugins: MutableSet<CampaignTerrainPlugin> = HashSet(),
+        val debrisFieldPlugins: MutableSet<DebrisFieldTerrainPlugin> = HashSet()
     )
 }

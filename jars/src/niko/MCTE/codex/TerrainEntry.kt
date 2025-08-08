@@ -2,6 +2,7 @@ package niko.MCTE.codex
 
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.impl.campaign.ids.HullMods
+import com.fs.starfarer.api.impl.campaign.ids.Skills
 import com.fs.starfarer.api.impl.campaign.ids.StarTypes
 import com.fs.starfarer.api.impl.campaign.intel.BaseIntelPlugin
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin
@@ -491,6 +492,109 @@ enum class TerrainEntry(
         }
         override fun getRelatedEntries(): MutableSet<CodexEntryPlugin> = HashSet()
         override fun getTags(): MutableSet<String> = mutableSetOf(HAS_CAMPAIGN_EFFECTS, HAS_COMBAT_EFFECTS)
+    },
+    DEBRISFIELD("Debris Field", "graphics/icons/markets/abandoned.png") {
+
+        override fun getRelatedEntries(): MutableSet<CodexEntryPlugin> {
+            return mutableSetOf(
+                CodexDataV2.getEntry(CodexDataV2.getWeaponEntryId("devouring_swarm")),
+                CodexDataV2.getEntry(CodexDataV2.getSkillEntryId(Skills.ELECTRONIC_WARFARE))
+            )
+        }
+
+        override fun createDesc(info: TooltipMakerAPI) {
+            info.addPara("Debris left behind after a battle, a salvaging operation, or simply drifting together at a gravitationally stable location.", 0f)
+        }
+
+        override fun createCombatDesc(info: TooltipMakerAPI) {
+            super.createCombatDesc(info)
+
+            info.addPara(
+                "The wreckage of previous battles fought can be found here, causing %s to drift across the battlefield.",
+                0f,
+                Misc.getHighlightColor(),
+                "derelict ships"
+            )
+
+            info.addPara(
+                "Additionally, previously deployed objectives can be found in stand-by mode, %s by an amount varying on the debris field's %s.",
+                5f,
+                Misc.getHighlightColor(),
+                "increasing overall objective count", "density"
+            )
+        }
+
+        override fun createCampaignDesc(info: TooltipMakerAPI) {
+            super.createCampaignDesc(info)
+
+            val stop = Global.getSettings().getControlStringForEnumName("GO_SLOW")
+            val highlight = Misc.getHighlightColor()
+            var reductionString = "a varying amount, depending on fleet size"
+            val playerFleet = Global.getSector().playerFleet
+            if (playerFleet != null) {
+                reductionString = "" + ((1f - RingSystemTerrainPlugin.getVisibilityMult(Global.getSector().playerFleet)) * 100).toInt() + "%"
+            }
+            info.addPara(
+                "Reduces the range at which stationary or slow-moving* fleets inside it can be detected by %s.",
+                0f,
+                highlight,
+                reductionString
+            )
+            info.addPara(
+                "*Press and hold %s to stop; combine with holding the left mouse button down to move slowly.", 0f,
+                Misc.getGrayColor(), highlight,
+                stop
+            )
+
+            info.addPara(
+                "Scavenging through the debris for anything useful is possible, but can be dangerous for the crew and equipment involved. Enables the use of the " +
+                    "%s ability, which allows you to scour the wreckage for valuables.",
+                5f,
+                Misc.getHighlightColor(),
+                "salvage"
+            )
+
+            info.addPara(
+                "This terrain will not add any objectives if none are already present.",
+                5f
+            ).color = Misc.getGrayColor()
+        }
+
+        override fun hasTacticalDesc(): Boolean = true
+        override fun createTacticalDesc(info: TooltipMakerAPI) {
+            super.createTacticalDesc(info)
+
+            info.addPara(
+                "The drifting ships act as durable cover, if you can find one.",
+                0f
+            )
+
+            val deconSwarmWpnCodex = CodexDataV2.getEntry(CodexDataV2.getWeaponEntryId("devouring_swarm"))!!
+            if (!deconSwarmWpnCodex.isLocked) {
+                info.addPara(
+                    "Additionally, the %s weapon can find great use in scavenging the hulks for %s.",
+                    5f,
+                    Misc.getPositiveHighlightColor(),
+                    "defabrication swarm", "free fragments"
+                ).setHighlightColors(
+                    Misc.getDesignTypeColor("Threat"),
+                    Misc.getPositiveHighlightColor()
+                )
+            }
+
+            info.addPara(
+                "The additional objectives %s an agile fleet with %s; establish battlefield supremacy before the enemy can.",
+                5f,
+                Misc.getPositiveHighlightColor(),
+                "greatly favor", "Electronic Warfare"
+            ).setHighlightColors(
+                Misc.getPositiveHighlightColor(),
+                Color(0,121,216,255)
+            )
+        }
+
+        override fun getTags(): MutableSet<String> = mutableSetOf(HAS_CAMPAIGN_EFFECTS, HAS_COMBAT_EFFECTS)
+
     };
 
     abstract fun createDesc(info: TooltipMakerAPI)

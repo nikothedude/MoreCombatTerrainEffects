@@ -22,6 +22,7 @@ MCTE_blackholeToggle,Black Holes,Boolean,true,"Black holes lose some of their CR
 Affected by solar shielding, but inversely: The timeflow decreases as effect resistance increases, but the gravity doesn't, so solar shielding is a strict nerf in this case.",,,Combat
 MCTE_pulsarToggle,Pulsars,Boolean,true,"Pulsars lose some of their CR penalty in exchange for decreasing shield efficiency, increasing shield upkeep, decreasing shield EMP arc pierce resist, randomly EMPing all ships, applying a flat EMP damage increase to all projectiles, pushing all combat entities away from it's campaign location, and slowly building hardflux. Effect scales with your proximity to the pulsar in the campaign layer.
 All effects except for the projectile EMP damage increase and push effect are affected by solar shielding.",,,Combat
+MCTE_debrisFieldToggle,Debris Fields,Boolean,true,"Debris fields spawn derelict ships, as well as bonus objectives.",,,Combat
 MCTE_objectivesToggle,Objectives,Boolean,true,"Comm relays increase CP regeneration, nav buoys increase coordinated maneuvers, sensor relays increase weapon range.",,,Combat
 MCTE_moddedHeader,awdjdwai,Header,Inter-mod settings below,,,,Combat
 MCTE_MPCheader,awdjdwai,Header,More Planetary Conditions settings,,,,Combat

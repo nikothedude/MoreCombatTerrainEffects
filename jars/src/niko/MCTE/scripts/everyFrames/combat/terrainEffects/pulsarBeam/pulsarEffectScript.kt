@@ -25,11 +25,12 @@ import niko.MCTE.utils.MCTE_miscUtils.replaceExistingEffect
 import niko.MCTE.utils.MCTE_shipUtils.isTangible
 import niko.MCTE.utils.terrainCombatEffectIds
 import org.lazywizard.lazylib.MathUtils
+import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
 import java.awt.Color
 
 class pulsarEffectScript(
-    val anglesToIntensity: MutableMap<Float, Float> = HashMap(),
+    val anglesToIntensity: MutableMap<Any, Float> = HashMap(),
     var hardFluxGenerationPerFrame: Float = 0f,
     var bonusEMPDamageForWeapons: Float = 0f,
     var shieldDestabilziationMult: Float = 1f,
@@ -216,12 +217,21 @@ class pulsarEffectScript(
         if (engine.isPaused) return
         if (!PULSAR_FORCE_ENABLED) return
         for (entry in anglesToIntensity.entries) {
-            val angle = entry.key
+            val first = entry.key
             val intensity = entry.value
 
             for (entity: CombatEntityAPI in engine.getAllObjects()) {
                 if (!engine.isInPlay(entity)) continue
                 if (!entity.isTangible()) continue
+
+                var angle = 0f
+                if (first is Float) {
+                    angle = first
+                } else if (first is CombatEntityAPI) {
+                    if (entity == first) continue
+                    angle = VectorUtils.getAngle(first.location, entity.location)
+                }
+
                 var mass = entity.mass
                 if (mass == 0f) {
                     if (entity is DamagingProjectileAPI) {
@@ -357,7 +367,7 @@ class pulsarEffectScript(
     override fun handleNotification(amount: Float): Boolean {
         if (!super.handleNotification(amount)) return false
         if (engine.playerShip == null) return false
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+        val icon = getDefaultNotifIcon()
 
         val ship = engine.playerShip
 

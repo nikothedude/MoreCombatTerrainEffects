@@ -10,6 +10,10 @@ import niko.MCTE.utils.terrainScriptsTracker
 
 abstract class baseTerrainEffectScript(): MCTEEffectScript() {
 
+    companion object {
+        fun getDefaultNotifIcon(): String = "graphics/icons/danger2.png"
+    }
+
     abstract var effectPrototype: combatEffectTypes?
 
     override fun start() {

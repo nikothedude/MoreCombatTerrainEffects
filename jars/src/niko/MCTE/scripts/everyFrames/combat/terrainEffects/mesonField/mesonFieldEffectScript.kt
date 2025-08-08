@@ -89,7 +89,7 @@ class mesonFieldEffectScript(
    override fun handleNotification(amount: Float): Boolean {
         if (!super.handleNotification(amount)) return false
         val ship = engine.playerShip ?: return false
-        val icon = Global.getSettings().getSpriteName("ui", "icon_tactical_cr_penalty")
+        val icon = getDefaultNotifIcon()
         val stormOrNot = if (isStorm) "storm" else "field"
         val missileOrNot = if (isStorm) "" else "non-missile "
         engine.maintainStatusForPlayerShip(
